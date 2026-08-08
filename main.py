@@ -26,7 +26,7 @@ def calculate(iso_datetime: str):
     try:
         dt = datetime.fromisoformat(iso_datetime)
         jd = swe.julday(dt.year, dt.month, dt.day, dt.hour + dt.minute/60.0 + dt.second/3600.0)
-        swe.set_sidmode(swe.SIDM_LAHIRI, 0, 0)
+        swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
         res, _ = swe.calc_ut(jd, swe.MOON, swe.FLG_SIDEREAL)
         moon_lon = res[0] % 360.0
         
