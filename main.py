@@ -72,6 +72,10 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         3. Completely translate and remove all English bracketed headers like (Relationship Overview), (Compatibility Summary), (Key Strengths), (Areas of Mindful Effort), and (Future & Life Timeline Prediction) into pure localized equivalents. 
         4. Every single heading, subheading, and description must be in local script. No English should remain.
         """
+        response = client.models.generate_content(
+            model='gemini-3.5-flash',
+            contents=prompt,
+
         )
 
         return {
