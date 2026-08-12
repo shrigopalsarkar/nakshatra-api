@@ -61,7 +61,7 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         nakshatra_name = NAKSHATRAS[nak_index]
 
         # Gemini AI se report generate karwana
-        prompt = f"""
+        prompt = """
         Analyze the exact Swiss Ephemeris math:
         - Nakshatra: {nakshatra_name}
         - Pada: {pada}
