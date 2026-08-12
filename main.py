@@ -59,12 +59,15 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         pada = int((moon_lon % (360.0 / 27)) / (360.0 / 108)) + 1
         nakshatra_name = NAKSHATRAS[nak_index]
 
-        prompt = f"""
-        Analyze the exact Swiss Ephemeris math:
+       prompt = f"""
+        Analyze the exact Swiss Ephemeris math for Vedic astrology:
         - Nakshatra: {nakshatra_name}
         - Pada: {pada}
         - Moon Sidereal Longitude: {round(moon_lon, 6)}°
-        Provide a detailed Vedic astrology breakdown for career and wealth in language code: {lang}.
+        
+        CRITICAL LOCALIZATION RULE: 
+        You must translate 100% of the content, including all section headings, subheadings, bracketed titles (like Relationship Overview, Compatibility Summary, Key Strengths, etc.), descriptions, and advice strictly into fluent Bengali (lang code: {lang}). 
+        Do NOT leave any English words, titles, or subtitles anywhere in the response. Everything must be completely localized in Bengali script.
         """
 
         response = client.models.generate_content(
