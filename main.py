@@ -60,15 +60,18 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         nakshatra_name = NAKSHATRAS[nak_index]
 
        prompt = f"""
-Analyze the exact Swiss Ephemeris math for Vedic astrology:
-- Nakshatra: {nakshatra_name}
-- Pada: {pada}
-- Moon Sidereal Longitude: {round(moon_lon, 6)}°
-
-CRITICAL LOCALIZATION RULE: 
-You must translate 100% of the content, including all section headings, subheadings, bracketed titles, descriptions, and advice strictly into fluent language for code: {lang}. 
-Do NOT leave any English words, titles, or subtitles anywhere in the response. Everything must be completely localized in the requested language script.
-"""
+        Analyze the exact Swiss Ephemeris math for Vedic astrology:
+        - Nakshatra: {nakshatra_name}
+        - Pada: {pada}
+        - Moon Sidereal Longitude: {round(moon_lon, 6)}°
+        
+        STRICT LOCALIZATION & TRANSLATION DIRECTIVE: 
+        You are translating a complete Vedic astrology and compatibility report into language code: {lang}. 
+        1. Translate 100% of the text into fluent Bengali script.
+        2. Do NOT include any English words, English terms, or English section titles anywhere. 
+        3. Completely translate and remove all English bracketed headers like (Relationship Overview), (Compatibility Summary), (Key Strengths), (Areas of Mindful Effort), and (Future & Life Timeline Prediction) into pure Bengali equivalents. 
+        4. Every single heading, subheading, and description must be in local script. No English should remain.
+        """
         )
 
         return {
