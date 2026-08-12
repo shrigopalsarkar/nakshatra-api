@@ -68,7 +68,7 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         """
 
         response = client.models.generate_content(
-            model='gemini-2.0-flash',
+            model='gemini-2.5-flash',
             contents=prompt,
         )
 
