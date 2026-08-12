@@ -60,15 +60,15 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         nakshatra_name = NAKSHATRAS[nak_index]
 
        prompt = f"""
-        Analyze the exact Swiss Ephemeris math for Vedic astrology:
-        - Nakshatra: {nakshatra_name}
-        - Pada: {pada}
-        - Moon Sidereal Longitude: {round(moon_lon, 6)}°
-        
-        CRITICAL LOCALIZATION RULE: 
-        You must translate 100% of the content, including all section headings, subheadings, bracketed titles, descriptions, and advice strictly into fluent language for code: {lang} (for example: if lang is 'hi' use Hindi, if 'te' use Telugu, if 'bn' use Bengali). 
-        Do NOT leave any English words, titles, or subtitles anywhere in the response. Everything must be completely localized in the requested language script.
-        """
+Analyze the exact Swiss Ephemeris math for Vedic astrology:
+- Nakshatra: {nakshatra_name}
+- Pada: {pada}
+- Moon Sidereal Longitude: {round(moon_lon, 6)}°
+
+CRITICAL LOCALIZATION RULE: 
+You must translate 100% of the content, including all section headings, subheadings, bracketed titles, descriptions, and advice strictly into fluent language for code: {lang}. 
+Do NOT leave any English words, titles, or subtitles anywhere in the response. Everything must be completely localized in the requested language script.
+"""
         )
 
         return {
