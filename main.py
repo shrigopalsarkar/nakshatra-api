@@ -6,7 +6,7 @@ import os
 from google import genai  # Google GenAI SDK
 
 # Render ke environment variable se securely key uthayega
-GEMINI_API_KEY = os.environ.get("AQ.Ab8RN6LILqU2YzhTZbo2S_5Tt73nW845JNBzzwz1VbqwoxJeww")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=GEMINI_API_KEY)
 app = FastAPI(title="Nakshatra API")
 
@@ -61,7 +61,7 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         nakshatra_name = NAKSHATRAS[nak_index]
 
         # Gemini AI se report generate karwana
-        prompt = """
+        prompt = f"""
         Analyze the exact Swiss Ephemeris math:
         - Nakshatra: {nakshatra_name}
         - Pada: {pada}
