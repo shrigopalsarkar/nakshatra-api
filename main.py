@@ -64,13 +64,13 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         - Nakshatra: {nakshatra_name}
         - Pada: {pada}
         - Moon Sidereal Longitude: {round(moon_lon, 6)}°
-        - Language Code: {lang}
-
-        EXTREME ABSOLUTE LOCALIZATION DIRECTIVE:
-        1. Translate 100% of the content into the native script of language code: {lang}.
-        2. NO ENGLISH: Do NOT output any English words, technical terms, or English bullet points. Every single line, strength, dosha status, and advice point must be in the local language.
-        3. NO MIXED SCRIPT: Completely translate all terms like 'Rajju Dosha', 'Financial Harmony', 'High Overall Vedic Compatibility' into their native equivalents.
-        4. ABSOLUTE PURITY: The report must look natively authored in the target language.
+        
+        STRICT LOCALIZATION & TRANSLATION DIRECTIVE: 
+        You are translating a complete Vedic astrology and compatibility report into language code: {lang}. 
+        1. Translate 100% of the text into fluent Bengali script.
+        2. Do NOT include any English words, English terms, or English section titles anywhere. 
+        3. Completely translate and remove all English bracketed headers like (Relationship Overview), (Compatibility Summary), (Key Strengths), (Areas of Mindful Effort), and (Future & Life Timeline Prediction) into pure Bengali equivalents. 
+        4. Every single heading, subheading, and description must be in local script. No English should remain.
         """
 
         response = client.models.generate_content(
