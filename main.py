@@ -67,9 +67,9 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         
         STRICT LOCALIZATION & TRANSLATION DIRECTIVE: 
         You are translating a complete Vedic astrology and compatibility report into language code: {lang}. 
-        1. Translate 100% of the text into fluent Bengali script.
+        1. Translate 100% of the text into fluent script of the requested language.
         2. Do NOT include any English words, English terms, or English section titles anywhere. 
-        3. Completely translate and remove all English bracketed headers like (Relationship Overview), (Compatibility Summary), (Key Strengths), (Areas of Mindful Effort), and (Future & Life Timeline Prediction) into pure Bengali equivalents. 
+        3. Completely translate and remove all English bracketed headers like (Relationship Overview), (Compatibility Summary), (Key Strengths), (Areas of Mindful Effort), and (Future & Life Timeline Prediction) into pure localized equivalents. 
         4. Every single heading, subheading, and description must be in local script. No English should remain.
         """
         )
