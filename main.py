@@ -80,14 +80,6 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-       return {
-            "nakshatra": nakshatra_name,
-            "pada": pada,
-            "longitude": round(moon_lon, 6),
-            "ai_report": response.text
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn
