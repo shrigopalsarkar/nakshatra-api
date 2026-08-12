@@ -66,13 +66,9 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         - Moon Sidereal Longitude: {round(moon_lon, 6)}°
         
         CRITICAL LOCALIZATION RULE: 
-        You must translate 100% of the content, including all section headings, subheadings, bracketed titles (like Relationship Overview, Compatibility Summary, Key Strengths, etc.), descriptions, and advice strictly into fluent Bengali (lang code: {lang}). 
-        Do NOT leave any English words, titles, or subtitles anywhere in the response. Everything must be completely localized in Bengali script.
+        You must translate 100% of the content, including all section headings, subheadings, bracketed titles, descriptions, and advice strictly into fluent language for code: {lang} (for example: if lang is 'hi' use Hindi, if 'te' use Telugu, if 'bn' use Bengali). 
+        Do NOT leave any English words, titles, or subtitles anywhere in the response. Everything must be completely localized in the requested language script.
         """
-
-        response = client.models.generate_content(
-            model='gemini-3.5-flash',
-            contents=prompt,
         )
 
         return {
