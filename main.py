@@ -59,18 +59,12 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         pada = int((moon_lon % (360.0 / 27)) / (360.0 / 108)) + 1
         nakshatra_name = NAKSHATRAS[nak_index]
 
-       prompt = f"""
-        Analyze the exact Swiss Ephemeris math for Vedic astrology:
+        prompt = f"""
+        Analyze the exact Swiss Ephemeris math:
         - Nakshatra: {nakshatra_name}
         - Pada: {pada}
         - Moon Sidereal Longitude: {round(moon_lon, 6)}°
-        
-        STRICT LOCALIZATION & TRANSLATION DIRECTIVE: 
-        You are translating a complete Vedic astrology and compatibility report into language code: {lang}. 
-        1. Translate 100% of the text into fluent script of the requested language.
-        2. Do NOT include any English words, English terms, or English section titles anywhere. 
-        3. Completely translate and remove all English bracketed headers like (Relationship Overview), (Compatibility Summary), (Key Strengths), (Areas of Mindful Effort), and (Future & Life Timeline Prediction) into pure localized equivalents. 
-        4. Every single heading, subheading, and description must be in local script. No English should remain.
+        Provide a detailed Vedic astrology breakdown for career and wealth in language code: {lang}.
         """
 
         response = client.models.generate_content(
