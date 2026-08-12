@@ -64,13 +64,15 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         - Nakshatra: {nakshatra_name}
         - Pada: {pada}
         - Moon Sidereal Longitude: {round(moon_lon, 6)}°
+        - Selected Language Code: {lang}
+
+        EXTREME NATIVE SCRIPT LOCALIZATION DIRECTIVE:
+        You are generating a 100% natively localized Vedic astrology report.
         
-        STRICT LOCALIZATION & TRANSLATION DIRECTIVE: 
-        You are translating a complete Vedic astrology and compatibility report into language code: {lang}. 
-        1. Translate 100% of the text into fluent script of the requested language.
-        2. Do NOT include any English words, English terms, or English section titles anywhere. 
-        3. Completely translate and remove all English bracketed headers like (Relationship Overview), (Compatibility Summary), (Key Strengths), (Areas of Mindful Effort), and (Future & Life Timeline Prediction) into pure localized equivalents. 
-        4. Every single heading, subheading, and description must be in local script. No English should remain.
+        1. NO ENGLISH VEDIC TERMS: Do not use English terms like 'Mahadasha', 'Antardasha', or 'Pratyantar Dasha'. Translate them completely into native local script terms (e.g., in Bengali: 'মহা দশা', 'অন্তর্দশা', 'প্রত্যন্তর দশা').
+        2. LOCALIZED MONTHS & DATES: Translate all English month names (e.g., January, February, April, May, October, November) and date references entirely into the local language script (e.g., 'এপ্রিল', 'অক্টোবর', 'নভেম্বর', 'মে').
+        3. LOCALIZED NUMBERS & FORMATS: Format all numbers, years, and dates in a completely native local context, avoiding raw English formatting style.
+        4. ABSOLUTE PURITY: Every single heading, subtext, planetary period, date, and description must be 100% in fluent local script. Zero English characters or words are allowed.
         """
 
         response = client.models.generate_content(
