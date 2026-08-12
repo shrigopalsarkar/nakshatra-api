@@ -73,10 +73,7 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         2. LOCALIZED MONTHS & DATES: Translate all English month names (e.g., January, February, April, May, October, November) and date references entirely into the local language script (e.g., 'এপ্রিল', 'অক্টোবর', 'নভেম্বর', 'মে').
         3. LOCALIZED NUMBERS & FORMATS: Format all numbers, years, and dates in a completely native local context, avoiding raw English formatting style.
         4. ABSOLUTE PURITY: Every single heading, subtext, planetary period, date, and description must be 100% in fluent local script. Zero English characters or words are allowed.
-        5. Translate 100% of the content into the native script of language code: {lang}.
-        6. NO ENGLISH: Do NOT output any English words, technical terms, or English bullet points. Every single line, strength, dosha status, and advice point must be in the local language.
-        7. NO MIXED SCRIPT: Completely translate all terms like 'Rajju Dosha', 'Financial Harmony', 'High Overall Vedic Compatibility' into their native equivalents.
-        8. ABSOLUTE PURITY: The report must look natively authored in the target language.
+        
         """
 
         response = client.models.generate_content(
