@@ -64,18 +64,15 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         - Nakshatra: {nakshatra_name}
         - Pada: {pada}
         - Moon Sidereal Longitude: {round(moon_lon, 6)}°
+        - Language Code: {lang}
+
+        STRICT ABSOLUTE LOCALIZATION & TRANSLATION DIRECTIVE:
+        You are generating a 100% natively localized Vedic astrology and compatibility report for language code: {lang}.
         
-        STRICT LOCALIZATION & TRANSLATION DIRECTIVE: 
-        You are translating a complete Vedic astrology and compatibility report into language code: {lang}. 
-        1. Translate 100% of the text into fluent Bengali script.
-        2. Do NOT include any English words, English terms, or English section titles anywhere. 
-        3. Completely translate and remove all English bracketed headers like (Relationship Overview), (Compatibility Summary), (Key Strengths), (Areas of Mindful Effort), and (Future & Life Timeline Prediction) into pure Bengali equivalents. 
-        4. Every single heading, subheading, and description must be in local script. No English should remain.
-        STRICT LOCALIZATION RULE:
-        1. Convert EVERYTHING into fluent {lang} (Bengali or Hindi) script.
-        2. NUMBERS: Convert all digits (1, 2, 3...) into native local digits (e.g., Bengali: ১, ২, ৩... or Hindi: १, २, ३...).
-        3. DATES/MONTHS: Translate all months (Jan=জানুয়ারি/जनवरी) and dates into native language names.
-        4. NO ENGLISH: Zero English words or digits allowed. Everything must be purely native script.
+        1. 100% NATIVE SCRIPT: Translate EVERY SINGLE WORD, heading, subheading, bullet point, description, strength, and advice point entirely into the native script of the selected language (Bengali script if {lang} is 'bn', Hindi script if {lang} is 'hi').
+        2. ZERO ENGLISH WORDS OR DIGITS: Do NOT output any English words, technical terms, headers, or English digits (1, 2, 3...). 
+        3. LOCALIZED NUMBERS & DATES: Convert all numbers into native local digits (e.g., Bengali: ১, ২, ৩... or Hindi: १, २, ३...). Translate all month names (Jan, Feb, Mar, etc.) and date formats completely into native script equivalents.
+        4. ABSOLUTE PURITY: Completely translate or remove all English titles and bracketed terms (like 'Relationship Overview', 'Compatibility Summary', 'Key Strengths'). The entire response from start to finish must be 100% in the native script of {lang}.
         """
 
         response = client.models.generate_content(
