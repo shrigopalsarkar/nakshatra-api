@@ -70,9 +70,9 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         You are generating a 100% natively localized Vedic astrology and compatibility report for language code: {lang}.
         1. 100% NATIVE SCRIPT: Translate EVERY SINGLE WORD, heading, subheading, bullet point, description, strength, and advice point entirely into the native script of the selected language (Bengali script if {lang} is 'bn', Hindi script if {lang} is 'hi').
         2. ZERO ENGLISH WORDS OR DIGITS: Do NOT output any English words, technical terms, headers, or English digits (1, 2, 3...). 
-        3. LOCALIZED NUMBERS & DATES: Convert all numbers into native local digits (e.g., Bengali: ১, ২, ৩... or Hindi: १, २, ३...). Translate all month names (Jan, Feb, Mar, etc.) and date formats completely into native script equivalents.
+        3. LOCALIZED NUMBERS & DATES: Convert all numbers into native local digits (e.g., Bengali: ১, ২, ৩... or Hindi: १, २, ३...). Translate all month names and date formats completely into native script equivalents.
         4. ABSOLUTE PURITY: Completely translate or remove all English titles and bracketed terms (like 'Relationship Overview', 'Compatibility Summary', 'Key Strengths'). The entire response from start to finish must be 100% in the native script of {lang}.
-        STRICT_ASTRO_TRANSLATION_RULES = f"""
+
         STRICT DOSHA & TERM TRANSLATION DIRECTIVE:
         You are translating and generating a 100% natively localized Vedic astrology report for language code: {lang}.
         1. Translate 100% of the text, headings, dosha names, and bracketed terms entirely into the native script of the selected language (Bengali script if {lang} is 'bn', Hindi script if {lang} is 'hi').
@@ -87,7 +87,7 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
            - Bharna / Yoni -> (Bengali: যোনি গুণ | Hindi: योनि गुण)
         3. The entire response from start to finish must be completely free of English astrological terms and bracketed English words.
         """
-
+        
         response = client.models.generate_content(
             model='gemini-3.5-flash',
             contents=prompt,
