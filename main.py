@@ -68,7 +68,6 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
 
         STRICT ABSOLUTE LOCALIZATION & TRANSLATION DIRECTIVE:
         You are generating a 100% natively localized Vedic astrology and compatibility report for language code: {lang}.
-        
         1. 100% NATIVE SCRIPT: Translate EVERY SINGLE WORD, heading, subheading, bullet point, description, strength, and advice point entirely into the native script of the selected language (Bengali script if {lang} is 'bn', Hindi script if {lang} is 'hi').
         2. ZERO ENGLISH WORDS OR DIGITS: Do NOT output any English words, technical terms, headers, or English digits (1, 2, 3...). 
         3. LOCALIZED NUMBERS & DATES: Convert all numbers into native local digits (e.g., Bengali: ১, ২, ৩... or Hindi: १, २, ३...). Translate all month names (Jan, Feb, Mar, etc.) and date formats completely into native script equivalents.
