@@ -71,6 +71,11 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         2. Do NOT include any English words, English terms, or English section titles anywhere. 
         3. Completely translate and remove all English bracketed headers like (Relationship Overview), (Compatibility Summary), (Key Strengths), (Areas of Mindful Effort), and (Future & Life Timeline Prediction) into pure Bengali equivalents. 
         4. Every single heading, subheading, and description must be in local script. No English should remain.
+        STRICT LOCALIZATION RULE:
+        1. Convert EVERYTHING into fluent {lang} (Bengali or Hindi) script.
+        2. NUMBERS: Convert all digits (1, 2, 3...) into native local digits (e.g., Bengali: ১, ২, ৩... or Hindi: १, २, ३...).
+        3. DATES/MONTHS: Translate all months (Jan=জানুয়ারি/जनवरी) and dates into native language names.
+        4. NO ENGLISH: Zero English words or digits allowed. Everything must be purely native script.
         """
 
         response = client.models.generate_content(
