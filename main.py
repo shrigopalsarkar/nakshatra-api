@@ -72,6 +72,20 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
         2. ZERO ENGLISH WORDS OR DIGITS: Do NOT output any English words, technical terms, headers, or English digits (1, 2, 3...). 
         3. LOCALIZED NUMBERS & DATES: Convert all numbers into native local digits (e.g., Bengali: ১, ২, ৩... or Hindi: १, २, ३...). Translate all month names (Jan, Feb, Mar, etc.) and date formats completely into native script equivalents.
         4. ABSOLUTE PURITY: Completely translate or remove all English titles and bracketed terms (like 'Relationship Overview', 'Compatibility Summary', 'Key Strengths'). The entire response from start to finish must be 100% in the native script of {lang}.
+        STRICT_ASTRO_TRANSLATION_RULES = f"""
+        STRICT DOSHA & TERM TRANSLATION DIRECTIVE:
+        You are translating and generating a 100% natively localized Vedic astrology report for language code: {lang}.
+        1. Translate 100% of the text, headings, dosha names, and bracketed terms entirely into the native script of the selected language (Bengali script if {lang} is 'bn', Hindi script if {lang} is 'hi').
+        2. NEVER output English dosha names or terms in parentheses/brackets. Always convert them to native script terms:
+           - Nadi Dosha -> (Bengali: নাড়ী দোষ | Hindi: नाड़ी दोष)
+           - Bhakoot Dosha -> (Bengali: ভাকুট দোষ | Hindi: भाकूट दोष)
+           - Rajju Dosha -> (Bengali: রজ্জু দোষ | Hindi: रज्जू दोष)
+           - Vedha Dosha -> (Bengali: বেধ দোষ | Hindi: वेध दोष)
+           - Manglik Dosha / Mangal Dosha -> (Bengali: মঙ্গল দোষ | Hindi: मंगलिक दोष / मंगल दोष)
+           - Graha Maitri -> (Bengali: গ্রহ মৈত্রী | Hindi: ग्रह मैत्री)
+           - Gana Gun -> (Bengali: গণ গুণ | Hindi: गण गुण)
+           - Bharna / Yoni -> (Bengali: যোনি গুণ | Hindi: योनि गुण)
+        3. The entire response from start to finish must be completely free of English astrological terms and bracketed English words.
         """
 
         response = client.models.generate_content(
