@@ -1,4 +1,7 @@
-google-genai
 fastapi
 uvicorn
-pyswisseph
+google-genai
+numpy
+scipy
+timezonefinder
+PySwissEph
