@@ -86,6 +86,27 @@ def generate_report(iso_datetime: str, lang: str = "bn"):
            - Gana Gun -> (Bengali: গণ গুণ | Hindi: गण गुण)
            - Bharna / Yoni -> (Bengali: যোনি গুণ | Hindi: योनि गुण)
         3. The entire response from start to finish must be completely free of English astrological terms and bracketed English words.
+        Act as an expert Vedic Astrologer and Precise Ephemeris Calculator. 
+        Generate a comprehensive, highly accurate daily Panchang and planetary details for the given location (Latitude: {lat}, Longitude: {lng}), Date & Time: {iso_datetime}. 
+
+        The output must be strictly structured in JSON format (or clean key-value pairs) and include the following detailed parameters matching authentic traditional Panchang standards (Lahiri Ayanamsa):
+        1. Core Panchang Details:
+           - Tithi (Name and exact end time / 'upto' time)
+           - Nakshatra (Name, Pada, and exact end time / 'upto' time)
+           - Yoga (Name and exact end time)
+           - Karana (Name and exact end time)
+           - Vaar (Weekday) and Paksha (Shukla/Krishna)
+        2. Sun & Moon Timings:
+           - Exact Sunrise, Sunset, Moonrise, and Moonset timings for the location.
+        3. Auspicious Timings (Shubh Muhurt):
+           - Abhijit Muhurta, Brahma Muhurta, Pratah Sandhya, Godhuli Muhurta, Vijaya Muhurta, and Amrit Kaal with exact start and end times.
+        4. Inauspicious Timings (Ashubh Muhurt):
+           - Rahu Kaal, Yamgandam (Yamghata), Gulikai Kaal, Dur Muhurtam, and Varjyam with exact start and end times.
+        5. Planetary Positions & Dignities:
+           - Current Rashi of Sun, Moon, and other major planets along with their Nakshatra placements.
+        6. Special Yoga & Kakshas:
+           - Chandra Balam and Tara Balam details.
+        Language requested: {lang} (Translate the descriptive values into this language while keeping technical astronomical terms precise).
         """
         
         response = client.models.generate_content(
