@@ -47,7 +47,7 @@ def calculate(iso_datetime: str):
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.get("/generate-astrology-report")
-def generate_report(iso_datetime: str, lang: str = "bn"):
+def generate_report(iso_datetime: str, lat: float = 23.25, lng: float = 88.43, lang: str = "bn"):
     try:
         dt = datetime.fromisoformat(iso_datetime)
         jd = swe.julday(dt.year, dt.month, dt.day, dt.hour + dt.minute/60.0 + dt.second/3600.0)
