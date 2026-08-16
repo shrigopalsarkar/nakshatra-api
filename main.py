@@ -116,16 +116,15 @@ def generate_report(iso_datetime: str, lat: float = 23.25, lng: float = 88.43, l
             contents=prompt,
         )
 
-            return {
-        "nakshatra": nakshatra_name,
-        "pada": pada,
-        "longitude": round(moon_lon, 6),
-        "ai_report": response.text
-    }
+        return {
+            "nakshatra": nakshatra_name,
+            "pada": pada,
+            "longitude": round(moon_lon, 6),
+            "ai_report": response.text
+        }
 
-except Exception as e:
-    raise HTTPException(status_code=500, detail=str(e))
-
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/panchang")
 def panchang_endpoint(iso_date: str, lat: float, lon: float):
@@ -135,7 +134,6 @@ def panchang_endpoint(iso_date: str, lat: float, lon: float):
         return result.__dict__
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-
 
 if __name__ == "__main__":
     import uvicorn
