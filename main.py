@@ -131,7 +131,14 @@ def panchang_endpoint(iso_date: str, lat: float, lon: float):
     try:
         d = date_type.fromisoformat(iso_date)
         result = compute_panchang(d, lat, lon)
-        return result.__dict__
+        mm = compute_mantri_mandala(d)
+        response = result.__dict__
+        response["timezone"] = "Asia/Kolkata"
+        response["mantri_mandala"] = {
+            "vikram_samvat": 2083,
+            "offices": mm["offices"],
+        }
+        return response
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
