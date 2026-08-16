@@ -67,8 +67,8 @@ def panchang_endpoint(iso_date: str, lat: float, lon: float):
         d = date_type.fromisoformat(iso_date)  # e.g. "2026-08-16"
         result = compute_panchang(d, lat, lon)
         return result.__dict__
-        except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+      raise HTTPException(status_code=500, detail=str(e))
 
         prompt = f"""
         Analyze the exact Swiss Ephemeris math for Vedic astrology:
