@@ -61,13 +61,13 @@ def generate_report(iso_datetime: str, lat: float = 23.25, lng: float = 88.43, l
         pada = int((moon_lon % (360.0 / 27)) / (360.0 / 108)) + 1
         nakshatra_name = NAKSHATRAS[nak_index]
 
-        @app.get("/panchang")
+@app.get("/panchang")
 def panchang_endpoint(iso_date: str, lat: float, lon: float):
     try:
         d = date_type.fromisoformat(iso_date)  # e.g. "2026-08-16"
         result = compute_panchang(d, lat, lon)
         return result.__dict__
-    except Exception as e:
+        except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
         prompt = f"""
