@@ -292,32 +292,3 @@ def compute_mantri_mandala(for_date: date) -> dict:
         "offices": result,
     }
 
-
-# ---------------------------------------------------------------------------
-# Test cases — run with: python panchang.py
-# ---------------------------------------------------------------------------
-if __name__ == "__main__":
-    swe.set_ephe_path(".")  # adjust to your ephemeris files path if needed
-
-    ujjain_lat, ujjain_lon = 23.1793, 75.7849
-    test_date = date(2026, 8, 16)
-
-    print("=== Ujjain, 16 Aug 2026 Panchang test ===")
-    result = compute_panchang(test_date, ujjain_lat, ujjain_lon)
-    for field in result.__dataclass_fields__:
-        print(f"{field}: {getattr(result, field)}")
-
-    print("\nExpected reference values:")
-    print("Sunrise ~06:04:27 AM | Sunset ~06:57:47 PM | Moonrise ~09:21:42 AM")
-    print("Chaturthi ends ~04:52:47 PM -> Panchami starts")
-    print("Hasta ends ~03:50:20 AM (Aug 17) -> Chitra starts")
-    print("Sadhya ends ~04:07:15 AM (Aug 17)")
-    print("Vishti ends ~04:52:47 PM -> Bava -> ends ~04:51 AM (Aug 17)")
-
-    print("\n=== Mantri Mandala test ===")
-    mm = compute_mantri_mandala(test_date)
-    print(mm)
-    print("\nExpected reference (VS 2083, Siddharthi):")
-    print("Raja=Guru, Mantri=Mangal, Senadhipati=Chandra, Sasyadhipati=Guru,")
-    print("Dhanyadhipati=Budha, Meghadhipati=Chandra, Dhanadhipati=Guru,")
-    print("Rasadhipati=Shani, Nirasadhipati=Guru, Phaladhipati=Chandra")
