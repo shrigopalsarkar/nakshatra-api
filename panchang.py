@@ -169,6 +169,11 @@ def compute_panchang(local_date: date, lat: float, lon: float) -> PanchangResult
         s, m = sidereal_longitudes(jd)
         return int(((m - s) % 360.0) / 6.0)
 
+    def pada_index(jd):
+        """108 padas of 3deg20' each -- 4 padas per nakshatra (27 x 4 = 108)."""
+        _, m = sidereal_longitudes(jd)
+        return int((m % 360.0) / (360.0 / 108.0))
+
     def get_karana_name(idx):
         idx = idx % 60
         if idx in KARANA_FIXED:
@@ -190,6 +195,32 @@ def compute_panchang(local_date: date, lat: float, lon: float) -> PanchangResult
 
     def fmt(jd):
         return jd_to_local(jd).strftime("%Y-%m-%d %I:%M:%S %p") if jd else None
+
+    # Build the Moon's Nakshatra-Pada timeline across the full civil day
+    # (sunrise -> next sunrise), walking pada-to-pada transition by
+    # transition, so the frontend can show every pada the Moon occupies
+    # today rather than just a single static value.
+    pada_timeline = []
+    jd_cursor = jd_sunrise
+    guard = 0
+    while jd_cursor < jd_next_sunrise and guard < 40:
+        guard += 1
+        p_idx = pada_index(jd_cursor)
+        nak_here = NAKSHATRAS[p_idx // 4]
+        pada_num = (p_idx % 4) + 1
+        p_end = find_transition(jd_cursor, pada_index, max_hours=30.0)
+        if p_end is None or p_end >= jd_next_sunrise:
+            end_jd = jd_next_sunrise
+        else:
+            end_jd = p_end
+        pada_timeline.append({
+            "nakshatra": nak_here,
+            "pada": pada_num,
+            "end": fmt(end_jd)
+        })
+        if p_end is None or p_end >= jd_next_sunrise:
+            break
+        jd_cursor = p_end
 
     return PanchangResult(
         date_local=local_date.isoformat(),
