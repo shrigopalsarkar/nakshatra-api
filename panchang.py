@@ -118,7 +118,6 @@ def find_transition(jd_start: float, target_fn, step_hours=0.25, max_hours=48.0)
         prev_jd = jd
     return None
 
-
 @dataclass
 class PanchangResult:
     date_local: str
@@ -138,7 +137,9 @@ class PanchangResult:
     karana_name: str
     karana_end: str | None
     karana_next_name: str
-
+    pada_timeline: list
+    nakshatra_pada_display: str
+    karana_type: str
 
 def compute_panchang(local_date: date, lat: float, lon: float) -> PanchangResult:
     """
@@ -208,6 +209,12 @@ def compute_panchang(local_date: date, lat: float, lon: float) -> PanchangResult
         karana_name=get_karana_name(k_idx),
         karana_end=fmt(k_end),
         karana_next_name=get_karana_name(k_idx + 1),
+        pada_timeline=pada_timeline,
+        nakshatra_pada_display=" → ".join(
+            f"{p['nakshatra']} (Pada {p['pada']}) till {p['end']}"
+            for p in pada_timeline
+        ),
+        karana_type="Fixed" if (k_idx % 60) in KARANA_FIXED else "Movable",
     )
 
 
