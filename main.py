@@ -19,6 +19,13 @@ from panchang import compute_panchang, compute_mantri_mandala
 IST = ZoneInfo("Asia/Kolkata")
 UTC = ZoneInfo("UTC")
 
+from muhurta import (compute_kaal_periods, compute_choghadiya,
+                     compute_muhurtas, compute_samvatsara)
+
+def _parse_local(s: str) -> datetime:
+    """Panchang strings are '%Y-%m-%d %I:%M:%S %p' in IST."""
+    return datetime.strptime(s, "%Y-%m-%d %I:%M:%S %p").replace(tzinfo=IST)
+    
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
