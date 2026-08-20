@@ -69,7 +69,7 @@ def get_sunrise_jd(target_date: date, lat: float, lon: float) -> float:
     noon_local = datetime(target_date.year, target_date.month, target_date.day, 6, 0, tzinfo=IST)
     jd_approx = to_jd_ut(noon_local) - 0.25
     geopos = (lon, lat, 0.0)
-    flags = swe.CALC_RISE | swe.BIT_DISC_CENTER
+    flags = swe.CALC_RISE
     _, s_rise = swe.rise_trans(jd_approx, swe.SUN, flags, geopos)
     return s_rise[0]
 
@@ -83,40 +83,49 @@ def sidereal_longitudes(jd_ut: float) -> tuple[float, float]:
 
 
 def sun_moon_events(jd_start: float, lat: float, lon: float):
-    """All events computed relative to the GIVEN lat/lon, so results are location-accurate."""
+    """Calculates apparent upper-limb rise and set times for Sun and Moon."""
     geopos = (lon, lat, 0.0)
-    flags = swe.CALC_RISE | swe.BIT_DISC_CENTER
-    _, sunrise = swe.rise_trans(jd_start, swe.SUN, flags, geopos)
-    _, sunset = swe.rise_trans(sunrise[0], swe.SUN, swe.CALC_SET | swe.BIT_DISC_CENTER, geopos)
-    _, next_sunrise = swe.rise_trans(sunrise[0] + 0.5, swe.SUN, flags, geopos)
+    flags_rise = swe.CALC_RISE
+    flags_set = swe.CALC_SET
+    _, sunrise = swe.rise_trans(jd_start, swe.SUN, flags_rise, geopos)
+    _, sunset = swe.rise_trans(sunrise[0], swe.SUN, flags_set, geopos)
+    _, next_sunrise = swe.rise_trans(sunrise[0] + 0.5, swe.SUN, flags_rise, geopos)
     try:
-        _, moonrise = swe.rise_trans(sunrise[0] - 0.25, swe.MOON, flags, geopos)
-        m_jd = moonrise[0]
+        _, moonrise = swe.rise_trans(sunrise[0] - 0.25, swe.MOON, flags_rise, geopos)
+        m_rise_jd = moonrise[0]
     except Exception:
-        m_jd = None
-    return sunrise[0], sunset[0], next_sunrise[0], m_jd
+        m_rise_jd = None
+    try:
+        _, moonset = swe.rise_trans(sunrise[0] - 0.25, swe.MOON, flags_set, geopos)
+        m_set_jd = moonset[0]
+    except Exception:
+        m_set_jd = None
+    return sunrise[0], sunset[0], next_sunrise[0], m_rise_jd, m_set_jd
 
 
-def find_transition(jd_start: float, target_fn, step_hours=0.25, max_hours=48.0):
+def find_transition(jd_start: float, target_fn, step_hours=0.25, max_hours=48.0, backward=False):
     start_index = target_fn(jd_start)
     jd = jd_start
-    step = step_hours / 24.0
+    step = (-step_hours if backward else step_hours) / 24.0
     hours_scanned = 0.0
     prev_jd = jd
     while hours_scanned < max_hours:
         jd += step
         hours_scanned += step_hours
         if target_fn(jd) != start_index:
-            lo, hi = prev_jd, jd
+            lo, hi = (jd, prev_jd) if backward else (prev_jd, jd)
             for _ in range(35):
                 mid = (lo + hi) / 2.0
                 if target_fn(mid) == start_index:
-                    lo = mid
+                    if backward: hi = mid
+                    else: lo = mid
                 else:
-                    hi = mid
-            return hi
+                    if backward: lo = mid
+                    else: hi = mid
+            return lo if backward else hi
         prev_jd = jd
     return None
+
 
 @dataclass
 class PanchangResult:
@@ -125,10 +134,14 @@ class PanchangResult:
     sunset: str
     next_sunrise: str
     moonrise: str | None
+    moonset: str | None
     tithi_name: str
     tithi_end: str | None
     tithi_next_name: str
     nakshatra_name: str
+    nakshatra_index: int
+    nakshatra_start_dt: datetime | None
+    nakshatra_end_dt: datetime | None
     nakshatra_end: str | None
     nakshatra_next_name: str
     yoga_name: str
@@ -140,18 +153,17 @@ class PanchangResult:
     pada_timeline: list
     nakshatra_pada_display: str
     karana_type: str
+    raw_sunrise_dt: datetime
+    raw_sunset_dt: datetime
+    raw_next_sunrise_dt: datetime
+
 
 def compute_panchang(local_date: date, lat: float, lon: float) -> PanchangResult:
-    """
-    Computes the full daily Panchang for the given date AT THE GIVEN lat/lon.
-    Sunrise/sunset/moonrise and every tithi/nakshatra/yoga/karana transition
-    time are location-dependent and recalculated from scratch here every call
-    -- nothing is cached or shared across locations.
-    """
+    """Computes precision Panchang elements for the given location."""
     swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
     noon_local = datetime(local_date.year, local_date.month, local_date.day, 6, 0, tzinfo=IST)
     jd_approx = to_jd_ut(noon_local) - 0.25
-    jd_sunrise, jd_sunset, jd_next_sunrise, jd_moonrise = sun_moon_events(jd_approx, lat, lon)
+    jd_sunrise, jd_sunset, jd_next_sunrise, jd_moonrise, jd_moonset = sun_moon_events(jd_approx, lat, lon)
 
     def tithi_index(jd):
         s, m = sidereal_longitudes(jd)
@@ -169,23 +181,18 @@ def compute_panchang(local_date: date, lat: float, lon: float) -> PanchangResult
         s, m = sidereal_longitudes(jd)
         return int(((m - s) % 360.0) / 6.0)
 
-    def pada_index(jd):
-        """108 padas of 3deg20' each -- 4 padas per nakshatra (27 x 4 = 108)."""
-        _, m = sidereal_longitudes(jd)
-        return int((m % 360.0) / (360.0 / 108.0))
-
     def get_karana_name(idx):
         idx = idx % 60
         if idx in KARANA_FIXED:
             return KARANA_FIXED[idx]
         return KARANA_NAMES_MOVABLE[(idx - 1) % 7]
 
-    # Evaluate all Panchang elements as per Udaya Tithi (at Sunrise, for THIS location)
     t_idx = tithi_index(jd_sunrise)
     t_end = find_transition(jd_sunrise, tithi_index)
 
     n_idx = nak_index(jd_sunrise)
-    n_end = find_transition(jd_sunrise, nak_index)
+    n_start_jd = find_transition(jd_sunrise, nak_index, backward=True)
+    n_end_jd = find_transition(jd_sunrise, nak_index)
 
     y_idx = yoga_index(jd_sunrise)
     y_end = find_transition(jd_sunrise, yoga_index)
@@ -196,10 +203,10 @@ def compute_panchang(local_date: date, lat: float, lon: float) -> PanchangResult
     def fmt(jd):
         return jd_to_local(jd).strftime("%Y-%m-%d %I:%M:%S %p") if jd else None
 
-    # Build the Moon's Nakshatra-Pada timeline across the full civil day
-    # (sunrise -> next sunrise), walking pada-to-pada transition by
-    # transition, so the frontend can show every pada the Moon occupies
-    # today rather than just a single static value.
+    def pada_index(jd):
+        _, m = sidereal_longitudes(jd)
+        return int((m % 360.0) / (360.0 / 108.0))
+
     pada_timeline = []
     jd_cursor = jd_sunrise
     guard = 0
@@ -209,10 +216,7 @@ def compute_panchang(local_date: date, lat: float, lon: float) -> PanchangResult
         nak_here = NAKSHATRAS[p_idx // 4]
         pada_num = (p_idx % 4) + 1
         p_end = find_transition(jd_cursor, pada_index, max_hours=30.0)
-        if p_end is None or p_end >= jd_next_sunrise:
-            end_jd = jd_next_sunrise
-        else:
-            end_jd = p_end
+        end_jd = jd_next_sunrise if (p_end is None or p_end >= jd_next_sunrise) else p_end
         pada_timeline.append({
             "nakshatra": nak_here,
             "pada": pada_num,
@@ -228,11 +232,15 @@ def compute_panchang(local_date: date, lat: float, lon: float) -> PanchangResult
         sunset=fmt(jd_sunset),
         next_sunrise=fmt(jd_next_sunrise),
         moonrise=fmt(jd_moonrise),
+        moonset=fmt(jd_moonset),
         tithi_name=TITHI_NAMES[t_idx],
         tithi_end=fmt(t_end),
         tithi_next_name=TITHI_NAMES[(t_idx + 1) % 30],
         nakshatra_name=NAKSHATRAS[n_idx],
-        nakshatra_end=fmt(n_end),
+        nakshatra_index=n_idx,
+        nakshatra_start_dt=jd_to_local(n_start_jd) if n_start_jd else None,
+        nakshatra_end_dt=jd_to_local(n_end_jd) if n_end_jd else None,
+        nakshatra_end=fmt(n_end_jd),
         nakshatra_next_name=NAKSHATRAS[(n_idx + 1) % 27],
         yoga_name=YOGA_NAMES[y_idx],
         yoga_end=fmt(y_end),
@@ -246,12 +254,11 @@ def compute_panchang(local_date: date, lat: float, lon: float) -> PanchangResult
             for p in pada_timeline
         ),
         karana_type="Fixed" if (k_idx % 60) in KARANA_FIXED else "Movable",
+        raw_sunrise_dt=jd_to_local(jd_sunrise),
+        raw_sunset_dt=jd_to_local(jd_sunset),
+        raw_next_sunrise_dt=jd_to_local(jd_next_sunrise)
     )
 
-
-# ---------------------------------------------------------------------------
-# True Solar Ingress (Sankranti) & Mantri Mandala Engine
-# ---------------------------------------------------------------------------
 
 def find_solar_ingress(target_deg: float, approx_start: date) -> datetime:
     """Finds exact moment Sun reaches a specific sidereal longitude (a Sankranti)."""
@@ -259,8 +266,6 @@ def find_solar_ingress(target_deg: float, approx_start: date) -> datetime:
     start_dt = datetime(approx_start.year, approx_start.month, approx_start.day, 0, 0, tzinfo=UTC)
     jd = to_jd_ut(start_dt)
 
-    # 45-day scan window in 1-day increments, looking for the day the Sun's
-    # sidereal longitude crosses target_deg (going forward, i.e. 359deg -> 0deg wrap).
     for _ in range(45):
         s_long, _ = sidereal_longitudes(jd)
         s_next, _ = sidereal_longitudes(jd + 1.0)
@@ -285,22 +290,9 @@ def find_solar_ingress(target_deg: float, approx_start: date) -> datetime:
 
 
 def find_new_moon_before(ref_instant: datetime, lookback_days: int = 40) -> datetime:
-    """
-    Finds the exact New Moon (Sun-Moon sidereal conjunction) immediately
-    preceding ref_instant, by scanning BACKWARD hour by hour from ref_instant
-    (not forward from a fixed number of days before it). Bisects to the minute.
-
-    Searching backward from the reference point -- rather than forward from a
-    fixed offset -- is essential: the gap between Chaitra Shukla Pratipada and
-    the following Mesha Sankranti is NOT constant (it varies roughly 5-30 days
-    year to year depending on lunar-month drift). A forward scan anchored a
-    fixed number of days early can walk right past the correct New Moon and
-    land on the PREVIOUS lunar month's instead -- this was a confirmed bug,
-    caught by cross-checking VS 2077 (2020) and VS 2084 (2027) against
-    multiple independently published Panchang sources.
-    """
+    """Finds the exact New Moon immediately preceding ref_instant."""
     jd = to_jd_ut(ref_instant)
-    step = 1.0 / 24.0  # hourly steps, walking backward in time
+    step = 1.0 / 24.0
 
     prev_diff = None
     prev_jd = jd
@@ -308,8 +300,6 @@ def find_new_moon_before(ref_instant: datetime, lookback_days: int = 40) -> date
     for _ in range(total_hours):
         s, m = sidereal_longitudes(jd)
         diff = (m - s) % 360.0
-        # Walking backward: look for diff going from just-after-New-Moon
-        # (small, near 0) to just-before-New-Moon (large, near 360).
         if prev_diff is not None and prev_diff < 60.0 and diff > 300.0:
             lo, hi = jd, prev_jd
             for _ in range(40):
@@ -329,26 +319,7 @@ def find_new_moon_before(ref_instant: datetime, lookback_days: int = 40) -> date
 
 
 def find_chaitra_shukla_pratipada(target_date: date, lat: float = 23.1793, lon: float = 75.7849) -> date:
-    """
-    Locates the Chaitra Shukla Pratipada (Hindu New Year / Vikram Samvat start)
-    governing target_date.
-
-    Method: find the New Moon immediately preceding that year's Mesha Sankranti
-    (searching backward from it, so the varying month-to-month gap never causes
-    an off-by-one-month error -- see find_new_moon_before). Then apply the
-    standard published rule: the calendar day is named by whichever sunrise the
-    Pratipada tithi (0-12 degrees) is prevailing on; if Pratipada never touches
-    a sunrise (a rare "tithi kshaya" case), the New Moon's own calendar date is
-    used instead. This exact combined rule was verified against five
-    independently published New Year dates spanning 2018-2027.
-
-    lat/lon affect only which local sunrise is checked (a location-dependent
-    but usually inconsequential nuance); defaults to Ujjain, the traditional
-    reference meridian for Indian Panchang calculations.
-    """
-    # Vikram Samvat year in effect: if target_date is before this calendar
-    # year's Mesha Sankranti (~mid April), the governing new year started
-    # in the *previous* Gregorian year's Chaitra.
+    """Locates the Chaitra Shukla Pratipada governing target_date."""
     approx_mesha = date(target_date.year, 4, 14)
     ref_year = target_date.year if target_date >= approx_mesha else target_date.year - 1
     mesha_ingress = find_solar_ingress(0.0, date(ref_year, 4, 10))
@@ -356,9 +327,6 @@ def find_chaitra_shukla_pratipada(target_date: date, lat: float = 23.1793, lon: 
     new_moon = find_new_moon_before(mesha_ingress)
     nm_date = new_moon.date()
 
-    # Standard rule: the day is named by whichever sunrise the Pratipada
-    # tithi (0-12 degrees) prevails on. Check the New Moon's date and the
-    # following couple of days.
     for offset in range(0, 3):
         d = nm_date + timedelta(days=offset)
         jd_sun = get_sunrise_jd(d, lat, lon)
@@ -367,31 +335,14 @@ def find_chaitra_shukla_pratipada(target_date: date, lat: float = 23.1793, lon: 
         if 0.0 <= diff < 12.0:
             return d
 
-    # Kshaya fallback: Pratipada never touches a sunrise -- use the New
-    # Moon's own calendar date (verified correct for this edge case, e.g. VS 2083 / 2026).
     return nm_date
 
 
 def compute_mantri_mandala(for_date: date, lat: float, lon: float) -> dict:
-    """
-    Computes Navadhikaris (the Vikram Samvat "Cabinet") using true astronomical
-    Sankranti ingresses. lat/lon are accepted for API compatibility but this
-    calculation is NOT location-dependent -- Sankranti/New Moon instants are
-    the same worldwide; only the IST calendar date (the universal convention
-    used by every published Panchang) is used to derive the weekday lord.
-    """
+    """Computes the 10-office Vikram Samvat Cabinet."""
     new_year_day = find_chaitra_shukla_pratipada(for_date, lat, lon)
     year = new_year_day.year
 
-    # Astronomical ingress points for governing offices.
-    # NOTE: these 9 offices were individually verified against a live
-    # published Panchang for VS 2083 (Mantri=Mangal, Senadhipati=Chandra,
-    # Sasyadhipati=Guru, Meghadhipati=Chandra, Rasadhipati=Shani,
-    # Nirasadhipati=Guru, Phaladhipati=Chandra, Dhanyadhipati=Budha) and all
-    # matched. A 10th office, "Dhanadhipati" (wealth/treasury, distinct from
-    # Dhanyadhipati/grain), exists in some published Panchangs but its exact
-    # Sankranti basis wasn't verifiable here -- deliberately left out rather
-    # than guessed, so this doesn't silently show a wrong value.
     ingresses = {
         "Raja": ("Chaitra Shukla Pratipada", new_year_day),
         "Mantri": ("Mesha Sankranti (0°)", find_solar_ingress(0.0, date(year, 4, 10)).date()),
