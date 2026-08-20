@@ -138,15 +138,48 @@ def calculate(iso_datetime: str):
 
 
 @app.get("/panchang")
-def panchang_endpoint(iso_date: str, lat: float = 23.1793, lon: float = 75.7849):
+def panchang_endpoint(iso_date: str, lat: float = 28.6139, lon: float = 77.2090):
     try:
         d = date_type.fromisoformat(iso_date)
-        panchang_data = compute_panchang(d, lat, lon)
+        p_res = compute_panchang(d, lat, lon)
         mm_data = compute_mantri_mandala(d, lat, lon)
+        w_idx = vedic_weekday(p_res.raw_sunrise_dt)
 
-        response = panchang_data.__dict__
-        response["timezone"] = "Asia/Kolkata"
-        response["mantri_mandala"] = mm_data
+        kaal_data = compute_kaal_periods(p_res.raw_sunrise_dt, p_res.raw_sunset_dt, w_idx)
+        muhurta_data = compute_muhurtas(
+            p_res.raw_sunrise_dt, p_res.raw_sunset_dt, w_idx,
+            p_res.nakshatra_index, p_res.nakshatra_start_dt, p_res.nakshatra_end_dt
+        )
+        choghadiya_data = compute_choghadiya(p_res.raw_sunrise_dt, p_res.raw_sunset_dt, p_res.raw_next_sunrise_dt, w_idx)
+
+        response = {
+            "date_local": p_res.date_local,
+            "sunrise": p_res.sunrise,
+            "sunset": p_res.sunset,
+            "next_sunrise": p_res.next_sunrise,
+            "moonrise": p_res.moonrise,
+            "moonset": p_res.moonset,
+            "tithi_name": p_res.tithi_name,
+            "tithi_end": p_res.tithi_end,
+            "tithi_next_name": p_res.tithi_next_name,
+            "nakshatra_name": p_res.nakshatra_name,
+            "nakshatra_end": p_res.nakshatra_end,
+            "nakshatra_next_name": p_res.nakshatra_next_name,
+            "yoga_name": p_res.yoga_name,
+            "yoga_end": p_res.yoga_end,
+            "yoga_next_name": p_res.yoga_next_name,
+            "karana_name": p_res.karana_name,
+            "karana_end": p_res.karana_end,
+            "karana_next_name": p_res.karana_next_name,
+            "karana_type": p_res.karana_type,
+            "pada_timeline": p_res.pada_timeline,
+            "nakshatra_pada_display": p_res.nakshatra_pada_display,
+            "timezone": "Asia/Kolkata",
+            "mantri_mandala": mm_data,
+            "kaal_periods": kaal_data,
+            "muhurtas": muhurta_data,
+            "choghadiya": choghadiya_data
+        }
         return response
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
