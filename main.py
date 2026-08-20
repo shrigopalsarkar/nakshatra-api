@@ -20,7 +20,7 @@ IST = ZoneInfo("Asia/Kolkata")
 UTC = ZoneInfo("UTC")
 
 from muhurta import (compute_kaal_periods, compute_choghadiya,
-                     compute_muhurtas, compute_samvatsara)
+                     compute_muhurtas, compute_samvatsara, vedic_weekday)
 
 def _parse_local(s: str) -> datetime:
     """Panchang strings are '%Y-%m-%d %I:%M:%S %p' in IST."""
