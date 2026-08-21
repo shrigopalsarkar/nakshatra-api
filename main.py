@@ -180,6 +180,8 @@ def panchang_endpoint(iso_date: str, lat: float = 28.6139, lon: float = 77.2090)
             "muhurtas": muhurta_data,
             "choghadiya": choghadiya_data
         }
+        vikram_samvat_num = int(mm_data["vikram_samvat_new_year"][:4]) + 57
+        response["samvatsara"] = compute_samvatsara(vikram_samvat_num)
         return response
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
