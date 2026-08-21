@@ -355,7 +355,7 @@ def compute_mantri_mandala(for_date: date, lat: float, lon: float) -> dict:
             270.0, date(year + (1 if new_year_day.month > 1 else 0), 1, 10)
         ).date()),
         "Phaladhipati": ("Mithuna Sankranti (60°)", find_solar_ingress(60.0, date(year, 6, 10)).date()),
-        "Dhanadhipati": ("Vrishabha Sankranti (30°)", find_solar_ingress(30.0, date(year, 5, 10)).date()),
+        "Dhanadhipati": ("Chaitra Shukla Pratipada", new_year_day),
     }
 
     offices = {}
