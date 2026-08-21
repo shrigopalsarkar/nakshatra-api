@@ -138,6 +138,7 @@ def calculate(iso_datetime: str):
 
 
 @app.get("/panchang")
+@app.get("/api/v1/panchang")  # <-- শুধু এই লাইনটি যোগ করুন
 def panchang_endpoint(iso_date: str, lat: float = 28.6139, lon: float = 77.2090):
     try:
         d = date_type.fromisoformat(iso_date)
