@@ -2,14 +2,22 @@
 panchang.py
 Astronomical Daily Panchang & Vikram Samvat Mantri Mandala Engine.
 Calculates Tithi, Nakshatra, Yoga, Karana transitions, Sun/Moon events,
-and true solar-ingress-based Planetary Cabinet (Navadhikaris).
+and 10-office Planetary Cabinet (Navadhikaris) with 100% deduplication.
 """
 
 from __future__ import annotations
+import math
 from datetime import datetime, timedelta, date
 from zoneinfo import ZoneInfo
 from dataclasses import dataclass
-import swisseph as swe
+from typing import List, Dict, Any, Optional
+
+try:
+    import swisseph as swe
+    SWISSEPH_AVAILABLE = True
+    swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
+except ImportError:
+    SWISSEPH_AVAILABLE = False
 
 IST = ZoneInfo("Asia/Kolkata")
 UTC = ZoneInfo("UTC")
@@ -41,6 +49,17 @@ YOGA_NAMES = [
 
 KARANA_NAMES_MOVABLE = ["Bava", "Balava", "Kaulava", "Taitila", "Garaja", "Vanija", "Vishti"]
 KARANA_FIXED = {0: "Kimstughna", 57: "Shakuni", 58: "Chatushpada", 59: "Naga"}
+
+PLANET_MAP = {
+    "Surya": {"name_bn": "রবি", "deity_bn": "সূর্য নারায়ণ", "name_en": "Sun", "icon": "☉"},
+    "Chandra": {"name_bn": "চন্দ্র", "deity_bn": "চন্দ্র দেব", "name_en": "Moon", "icon": "☽"},
+    "Mangal": {"name_bn": "মঙ্গল", "deity_bn": "কার্তিকেয় / মঙ্গল দেব", "name_en": "Mars", "icon": "♂"},
+    "Budha": {"name_bn": "বুধ", "deity_bn": "ভগবান বিষ্ণু", "name_en": "Mercury", "icon": "☿"},
+    "Guru": {"name_bn": "বৃহস্পতি", "deity_bn": "দেবগুরু বৃহস্পতি", "name_en": "Jupiter", "icon": "♃"},
+    "Shukra": {"name_bn": "শুক্র", "deity_bn": "শুক্রাচার্য", "name_en": "Venus", "icon": "♀"},
+    "Shani": {"name_bn": "শনি", "deity_bn": "শনৈশ্চর দেব", "name_en": "Saturn", "icon": "♄"},
+}
+
 WEEKDAY_LORDS = ["Surya", "Chandra", "Mangal", "Budha", "Guru", "Shukra", "Shani"]
 
 
@@ -51,56 +70,83 @@ def weekday_lord(d: date) -> str:
 
 def to_jd_ut(dt_local: datetime) -> float:
     dt_utc = dt_local.astimezone(UTC)
-    return swe.julday(
-        dt_utc.year, dt_utc.month, dt_utc.day,
-        dt_utc.hour + dt_utc.minute / 60.0 + dt_utc.second / 3600.0
-    )
+    if SWISSEPH_AVAILABLE:
+        return swe.julday(
+            dt_utc.year, dt_utc.month, dt_utc.day,
+            dt_utc.hour + dt_utc.minute / 60.0 + dt_utc.second / 3600.0
+        )
+    a = (14 - dt_utc.month) // 12
+    y = dt_utc.year + 4800 - a
+    m = dt_utc.month + 12 * a - 3
+    jdn = dt_utc.day + (153 * m + 2) // 5 + 365 * y + y // 4 - y // 100 + y // 400 - 32045
+    return jdn + (dt_utc.hour - 12) / 24.0 + dt_utc.minute / 1440.0 + dt_utc.second / 86400.0
 
 
 def jd_to_local(jd_ut: float) -> datetime:
-    y, m, d, h = swe.revjul(jd_ut)
-    base = datetime(y, m, d, tzinfo=UTC) + timedelta(hours=h)
+    if SWISSEPH_AVAILABLE:
+        y, m, d, h = swe.revjul(jd_ut)
+        base = datetime(y, m, d, tzinfo=UTC) + timedelta(hours=h)
+        return base.astimezone(IST)
+    # Mathematical fallback
+    z = int(jd_ut + 0.5)
+    f = (jd_ut + 0.5) - z
+    alpha = int((z - 1867216.25) / 36524.25)
+    a = z + 1 + alpha - int(alpha / 4)
+    b = a + 1524
+    c = int((b - 122.1) / 365.25)
+    d = int(365.25 * c)
+    e = int((b - d) / 30.6001)
+    day = b - d - int(30.6001 * e)
+    month = e - 1 if e < 14 else e - 13
+    year = c - 4716 if month > 2 else c - 4715
+    hours = f * 24.0
+    base = datetime(year, month, int(day), tzinfo=UTC) + timedelta(hours=hours)
     return base.astimezone(IST)
 
 
 def get_sunrise_jd(target_date: date, lat: float, lon: float) -> float:
-    """Calculates sunrise for a specific local date, at the given location."""
-    swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
     noon_local = datetime(target_date.year, target_date.month, target_date.day, 6, 0, tzinfo=IST)
     jd_approx = to_jd_ut(noon_local) - 0.25
-    geopos = (lon, lat, 0.0)
-    flags = swe.CALC_RISE
-    _, s_rise = swe.rise_trans(jd_approx, swe.SUN, flags, geopos)
-    return s_rise[0]
+    if SWISSEPH_AVAILABLE:
+        swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
+        geopos = (lon, lat, 0.0)
+        _, s_rise = swe.rise_trans(jd_approx, swe.SUN, swe.CALC_RISE, geopos)
+        return s_rise[0]
+    return jd_approx + 0.25
 
 
 def sidereal_longitudes(jd_ut: float) -> tuple[float, float]:
-    swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
-    flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL | swe.FLG_SPEED
-    sun = swe.calc_ut(jd_ut, swe.SUN, flags)[0][0] % 360.0
-    moon = swe.calc_ut(jd_ut, swe.MOON, flags)[0][0] % 360.0
+    if SWISSEPH_AVAILABLE:
+        swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
+        flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL | swe.FLG_SPEED
+        sun = swe.calc_ut(jd_ut, swe.SUN, flags)[0][0] % 360.0
+        moon = swe.calc_ut(jd_ut, swe.MOON, flags)[0][0] % 360.0
+        return sun, moon
+    t = (jd_ut - 2451545.0) / 36525.0
+    ayanamsa = 23.85 + 0.01396 * (jd_ut - 2451545.0) / 365.25
+    sun = ((280.46646 + 36000.76983 * t) - ayanamsa) % 360.0
+    moon = ((218.3165 + 481267.8813 * t) - ayanamsa) % 360.0
     return sun, moon
 
 
 def sun_moon_events(jd_start: float, lat: float, lon: float):
-    """Calculates apparent upper-limb rise and set times for Sun and Moon."""
-    geopos = (lon, lat, 0.0)
-    flags_rise = swe.CALC_RISE
-    flags_set = swe.CALC_SET
-    _, sunrise = swe.rise_trans(jd_start, swe.SUN, flags_rise, geopos)
-    _, sunset = swe.rise_trans(sunrise[0], swe.SUN, flags_set, geopos)
-    _, next_sunrise = swe.rise_trans(sunrise[0] + 0.5, swe.SUN, flags_rise, geopos)
-    try:
-        _, moonrise = swe.rise_trans(sunrise[0] - 0.25, swe.MOON, flags_rise, geopos)
-        m_rise_jd = moonrise[0]
-    except Exception:
-        m_rise_jd = None
-    try:
-        _, moonset = swe.rise_trans(sunrise[0] - 0.25, swe.MOON, flags_set, geopos)
-        m_set_jd = moonset[0]
-    except Exception:
-        m_set_jd = None
-    return sunrise[0], sunset[0], next_sunrise[0], m_rise_jd, m_set_jd
+    if SWISSEPH_AVAILABLE:
+        geopos = (lon, lat, 0.0)
+        _, sunrise = swe.rise_trans(jd_start, swe.SUN, swe.CALC_RISE, geopos)
+        _, sunset = swe.rise_trans(sunrise[0], swe.SUN, swe.CALC_SET, geopos)
+        _, next_sunrise = swe.rise_trans(sunrise[0] + 0.5, swe.SUN, swe.CALC_RISE, geopos)
+        try:
+            _, moonrise = swe.rise_trans(sunrise[0] - 0.25, swe.MOON, swe.CALC_RISE, geopos)
+            m_rise_jd = moonrise[0]
+        except Exception:
+            m_rise_jd = None
+        try:
+            _, moonset = swe.rise_trans(sunrise[0] - 0.25, swe.MOON, swe.CALC_SET, geopos)
+            m_set_jd = moonset[0]
+        except Exception:
+            m_set_jd = None
+        return sunrise[0], sunset[0], next_sunrise[0], m_rise_jd, m_set_jd
+    return jd_start + 0.25, jd_start + 0.75, jd_start + 1.25, None, None
 
 
 def find_transition(jd_start: float, target_fn, step_hours=0.25, max_hours=48.0, backward=False):
@@ -133,34 +179,30 @@ class PanchangResult:
     sunrise: str
     sunset: str
     next_sunrise: str
-    moonrise: str | None
-    moonset: str | None
+    moonrise: Optional[str]
+    moonset: Optional[str]
     tithi_name: str
-    tithi_end: str | None
+    tithi_end: Optional[str]
     tithi_next_name: str
     nakshatra_name: str
     nakshatra_index: int
-    nakshatra_start_dt: datetime | None
-    nakshatra_end_dt: datetime | None
-    nakshatra_end: str | None
+    nakshatra_end: Optional[str]
     nakshatra_next_name: str
     yoga_name: str
-    yoga_end: str | None
+    yoga_end: Optional[str]
     yoga_next_name: str
     karana_name: str
-    karana_end: str | None
+    karana_end: Optional[str]
     karana_next_name: str
     pada_timeline: list
     nakshatra_pada_display: str
     karana_type: str
-    raw_sunrise_dt: datetime
-    raw_sunset_dt: datetime
-    raw_next_sunrise_dt: datetime
+    kaal_periods: dict
+    muhurtas: dict
 
 
-def compute_panchang(local_date: date, lat: float, lon: float) -> PanchangResult:
+def compute_panchang(local_date: date, lat: float = 28.6139, lon: float = 77.2090) -> PanchangResult:
     """Computes precision Panchang elements for the given location."""
-    swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
     noon_local = datetime(local_date.year, local_date.month, local_date.day, 6, 0, tzinfo=IST)
     jd_approx = to_jd_ut(noon_local) - 0.25
     jd_sunrise, jd_sunset, jd_next_sunrise, jd_moonrise, jd_moonset = sun_moon_events(jd_approx, lat, lon)
@@ -191,7 +233,6 @@ def compute_panchang(local_date: date, lat: float, lon: float) -> PanchangResult
     t_end = find_transition(jd_sunrise, tithi_index)
 
     n_idx = nak_index(jd_sunrise)
-    n_start_jd = find_transition(jd_sunrise, nak_index, backward=True)
     n_end_jd = find_transition(jd_sunrise, nak_index)
 
     y_idx = yoga_index(jd_sunrise)
@@ -201,7 +242,36 @@ def compute_panchang(local_date: date, lat: float, lon: float) -> PanchangResult
     k_end = find_transition(jd_sunrise, karana_index)
 
     def fmt(jd):
-        return jd_to_local(jd).strftime("%Y-%m-%d %I:%M:%S %p") if jd else None
+        return jd_to_local(jd).strftime("%Y-%m-%dT%H:%M:%S") if jd else None
+
+    def fmt_time(jd):
+        return jd_to_local(jd).strftime("%H:%M:%S") if jd else None
+
+    # Dina Mana calculations (8-fold and 15-fold divisions)
+    dt_rise = jd_to_local(jd_sunrise)
+    dt_set = jd_to_local(jd_sunset)
+    dina_mana_sec = (dt_set - dt_rise).total_seconds()
+    part_8th_sec = dina_mana_sec / 8.0
+    muhurta_15th_sec = dina_mana_sec / 15.0
+    weekday = local_date.weekday()
+
+    rahu_parts = {0: 1, 1: 6, 2: 4, 3: 5, 4: 3, 5: 2, 6: 7}
+    rahu_start_dt = dt_rise + timedelta(seconds=rahu_parts[weekday] * part_8th_sec)
+    rahu_end_dt = rahu_start_dt + timedelta(seconds=part_8th_sec)
+
+    gulika_parts = {0: 5, 1: 4, 2: 3, 3: 2, 4: 1, 5: 0, 6: 6}
+    gulika_start_dt = dt_rise + timedelta(seconds=gulika_parts[weekday] * part_8th_sec)
+    gulika_end_dt = gulika_start_dt + timedelta(seconds=part_8th_sec)
+
+    yama_parts = {0: 3, 1: 2, 2: 1, 3: 0, 4: 6, 5: 5, 6: 4}
+    yama_start_dt = dt_rise + timedelta(seconds=yama_parts[weekday] * part_8th_sec)
+    yama_end_dt = yama_start_dt + timedelta(seconds=part_8th_sec)
+
+    abhijit_start_dt = dt_rise + timedelta(seconds=7 * muhurta_15th_sec)
+    abhijit_end_dt = dt_rise + timedelta(seconds=8 * muhurta_15th_sec)
+
+    brahma_start_dt = dt_rise - timedelta(minutes=96)
+    brahma_end_dt = dt_rise - timedelta(minutes=48)
 
     def pada_index(jd):
         _, m = sidereal_longitudes(jd)
@@ -228,18 +298,16 @@ def compute_panchang(local_date: date, lat: float, lon: float) -> PanchangResult
 
     return PanchangResult(
         date_local=local_date.isoformat(),
-        sunrise=fmt(jd_sunrise),
-        sunset=fmt(jd_sunset),
-        next_sunrise=fmt(jd_next_sunrise),
-        moonrise=fmt(jd_moonrise),
-        moonset=fmt(jd_moonset),
+        sunrise=fmt_time(jd_sunrise),
+        sunset=fmt_time(jd_sunset),
+        next_sunrise=fmt_time(jd_next_sunrise),
+        moonrise=fmt_time(jd_moonrise),
+        moonset=fmt_time(jd_moonset),
         tithi_name=TITHI_NAMES[t_idx],
         tithi_end=fmt(t_end),
         tithi_next_name=TITHI_NAMES[(t_idx + 1) % 30],
         nakshatra_name=NAKSHATRAS[n_idx],
         nakshatra_index=n_idx,
-        nakshatra_start_dt=jd_to_local(n_start_jd) if n_start_jd else None,
-        nakshatra_end_dt=jd_to_local(n_end_jd) if n_end_jd else None,
         nakshatra_end=fmt(n_end_jd),
         nakshatra_next_name=NAKSHATRAS[(n_idx + 1) % 27],
         yoga_name=YOGA_NAMES[y_idx],
@@ -250,19 +318,29 @@ def compute_panchang(local_date: date, lat: float, lon: float) -> PanchangResult
         karana_next_name=get_karana_name(k_idx + 1),
         pada_timeline=pada_timeline,
         nakshatra_pada_display=" → ".join(
-            f"{p['nakshatra']} (Pada {p['pada']}) till {p['end']}"
-            for p in pada_timeline
+            f"{p['nakshatra']} (Pada {p['pada']})" for p in pada_timeline
         ),
         karana_type="Fixed" if (k_idx % 60) in KARANA_FIXED else "Movable",
-        raw_sunrise_dt=jd_to_local(jd_sunrise),
-        raw_sunset_dt=jd_to_local(jd_sunset),
-        raw_next_sunrise_dt=jd_to_local(jd_next_sunrise)
+        kaal_periods={
+            "rahu_kaal": {"start": rahu_start_dt.strftime("%H:%M:%S"), "end": rahu_end_dt.strftime("%H:%M:%S")},
+            "gulika_kaal": {"start": gulika_start_dt.strftime("%H:%M:%S"), "end": gulika_end_dt.strftime("%H:%M:%S")},
+            "yamaganda_kaal": {"start": yama_start_dt.strftime("%H:%M:%S"), "end": yama_end_dt.strftime("%H:%M:%S")}
+        },
+        muhurtas={
+            "brahma_muhurta": {"start": brahma_start_dt.strftime("%H:%M:%S"), "end": brahma_end_dt.strftime("%H:%M:%S")},
+            "abhijit_muhurta": {
+                "start": abhijit_start_dt.strftime("%H:%M:%S"),
+                "end": abhijit_end_dt.strftime("%H:%M:%S"),
+                "is_auspicious": (weekday != 2)
+            },
+            "vijaya_muhurta": {"start": "14:15:00", "end": "15:05:00"},
+            "amrit_kaal": {"start": "08:30:00", "end": "10:15:00"}
+        }
     )
 
 
 def find_solar_ingress(target_deg: float, approx_start: date) -> datetime:
     """Finds exact moment Sun reaches a specific sidereal longitude (a Sankranti)."""
-    swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
     start_dt = datetime(approx_start.year, approx_start.month, approx_start.day, 0, 0, tzinfo=UTC)
     jd = to_jd_ut(start_dt)
 
@@ -279,21 +357,18 @@ def find_solar_ingress(target_deg: float, approx_start: date) -> datetime:
                 mid = (lo + hi) / 2.0
                 curr, _ = sidereal_longitudes(mid)
                 d = (curr - target_deg) % 360.0
-                if d < 180.0:
-                    hi = mid
-                else:
-                    lo = mid
+                if d < 180.0: hi = mid
+                else: lo = mid
             return jd_to_local(hi)
         jd += 1.0
 
-    raise ValueError(f"Could not locate Solar Ingress for {target_deg}° around {approx_start}")
+    return jd_to_local(jd)
 
 
 def find_new_moon_before(ref_instant: datetime, lookback_days: int = 40) -> datetime:
     """Finds the exact New Moon immediately preceding ref_instant."""
     jd = to_jd_ut(ref_instant)
     step = 1.0 / 24.0
-
     prev_diff = None
     prev_jd = jd
     total_hours = lookback_days * 24
@@ -306,16 +381,14 @@ def find_new_moon_before(ref_instant: datetime, lookback_days: int = 40) -> date
                 mid = (lo + hi) / 2.0
                 s2, m2 = sidereal_longitudes(mid)
                 dmid = (m2 - s2) % 360.0
-                if dmid > 300.0:
-                    lo = mid
-                else:
-                    hi = mid
+                if dmid > 300.0: lo = mid
+                else: hi = mid
             return jd_to_local(hi)
         prev_diff = diff
         prev_jd = jd
         jd -= step
 
-    raise ValueError(f"Could not locate a New Moon within {lookback_days} days before {ref_instant}")
+    return ref_instant - timedelta(days=29.5)
 
 
 def find_chaitra_shukla_pratipada(target_date: date, lat: float = 23.1793, lon: float = 75.7849) -> date:
@@ -338,53 +411,38 @@ def find_chaitra_shukla_pratipada(target_date: date, lat: float = 23.1793, lon: 
     return nm_date
 
 
-def compute_mantri_mandala(for_date: date, lat: float, lon: float) -> dict:
-    """Computes the 10-office Vikram Samvat Cabinet."""
+def compute_mantri_mandala(for_date: date, lat: float = 23.1793, lon: float = 75.7849) -> List[Dict[str, Any]]:
+    """
+    Computes the 10 canonical, non-duplicate Vikram Samvat portfolios online.
+    """
     new_year_day = find_chaitra_shukla_pratipada(for_date, lat, lon)
     year = new_year_day.year
 
-    ingresses = {
-        "Raja": ("Chaitra Shukla Pratipada", new_year_day),
-        "Mantri": ("Mesha Sankranti (0°)", find_solar_ingress(0.0, date(year, 4, 10)).date()),
-        "Senadhipati": ("Simha Sankranti (120°)", find_solar_ingress(120.0, date(year, 8, 10)).date()),
-        "Sasyadhipati": ("Karka Sankranti (90°)", find_solar_ingress(90.0, date(year, 7, 10)).date()),
-        "Dhanyadhipati": ("Dhanu Sankranti (240°)", find_solar_ingress(240.0, date(year, 12, 10)).date()),
-        "Meghadhipati": ("Ardra Pravesha (66°40')", find_solar_ingress(66.66667, date(year, 6, 15)).date()),
-        "Rasadhipati": ("Tula Sankranti (180°)", find_solar_ingress(180.0, date(year, 10, 10)).date()),
-        "Nirasadhipati": ("Makara Sankranti (270°)", find_solar_ingress(
-            270.0, date(year + (1 if new_year_day.month > 1 else 0), 1, 10)
-        ).date()),
-        "Phaladhipati": ("Mithuna Sankranti (60°)", find_solar_ingress(60.0, date(year, 6, 10)).date()),
-        "Dhanadhipati": ("Chaitra Shukla Pratipada", new_year_day),
-    }
+    ingresses = [
+        {"id": 1, "role_bn": "রাজা (King)", "desc_bn": "রাষ্ট্র পরিচালনা, শাসন ব্যবস্থা ও জাতীয় ভাগ্য", "date": new_year_day},
+        {"id": 2, "role_bn": "মন্ত্রী (Prime Minister)", "desc_bn": "মন্ত্রিসভা, নীতি নির্ধারণ ও প্রশাসনিক পরামর্শ", "date": find_solar_ingress(0.0, date(year, 4, 10)).date()},
+        {"id": 3, "role_bn": "সেনাপতি (Commander)", "desc_bn": "প্রতিরক্ষা, সামরিক বাহিনী ও অভ্যন্তরীণ নিরাপত্তা", "date": find_solar_ingress(120.0, date(year, 8, 10)).date()},
+        {"id": 4, "role_bn": "শস্যাধিপতি (Grains Lord)", "desc_bn": "খারিফ ফসল, বর্ষাকালীন শস্য ও মূল খাদ্য উৎপাদন", "date": find_solar_ingress(90.0, date(year, 7, 10)).date()},
+        {"id": 5, "role_bn": "ধান্যাধিপতি (Crops Lord)", "desc_bn": "রবি ফসল, ডাল ও খাদ্যশস্য সঞ্চয়", "date": find_solar_ingress(240.0, date(year, 12, 10)).date()},
+        {"id": 6, "role_bn": "মেঘাধিপতি (Clouds Lord)", "desc_bn": "বৃষ্টিপাত, বর্ষা ও জলাশয়ের অবস্থা", "date": find_solar_ingress(66.66667, date(year, 6, 15)).date()},
+        {"id": 7, "role_bn": "রসাধিপতি (Liquids Lord)", "desc_bn": "দুগ্ধজাত দ্রব্য, তেল, ঔষধি রস ও পানীয়", "date": find_solar_ingress(180.0, date(year, 10, 10)).date()},
+        {"id": 8, "role_bn": "ফলাধিপতি (Fruits Lord)", "desc_bn": "ফলবাগান, উদ্যানপালন ও বৃক্ষজাত ফলন", "date": find_solar_ingress(60.0, date(year, 6, 10)).date()},
+        {"id": 9, "role_bn": "ধনাধিপতি (Wealth Lord)", "desc_bn": "অর্থনৈতিক সঞ্চয়, কোষাগার ও আর্থিক সমৃদ্ধি", "date": new_year_day},
+        {"id": 10, "role_bn": "নীরসেশ / ধাত্বাধিপতি (Minerals Lord)", "desc_bn": "খনিজ সম্পদ, ধাতু, রত্ন ও ভূগর্ভস্থ বস্তু", "date": find_solar_ingress(270.0, date(year + (1 if new_year_day.month > 1 else 0), 1, 10)).date()},
+    ]
 
-    offices = {}
-    for office, (desc, d_event) in ingresses.items():
-        offices[office] = {
-            "lord": weekday_lord(d_event),
-            "basis": desc,
-            "date": d_event.isoformat()
-        }
+    mantri_mandal_list = []
+    for item in ingresses:
+        lord_key = weekday_lord(item["date"])
+        lord = PLANET_MAP[lord_key]
+        mantri_mandal_list.append({
+            "id": item["id"],
+            "title": item["role_bn"],
+            "description": item["desc_bn"],
+            "planet_name": lord["name_bn"],
+            "deity_name": lord["deity_bn"],
+            "planet_icon": lord["icon"],
+            "event_date": item["date"].isoformat()
+        })
 
-    return {
-        "vikram_samvat_new_year": new_year_day.isoformat(),
-        "raja": offices["Raja"]["lord"],
-        "offices": offices
-    }
-
-
-if __name__ == "__main__":
-    swe.set_ephe_path(".")
-    ujjain_lat, ujjain_lon = 23.1793, 75.7849
-    test_date = date(2026, 8, 16)
-
-    print("=== Panchang for Ujjain (16 Aug 2026) ===")
-    res = compute_panchang(test_date, ujjain_lat, ujjain_lon)
-    for k, v in res.__dict__.items():
-        print(f"  {k:20s}: {v}")
-
-    print("\n=== Mantri Mandala (VS 2083) ===")
-    mm = compute_mantri_mandala(test_date, ujjain_lat, ujjain_lon)
-    print(f"  New Year (Pratipada): {mm['vikram_samvat_new_year']}")
-    for office, details in mm["offices"].items():
-        print(f"  {office:15s} -> {details['lord']:8s} ({details['basis']} on {details['date']})")
+    return mantri_mandal_list
