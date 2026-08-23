@@ -142,7 +142,7 @@ async def generate_chat_response(request: BackendChatRequest):
 
     response_text = ""
 
-    # 7. Generate response using gemini-2.0-flash
+    # 7. Generate response using gemini-3.5-flash
     try:
         if NEW_GENAI_AVAILABLE:
             client = genai.Client(api_key=api_key)
@@ -161,7 +161,7 @@ async def generate_chat_response(request: BackendChatRequest):
             ]
 
             res = client.models.generate_content(
-                model="gemini-2.0-flash",
+                model="gemini-3.5-flash",
                 contents=sdk_contents,
                 config=gen_config
             )
@@ -169,7 +169,7 @@ async def generate_chat_response(request: BackendChatRequest):
 
         elif LEGACY_GENAI_AVAILABLE:
             legacy_genai.configure(api_key=api_key)
-            model_kwargs = {"model_name": "gemini-2.0-flash"}
+            model_kwargs = {"model_name": "gemini-3.5-flash"}
             if system_prompt:
                 model_kwargs["system_instruction"] = system_prompt
 
@@ -181,7 +181,7 @@ async def generate_chat_response(request: BackendChatRequest):
             import urllib.request
             import json
 
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
             payload: Dict[str, Any] = {"contents": alternating_contents}
             if system_prompt:
                 payload["systemInstruction"] = {
@@ -204,11 +204,11 @@ async def generate_chat_response(request: BackendChatRequest):
     except Exception as e:
         print("[BACKEND ERROR /generate-chat-response]:", str(e))
         traceback.print_exc()
-        # Fallback attempt with gemini-1.5-flash
+        # Fallback attempt with gemini-2.5-flash
         try:
             import urllib.request
             import json
-            fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+            fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
             payload = {"contents": alternating_contents}
             if system_prompt:
                 payload["systemInstruction"] = {"parts": [{"text": system_prompt}]}
