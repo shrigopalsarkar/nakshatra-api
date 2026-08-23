@@ -235,7 +235,7 @@ def generate_chat_response_endpoint(request: BackendChatRequest):
             )
 
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3.7-flash",
             contents=gemini_contents,
             config=types.GenerateContentConfig(
                 system_instruction=sys_inst_text,
