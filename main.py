@@ -4,7 +4,7 @@ Deployed on Render: https://nakshatra-api-zjp9.onrender.com
 
 Provides:
 1. POST /generate-chat-response -> Google Gemini AI grounded chat & predictions
-2. GET /panchang -> Real-time Swiss Ephemeris Panchang with dynamic NOAA Sunrise/Sunset
+2. GET /panchang -> Real-time Swiss Ephemeris Panchang & Online Mantri Mandal
 3. GET /generate-astrology-report -> Astronomical planetary positions & transits
 4. GET /calculate -> Moon sidereal longitude, nakshatra, and pada
 """
@@ -115,7 +115,7 @@ async def generate_chat_response(request: BackendChatRequest):
                 "parts": [{"text": combined_text}]
             })
 
-    # 3. Strip any leading "model" messages (Gemini strictly requires contents to start with "user")
+    # 3. Strip any leading "model" messages
     while raw_contents and raw_contents[0]["role"] == "model":
         raw_contents.pop(0)
 
@@ -224,9 +224,18 @@ async def generate_chat_response(request: BackendChatRequest):
                     parts = candidates[0].get("content", {}).get("parts", [])
                     response_text = "".join([p.get("text", "") for p in parts])
         except Exception as inner_e:
+            # বহুভাষিক ডায়নামিক এরর মেসেজ
+            full_context = (system_prompt or "") + " " + " ".join([p["parts"][0]["text"] for item in alternating_contents for p in item.get("parts", [])])
+            if any(char in full_context for char in "अआइईउऊऋएऐओऔकखगघचछजझटठडढणतथदधनपफबभमयरलवशषसह"):
+                fallback_msg = "क्षमा करें, एआई सर्वर से कनेक्शन स्थापित नहीं हो सका। कृपया कुछ समय बाद पुनः प्रयास करें।"
+            elif any(char in full_context for char in "অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলবশষসহ"):
+                fallback_msg = "দুঃখিত, এআই সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি। অনুগ্রহ করে কিছুক্ষণ পর পুনরায় চেষ্টা করুন।"
+            else:
+                fallback_msg = "Sorry, unable to connect to the AI server. Please try again in a few moments."
+
             return BackendChatResponse(
-                text="দুঃখিত, এআই সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি। অনুগ্রহ করে কিছুক্ষণ পর পুনরায় চেষ্টা করুন।",
-                responseText="দুঃখিত, এআই সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি। অনুগ্রহ করে কিছুক্ষণ পর পুনরায় চেষ্টা করুন।",
+                text=fallback_msg,
+                responseText=fallback_msg,
                 status="error",
                 error=f"Gemini API error: {str(e)} | Fallback error: {str(inner_e)}"
             )
@@ -399,9 +408,7 @@ def calculate_online_mantri_mandal(year: int):
 
     return mantri_mandal_list
 
-# --- অ্যাস্ট্রোনমিক্যাল সূর্যোদয় ও সূর্যাস্ত গণনা (NOAA Solar Formula) ---
 
-# --- অ্যাস্ট্রোনমিক্যাল সূর্যোদয় ও সূর্যাস্ত গণনা (NOAA Solar Formula) ---
 def compute_sunrise_sunset(date_obj: datetime.date, lat: float, lon: float):
     """
     Computes precise local sunrise and sunset using standard solar zenith formulas.
@@ -532,7 +539,8 @@ async def get_panchang(
             },
             "vijaya_muhurta": {"start": "14:15:00", "end": "15:05:00"},
             "amrit_kaal": {"start": "08:30:00", "end": "10:15:00"}
-        }
+        },
+        "mantri_mandal": calculate_online_mantri_mandal(date_obj.year)
     }
 
 @app.get("/calculate")
