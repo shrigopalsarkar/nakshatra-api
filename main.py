@@ -9,27 +9,47 @@ from __future__ import annotations
 import os
 from datetime import datetime, date as date_type
 from zoneinfo import ZoneInfo
+from typing import List, Optional
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import RedirectResponse
+from pydantic import BaseModel
 import swisseph as swe
 from google import genai
+from google.genai import types
 
 from panchang import compute_panchang, compute_mantri_mandala
+from muhurta import (
+    compute_kaal_periods,
+    compute_choghadiya,
+    compute_muhurtas,
+    compute_samvatsara,
+    vedic_weekday,
+)
 
 IST = ZoneInfo("Asia/Kolkata")
 UTC = ZoneInfo("UTC")
 
-from muhurta import (compute_kaal_periods, compute_choghadiya,
-                     compute_muhurtas, compute_samvatsara, vedic_weekday)
-
-def _parse_local(s: str) -> datetime:
-    """Panchang strings are '%Y-%m-%d %I:%M:%S %p' in IST."""
-    return datetime.strptime(s, "%Y-%m-%d %I:%M:%S %p").replace(tzinfo=IST)
-    
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
 app = FastAPI(title="Panchang & Vedic Astrology API")
+
+# --- Pydantic Data Models for Live AI Chat ---
+class BackendChatPart(BaseModel):
+    text: str
+
+class BackendChatContent(BaseModel):
+    role: Optional[str] = "user"
+    parts: List[BackendChatPart]
+
+class BackendChatRequest(BaseModel):
+    contents: List[BackendChatContent]
+    systemInstruction: Optional[BackendChatContent] = None
+
+class BackendChatResponse(BaseModel):
+    text: str
+    status: str = "success"
+
 
 NAKSHATRAS = [
     "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra",
@@ -61,7 +81,6 @@ def parse_to_utc_jd(iso_datetime_str: str) -> tuple[float, datetime]:
     """Parses an ISO datetime string and returns (Julian Day UT, UTC Datetime)."""
     dt = datetime.fromisoformat(iso_datetime_str)
     if dt.tzinfo is None:
-        # Default naive datetimes to IST
         dt = dt.replace(tzinfo=IST)
     dt_utc = dt.astimezone(UTC)
     jd = swe.julday(
@@ -93,7 +112,6 @@ def get_planetary_positions(jd_ut: float) -> dict:
             "is_retrograde": speed < 0
         }
 
-    # Ketu is exactly 180 degrees from Rahu
     rahu_lon = positions["Rahu"]["longitude"]
     ketu_lon = (rahu_lon + 180.0) % 360.0
     positions["Ketu"] = {
@@ -138,7 +156,7 @@ def calculate(iso_datetime: str):
 
 
 @app.get("/panchang")
-@app.get("/api/v1/panchang")  # <-- শুধু এই লাইনটি যোগ করুন
+@app.get("/api/v1/panchang")
 def panchang_endpoint(iso_date: str, lat: float = 28.6139, lon: float = 77.2090):
     try:
         d = date_type.fromisoformat(iso_date)
@@ -188,6 +206,50 @@ def panchang_endpoint(iso_date: str, lat: float = 28.6139, lon: float = 77.2090)
         raise HTTPException(status_code=400, detail=str(e))
 
 
+@app.post("/generate-chat-response", response_model=BackendChatResponse)
+def generate_chat_response_endpoint(request: BackendChatRequest):
+    """
+    Live AI Chat & Prediction Endpoint
+    Receives prompt and context from the Android app, executes Gemini server-side,
+    and returns 100% dynamic, personalized answers.
+    """
+    if not client:
+        raise HTTPException(
+            status_code=500,
+            detail="GEMINI_API_KEY environment variable is not configured on Render server."
+        )
+
+    try:
+        sys_inst_text = None
+        if request.systemInstruction and request.systemInstruction.parts:
+            sys_inst_text = request.systemInstruction.parts[0].text
+
+        gemini_contents = []
+        for content in request.contents:
+            role = "user" if content.role == "user" else "model"
+            gemini_contents.append(
+                types.Content(
+                    role=role,
+                    parts=[types.Part.from_text(text=p.text) for p in content.parts]
+                )
+            )
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=gemini_contents,
+            config=types.GenerateContentConfig(
+                system_instruction=sys_inst_text,
+                temperature=0.7,
+            )
+        )
+
+        return BackendChatResponse(
+            text=response.text or "দুঃখিত, কোনো উত্তর প্রস্তুত করা সম্ভব হয়নি।"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Gemini error: {str(e)}")
+
+
 @app.get("/generate-astrology-report")
 def generate_report(
     iso_datetime: str,
@@ -202,12 +264,10 @@ def generate_report(
         jd, dt_utc = parse_to_utc_jd(iso_datetime)
         local_date = dt_utc.astimezone(IST).date()
 
-        # Deterministic ephemeris math calculated in Python
         panchang_data = compute_panchang(local_date, lat, lng)
         planetary_positions = get_planetary_positions(jd)
         moon_details = planetary_positions["Moon"]
 
-        # Provide exact astronomical data to Gemini for translation & astrological analysis
         prompt = f"""
 You are a master Vedic Astrologer. Analyze the following astronomical calculations and generate a detailed report.
 
@@ -232,18 +292,14 @@ Planetary Placements:
 
 --- LOCALIZATION & FORMATTING REQUIREMENTS ---
 Language Code: {lang}
-1. Native Script: Translate all headings, descriptions, and astrological analysis into the native script of {lang} (e.g., Bengali script for 'bn', Devanagari for 'hi').
-2. Numbers & Dates: Convert all numerals into the target script's native digits (e.g., ১, ২, ৩ for Bengali; १, २, ३ for Hindi).
+1. Native Script: Translate all headings, descriptions, and astrological analysis into the native script of {lang}.
+2. Numbers & Dates: Convert all numerals into the target script's native digits.
 3. Do NOT recalculate astronomical times; use the pre-computed timestamps above.
-4. Output a clean astrological analysis including:
-   - Nature & Characteristics of the Janma Nakshatra & Pada
-   - Panchang summary & Tithi significance
-   - Graha Dignities & dosha analysis (e.g., Nadi, Bhakoot, Manglik considerations)
-   - Practical astrological guidance
+4. Output a clean astrological analysis.
 """
 
         response = client.models.generate_content(
-            model="gemini-3.5-flash",
+            model="gemini-2.5-flash",
             contents=prompt,
         )
 
