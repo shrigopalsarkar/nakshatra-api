@@ -3,8 +3,8 @@ FastAPI Backend for Swiss Ephemeris Calculations and Vedic Astrology AI Groundin
 Deployed on Render: https://nakshatra-api-zjp9.onrender.com
 
 Provides:
-1. POST /generate-chat-response -> Google Gemini 2.0 Flash grounded chat & predictions
-2. GET /panchang -> Real-time Swiss Ephemeris Panchang
+1. POST /generate-chat-response -> Google Gemini AI grounded chat & predictions
+2. GET /panchang -> Real-time Swiss Ephemeris Panchang with dynamic NOAA Sunrise/Sunset
 3. GET /generate-astrology-report -> Astronomical planetary positions & transits
 4. GET /calculate -> Moon sidereal longitude, nakshatra, and pada
 """
@@ -88,7 +88,7 @@ class BackendChatResponse(BaseModel):
 async def generate_chat_response(request: BackendChatRequest):
     """
     Direct endpoint matching Android BackendChatRequest DTO.
-    Connects securely to Google Gemini 2.0 Flash via Gemini API Key.
+    Connects securely to Google Gemini via Gemini API Key.
     """
     api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
     if not api_key:
@@ -204,7 +204,6 @@ async def generate_chat_response(request: BackendChatRequest):
     except Exception as e:
         print("[BACKEND ERROR /generate-chat-response]:", str(e))
         traceback.print_exc()
-        # Fallback attempt with gemini-2.5-flash
         try:
             import urllib.request
             import json
@@ -360,6 +359,43 @@ def calculate_planet_positions(dt: datetime.datetime, lat: float = 28.6139, lon:
 
     return planets_data
 
+# --- অ্যাস্ট্রোনমিক্যাল সূর্যোদয় ও সূর্যাস্ত গণনা (NOAA Solar Formula) ---
+def compute_sunrise_sunset(date_obj: datetime.date, lat: float, lon: float):
+    """
+    Computes precise local sunrise and sunset using standard solar zenith formulas.
+    """
+    day_of_year = date_obj.timetuple().tm_yday
+    gamma = 2 * math.pi / 365 * (day_of_year - 1 + (12 - lon / 15) / 24)
+    
+    eqtime = 229.18 * (0.000075 + 0.001868 * math.cos(gamma) - 0.032077 * math.sin(gamma)
+             - 0.014615 * math.cos(2 * gamma) - 0.040849 * math.sin(2 * gamma))
+    
+    decl = 0.006918 - 0.399912 * math.cos(gamma) + 0.070257 * math.sin(gamma) \
+           - 0.006758 * math.cos(2 * gamma) + 0.000907 * math.sin(2 * gamma)
+
+    zenith = math.radians(90.8333)
+    lat_rad = math.radians(lat)
+    
+    cos_hour_angle = (math.cos(zenith) / (math.cos(lat_rad) * math.cos(decl))) - (math.tan(lat_rad) * math.tan(decl))
+    cos_hour_angle = max(-1.0, min(1.0, cos_hour_angle))
+    hour_angle_deg = math.degrees(math.acos(cos_hour_angle))
+
+    sunrise_utc_min = 720 - 4 * lon - eqtime - (hour_angle_deg * 4)
+    sunset_utc_min = 720 - 4 * lon - eqtime + (hour_angle_deg * 4)
+
+    ist_offset = 330
+    sunrise_ist_min = (sunrise_utc_min + ist_offset) % 1440
+    sunset_ist_min = (sunset_utc_min + ist_offset) % 1440
+
+    def min_to_time_str(m):
+        h = int(m // 60)
+        mins = int(m % 60)
+        s = int((m * 60) % 60)
+        return f"{h:02d}:{mins:02d}:{s:02d}"
+
+    return min_to_time_str(sunrise_ist_min), min_to_time_str(sunset_ist_min), sunrise_ist_min, sunset_ist_min
+
+
 @app.get("/panchang")
 async def get_panchang(
     iso_date: str = Query(..., description="Date in YYYY-MM-DD format"),
@@ -370,7 +406,35 @@ async def get_panchang(
         date_obj = datetime.date.fromisoformat(iso_date)
         dt = datetime.datetime(date_obj.year, date_obj.month, date_obj.day, 12, 0, 0)
     except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid iso_date format. Use YYYY-MM-DD.")
+        raise HTTPException(status_code=400, detail="Invalid iso_date format.")
+
+    sunrise_str, sunset_str, rise_min, set_min = compute_sunrise_sunset(date_obj, lat, lon)
+    
+    dina_mana_min = (set_min - rise_min) if set_min > rise_min else (1440 - rise_min + set_min)
+    part_8th = dina_mana_min / 8.0
+    weekday = date_obj.weekday()
+
+    rahu_parts = {0: 1, 1: 6, 2: 4, 3: 5, 4: 3, 5: 2, 6: 7}
+    rahu_start = rise_min + (rahu_parts[weekday] * part_8th)
+    rahu_end = rahu_start + part_8th
+
+    yama_parts = {0: 3, 1: 2, 2: 1, 3: 0, 4: 6, 5: 5, 6: 4}
+    yama_start = rise_min + (yama_parts[weekday] * part_8th)
+    yama_end = yama_start + part_8th
+
+    gulika_parts = {0: 5, 1: 4, 2: 3, 3: 2, 4: 1, 5: 0, 6: 6}
+    gulika_start = rise_min + (gulika_parts[weekday] * part_8th)
+    gulika_end = gulika_start + part_8th
+
+    muhurta_15th = dina_mana_min / 15.0
+    abhijit_start = rise_min + (7 * muhurta_15th)
+    abhijit_end = rise_min + (8 * muhurta_15th)
+
+    def min_to_str(m):
+        h = int((m % 1440) // 60)
+        mins = int(m % 60)
+        s = int((m * 60) % 60)
+        return f"{h:02d}:{mins:02d}:{s:02d}"
 
     planets = calculate_planet_positions(dt, lat, lon)
     sun_lon = planets["Sun"]["longitude"]
@@ -378,36 +442,29 @@ async def get_panchang(
 
     diff_tithi = (moon_lon - sun_lon) % 360.0
     tithi_idx = int(diff_tithi / 12.0) % 30
-    tithi_name = TITHIS[tithi_idx]
-
     nak_idx = int(moon_lon / (360.0 / 27.0)) % 27
-    nak_name = NAKSHATRAS[nak_idx]
     pada = int((moon_lon % (360.0 / 27.0)) / (360.0 / 108.0)) + 1
-
-    yoga_sum = (sun_lon + moon_lon) % 360.0
-    yoga_idx = int(yoga_sum / (360.0 / 27.0)) % 27
-    yoga_name = YOGAS[yoga_idx]
-
+    yoga_idx = int(((sun_lon + moon_lon) % 360.0) / (360.0 / 27.0)) % 27
     karana_idx = int(diff_tithi / 6.0) % 60
     karana_name = KARANAS[karana_idx % 7] if karana_idx < 57 else KARANAS[7 + (karana_idx - 57)]
 
-    sunrise_str = "06:00:00"
-    sunset_str = "18:30:00"
+    brahma_start = (rise_min - 96 + 1440) % 1440
+    brahma_end = (rise_min - 48 + 1440) % 1440
 
     return {
         "date_local": iso_date,
         "sunrise": sunrise_str,
         "sunset": sunset_str,
-        "next_sunrise": "06:00:00",
+        "next_sunrise": sunrise_str,
         "moonrise": "19:15:00",
         "moonset": "07:45:00",
-        "tithi_name": tithi_name,
+        "tithi_name": TITHIS[tithi_idx],
         "tithi_end": f"{iso_date}T23:59:59",
         "tithi_next_name": TITHIS[(tithi_idx + 1) % 30],
-        "nakshatra_name": nak_name,
+        "nakshatra_name": NAKSHATRAS[nak_idx],
         "nakshatra_end": f"{iso_date}T22:30:00",
         "nakshatra_next_name": NAKSHATRAS[(nak_idx + 1) % 27],
-        "yoga_name": yoga_name,
+        "yoga_name": YOGAS[yoga_idx],
         "yoga_end": f"{iso_date}T21:00:00",
         "yoga_next_name": YOGAS[(yoga_idx + 1) % 27],
         "karana_name": karana_name,
@@ -415,18 +472,22 @@ async def get_panchang(
         "karana_next_name": KARANAS[(karana_idx + 1) % 11],
         "karana_type": "Chara",
         "pada_timeline": [
-            {"nakshatra": nak_name, "pada": pada, "end": f"{iso_date}T18:00:00"}
+            {"nakshatra": NAKSHATRAS[nak_idx], "pada": pada, "end": f"{iso_date}T18:00:00"}
         ],
-        "nakshatra_pada_display": f"{nak_name} (Pada {pada})",
+        "nakshatra_pada_display": f"{NAKSHATRAS[nak_idx]} (Pada {pada})",
         "timezone": "Asia/Kolkata",
         "kaal_periods": {
-            "rahu_kaal": {"start": "16:30:00", "end": "18:00:00"},
-            "gulika_kaal": {"start": "13:30:00", "end": "15:00:00"},
-            "yamaganda_kaal": {"start": "06:00:00", "end": "07:30:00"}
+            "rahu_kaal": {"start": min_to_str(rahu_start), "end": min_to_str(rahu_end)},
+            "gulika_kaal": {"start": min_to_str(gulika_start), "end": min_to_str(gulika_end)},
+            "yamaganda_kaal": {"start": min_to_str(yama_start), "end": min_to_str(yama_end)}
         },
         "muhurtas": {
-            "brahma_muhurta": {"start": "04:24:00", "end": "05:12:00"},
-            "abhijit_muhurta": {"start": "11:45:00", "end": "12:35:00", "is_auspicious": True},
+            "brahma_muhurta": {"start": min_to_str(brahma_start), "end": min_to_str(brahma_end)},
+            "abhijit_muhurta": {
+                "start": min_to_str(abhijit_start),
+                "end": min_to_str(abhijit_end),
+                "is_auspicious": (weekday != 2)
+            },
             "vijaya_muhurta": {"start": "14:15:00", "end": "15:05:00"},
             "amrit_kaal": {"start": "08:30:00", "end": "10:15:00"}
         }
