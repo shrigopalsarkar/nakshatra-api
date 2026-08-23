@@ -359,6 +359,48 @@ def calculate_planet_positions(dt: datetime.datetime, lat: float = 28.6139, lon:
 
     return planets_data
 
+PLANET_LORDS = {
+    0: {"name_bn": "চন্দ্র", "deity_bn": "চন্দ্র দেব", "name_en": "Moon", "icon": "☽"},
+    1: {"name_bn": "মঙ্গল", "deity_bn": "কার্তিকেয় / মঙ্গল দেব", "name_en": "Mars", "icon": "♂"},
+    2: {"name_bn": "বুধ", "deity_bn": "ভগবান বিষ্ণু", "name_en": "Mercury", "icon": "☿"},
+    3: {"name_bn": "বৃহস্পতি", "deity_bn": "দেবগুরু বৃহস্পতি", "name_en": "Jupiter", "icon": "♃"},
+    4: {"name_bn": "শুক্র", "deity_bn": "শুক্রাচার্য", "name_en": "Venus", "icon": "♀"},
+    5: {"name_bn": "শনি", "deity_bn": "শনৈশ্চর দেব", "name_en": "Saturn", "icon": "♄"},
+    6: {"name_bn": "রবি", "deity_bn": "সূর্য নারায়ণ", "name_en": "Sun", "icon": "☉"},
+}
+
+def calculate_online_mantri_mandal(year: int):
+    base_pratipada_day = (year + year // 4 - year // 100 + year // 400 + 3) % 7
+    
+    portfolios = [
+        {"id": 1, "role_bn": "রাজা (King)", "desc_bn": "রাষ্ট্র পরিচালনা, শাসন ব্যবস্থা ও জাতীয় ভাগ্য", "weekday": base_pratipada_day},
+        {"id": 2, "role_bn": "মন্ত্রী (Prime Minister)", "desc_bn": "মন্ত্রিসভা, নীতি নির্ধারণ ও প্রশাসনিক পরামর্শ", "weekday": (base_pratipada_day + 2) % 7},
+        {"id": 3, "role_bn": "সেনাপতি (Commander)", "desc_bn": "প্রতিরক্ষা, সামরিক বাহিনী ও অভ্যন্তরীণ নিরাপত্তা", "weekday": (base_pratipada_day + 0) % 7},
+        {"id": 4, "role_bn": "শস্যাধিপতি (Grains Lord)", "desc_bn": "খারিফ ফসল, বর্ষাকালীন শস্য ও মূল খাদ্য উৎপাদন", "weekday": (base_pratipada_day + 3) % 7},
+        {"id": 5, "role_bn": "ধান্যাধিপতি (Crops Lord)", "desc_bn": "রবি ফসল, ডাল ও খাদ্যশস্য সঞ্চয়", "weekday": (base_pratipada_day + 2) % 7},
+        {"id": 6, "role_bn": "মেঘাধিপতি (Clouds Lord)", "desc_bn": "বৃষ্টিপাত, বর্ষা ও জলাশয়ের অবস্থা", "weekday": (base_pratipada_day + 0) % 7},
+        {"id": 7, "role_bn": "রসাধিপতি (Liquids Lord)", "desc_bn": "দুগ্ধজাত দ্রব্য, তেল, ঔষধি রস ও পানীয়", "weekday": (base_pratipada_day + 2) % 7},
+        {"id": 8, "role_bn": "ফলাধিপতি (Fruits Lord)", "desc_bn": "ফলবাগান, উদ্যানপালন ও বৃক্ষজাত ফলন", "weekday": (base_pratipada_day + 5) % 7},
+        {"id": 9, "role_bn": "ধনাধিপতি (Wealth Lord)", "desc_bn": "অর্থনৈতিক সঞ্চয়, কোষাগার ও আর্থিক সমৃদ্ধি", "weekday": (base_pratipada_day + 4) % 7},
+        {"id": 10, "role_bn": "নীরসেশ / ধাত্বাধিপতি (Minerals Lord)", "desc_bn": "খনিজ সম্পদ, ধাতু, রত্ন ও ভূগর্ভস্থ বস্তু", "weekday": (base_pratipada_day + 1) % 7},
+    ]
+
+    mantri_mandal_list = []
+    for item in portfolios:
+        lord = PLANET_LORDS[item["weekday"]]
+        mantri_mandal_list.append({
+            "id": item["id"],
+            "title": item["role_bn"],
+            "description": item["desc_bn"],
+            "planet_name": lord["name_bn"],
+            "deity_name": lord["deity_bn"],
+            "planet_icon": lord["icon"]
+        })
+
+    return mantri_mandal_list
+
+# --- অ্যাস্ট্রোনমিক্যাল সূর্যোদয় ও সূর্যাস্ত গণনা (NOAA Solar Formula) ---
+
 # --- অ্যাস্ট্রোনমিক্যাল সূর্যোদয় ও সূর্যাস্ত গণনা (NOAA Solar Formula) ---
 def compute_sunrise_sunset(date_obj: datetime.date, lat: float, lon: float):
     """
