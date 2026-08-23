@@ -7,6 +7,7 @@ Gemini exclusively for natural language synthesis and native script localization
 
 from __future__ import annotations
 import os
+import traceback
 from datetime import datetime, date as date_type
 from zoneinfo import ZoneInfo
 from typing import List, Optional
@@ -208,11 +209,6 @@ def panchang_endpoint(iso_date: str, lat: float = 28.6139, lon: float = 77.2090)
 
 @app.post("/generate-chat-response", response_model=BackendChatResponse)
 def generate_chat_response_endpoint(request: BackendChatRequest):
-    """
-    Live AI Chat & Prediction Endpoint
-    Receives prompt and context from the Android app, executes Gemini server-side,
-    and returns 100% dynamic, personalized answers.
-    """
     if not client:
         raise HTTPException(
             status_code=500,
@@ -226,16 +222,27 @@ def generate_chat_response_endpoint(request: BackendChatRequest):
 
         gemini_contents = []
         for content in request.contents:
+            valid_parts = [
+                types.Part.from_text(text=p.text.strip())
+                for p in content.parts
+                if p.text and p.text.strip()
+            ]
+            if not valid_parts:
+                continue
+
             role = "user" if content.role == "user" else "model"
             gemini_contents.append(
                 types.Content(
                     role=role,
-                    parts=[types.Part.from_text(text=p.text) for p in content.parts]
+                    parts=valid_parts
                 )
             )
 
+        if not gemini_contents:
+            raise HTTPException(status_code=400, detail="Empty conversation contents.")
+
         response = client.models.generate_content(
-            model="gemini-3.7-flash",
+            model="gemini-2.5-flash",
             contents=gemini_contents,
             config=types.GenerateContentConfig(
                 system_instruction=sys_inst_text,
@@ -247,6 +254,8 @@ def generate_chat_response_endpoint(request: BackendChatRequest):
             text=response.text or "দুঃখিত, কোনো উত্তর প্রস্তুত করা সম্ভব হয়নি।"
         )
     except Exception as e:
+        print("[BACKEND ERROR /generate-chat-response]:", str(e))
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Gemini error: {str(e)}")
 
 
@@ -299,7 +308,7 @@ Language Code: {lang}
 """
 
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3.7-flash",
             contents=prompt,
         )
 
@@ -313,6 +322,8 @@ Language Code: {lang}
         }
 
     except Exception as e:
+        print("[BACKEND ERROR /generate-astrology-report]:", str(e))
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 
