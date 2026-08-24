@@ -94,15 +94,22 @@ ERROR_MESSAGES = {
 }
 
 def resolve_user_language(contents: list, sys_text: str = "") -> str:
-    combined = sys_text + " " + " ".join(
-        part.text for item in contents for part in item.parts if part.text
-    )
-    if any("\u0980" <= ch <= "\u09ff" for ch in combined):
+    last_user_text = ""
+    for item in reversed(contents):
+        role = str(item.role or "user").lower()
+        if role in ["user", "human"]:
+            last_user_text = " ".join(p.text for p in item.parts if p.text and p.text.strip())
+            if last_user_text:
+                break
+
+    if not last_user_text and contents:
+        last_user_text = " ".join(p.text for p in contents[-1].parts if p.text)
+
+    if any("\u0980" <= ch <= "\u09ff" for ch in last_user_text):
         return "bn"
-    if any("\u0900" <= ch <= "\u097f" for ch in combined):
+    if any("\u0900" <= ch <= "\u097f" for ch in last_user_text):
         return "hi"
     return "en"
-
 
 @app.post("/generate-chat-response", response_model=BackendChatResponse)
 async def generate_chat_response(request: BackendChatRequest):
