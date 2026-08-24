@@ -224,12 +224,11 @@ async def generate_chat_response(request: BackendChatRequest):
                     parts = candidates[0].get("content", {}).get("parts", [])
                     response_text = "".join([p.get("text", "") for p in parts])
         except Exception as inner_e:
-            # বহুভাষিক ডায়নামিক এরর মেসেজ
             full_context = (system_prompt or "") + " " + " ".join([p["parts"][0]["text"] for item in alternating_contents for p in item.get("parts", [])])
-            if any(char in full_context for char in "अआइईउऊऋएऐओऔकखगघचछजझटठडढणतथदधनपफबभमयरलवशषसह"):
+            if any(char in full_context for char in "अआइईउऊऋएऐओऔकखगঘचछजझटठडढणतथदधनपफबभमयरलवशषसह"):
                 fallback_msg = "क्षमा करें, एआई सर्वर से कनेक्शन स्थापित नहीं हो सका। कृपया कुछ समय बाद पुनः प्रयास करें।"
             elif any(char in full_context for char in "অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলবশষসহ"):
-                fallback_msg = "দুঃখিত, এআই সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি। অনুগ্রহ করে কিছুক্ষণ পর পুনরায় চেষ্টা করুন।"
+                fallback_msg = "দুঃখিত, এআই সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি। অনুগ্রহ করে কিছুক্ষণ পর পুনরায় চেষ্টা করুন।"
             else:
                 fallback_msg = "Sorry, unable to connect to the AI server. Please try again in a few moments."
 
@@ -434,7 +433,7 @@ PORTFOLIOS = {
 
 PLANET_ICONS = {0: "☉", 1: "☽", 2: "♂", 3: "☿", 4: "♃", 5: "♀", 6: "♄"}
 
-def compute_mantri_mandala(date_obj, lat: float, lon: float, lang: str = "en") -> list:
+def compute_mantri_mandala(date_obj: datetime.date, lat: float, lon: float, lang: str = "en") -> list:
     lang_key = lang.lower() if lang.lower() in ["en", "hi", "bn"] else "en"
     
     # চৈত্র শুক্লা প্রতিপদ ও সংক্রান্তি ভিত্তিক বার গণনা
@@ -467,38 +466,6 @@ def compute_mantri_mandala(date_obj, lat: float, lon: float, lang: str = "en") -
             "planet_icon": PLANET_ICONS[p_idx]
         })
     return result
-
-
-def compute_sunrise_sunset(date_obj: datetime.date, lat: float, lon: float):
-    # ... [আপনার বিদ্যমান compute_sunrise_sunset কোড অপরিবর্তিত থাকবে]
-    base_pratipada_day = (year + year // 4 - year // 100 + year // 400 + 3) % 7
-    
-    portfolios = [
-        {"id": 1, "role_bn": "রাজা (King)", "desc_bn": "রাষ্ট্র পরিচালনা, শাসন ব্যবস্থা ও জাতীয় ভাগ্য", "weekday": base_pratipada_day},
-        {"id": 2, "role_bn": "মন্ত্রী (Prime Minister)", "desc_bn": "মন্ত্রিসভা, নীতি নির্ধারণ ও প্রশাসনিক পরামর্শ", "weekday": (base_pratipada_day + 2) % 7},
-        {"id": 3, "role_bn": "সেনাপতি (Commander)", "desc_bn": "প্রতিরক্ষা, সামরিক বাহিনী ও অভ্যন্তরীণ নিরাপত্তা", "weekday": (base_pratipada_day + 0) % 7},
-        {"id": 4, "role_bn": "শস্যাধিপতি (Grains Lord)", "desc_bn": "খারিফ ফসল, বর্ষাকালীন শস্য ও মূল খাদ্য উৎপাদন", "weekday": (base_pratipada_day + 3) % 7},
-        {"id": 5, "role_bn": "ধান্যাধিপতি (Crops Lord)", "desc_bn": "রবি ফসল, ডাল ও খাদ্যশস্য সঞ্চয়", "weekday": (base_pratipada_day + 2) % 7},
-        {"id": 6, "role_bn": "মেঘাধিপতি (Clouds Lord)", "desc_bn": "বৃষ্টিপাত, বর্ষা ও জলাশয়ের অবস্থা", "weekday": (base_pratipada_day + 0) % 7},
-        {"id": 7, "role_bn": "রসাধিপতি (Liquids Lord)", "desc_bn": "দুগ্ধজাত দ্রব্য, তেল, ঔষধি রস ও পানীয়", "weekday": (base_pratipada_day + 2) % 7},
-        {"id": 8, "role_bn": "ফলাধিপতি (Fruits Lord)", "desc_bn": "ফলবাগান, উদ্যানপালন ও বৃক্ষজাত ফলন", "weekday": (base_pratipada_day + 5) % 7},
-        {"id": 9, "role_bn": "ধনাধিপতি (Wealth Lord)", "desc_bn": "অর্থনৈতিক সঞ্চয়, কোষাগার ও আর্থিক সমৃদ্ধি", "weekday": (base_pratipada_day + 4) % 7},
-        {"id": 10, "role_bn": "নীরসেশ / ধাত্বাধিপতি (Minerals Lord)", "desc_bn": "খনিজ সম্পদ, ধাতু, রত্ন ও ভূগর্ভস্থ বস্তু", "weekday": (base_pratipada_day + 1) % 7},
-    ]
-
-    mantri_mandal_list = []
-    for item in portfolios:
-        lord = PLANET_LORDS[item["weekday"]]
-        mantri_mandal_list.append({
-            "id": item["id"],
-            "title": item["role_bn"],
-            "description": item["desc_bn"],
-            "planet_name": lord["name_bn"],
-            "deity_name": lord["deity_bn"],
-            "planet_icon": lord["icon"]
-        })
-
-    return mantri_mandal_list
 
 
 def compute_sunrise_sunset(date_obj: datetime.date, lat: float, lon: float):
@@ -566,14 +533,14 @@ def compute_moon_events(dt: datetime.datetime, lat: float, lon: float):
     # সুইস এফিমেরিস অনুপস্থিত থাকলে গাণিতিক ফলব্যাক
     return "16:30:00", "03:45:00"
 
+
 @app.get("/panchang")
 async def get_panchang(
     iso_date: str = Query(..., description="Date in YYYY-MM-DD format"),
     lat: float = Query(28.6139, description="Latitude"),
     lon: float = Query(77.2090, description="Longitude"),
-    lang: str = Query("en", description="Language: 'en', 'hi', or 'bn'")  # <--- যোগ করুন
+    lang: str = Query("en", description="Language: 'en', 'hi', or 'bn'")
 ):
-    
     try:
         date_obj = datetime.date.fromisoformat(iso_date)
         dt = datetime.datetime(date_obj.year, date_obj.month, date_obj.day, 12, 0, 0)
@@ -623,6 +590,7 @@ async def get_panchang(
     brahma_start = (rise_min - 96 + 1440) % 1440
     brahma_end = (rise_min - 48 + 1440) % 1440
     moonrise_str, moonset_str = compute_moon_events(dt, lat, lon)
+
     return {
         "date_local": iso_date,
         "sunrise": sunrise_str,
@@ -663,7 +631,7 @@ async def get_panchang(
             "vijaya_muhurta": {"start": "14:15:00", "end": "15:05:00"},
             "amrit_kaal": {"start": "08:30:00", "end": "10:15:00"}
         },
-        "mantri_mandal": compute_mantri_mandala(date_obj, lat, lon)
+        "mantri_mandal": compute_mantri_mandala(date_obj, lat, lon, lang=lang)
     }
 
 @app.get("/calculate")
@@ -697,7 +665,7 @@ async def generate_astrology_report(
 
     planets = calculate_planet_positions(dt, lat, lng)
     iso_date = dt.date().isoformat()
-    panchang_data = await get_panchang(iso_date, lat, lng)
+    panchang_data = await get_panchang(iso_date, lat, lng, lang)
 
     return {
         "astronomical_data": {
