@@ -460,6 +460,69 @@ def get_localized_mantri_mandala(date_obj: datetime.date, lat: float, lon: float
         })
     return localized_mandal
 
+# ==============================================================================
+# CHOGHADIYA COMPUTATION (Day & Night)
+# ==============================================================================
+
+CHOGHADIYA_NAMES = {
+    "en": {"Amrit": "Amrit", "Shubh": "Shubh", "Labh": "Labh", "Char": "Char", "Rog": "Rog", "Kaal": "Kaal", "Udveg": "Udveg"},
+    "hi": {"Amrit": "अमृत", "Shubh": "शुभ", "Labh": "लाभ", "Char": "चल", "Rog": "रोग", "Kaal": "काल", "Udveg": "उद्वेग"},
+    "bn": {"Amrit": "অমৃত", "Shubh": "শুভ", "Labh": "লাভ", "Char": "চর", "Rog": "রোগ", "Kaal": "কাল", "Udveg": "উদ্বেগ"}
+}
+
+CHOGHADIYA_ORDER = ["Udveg", "Char", "Labh", "Amrit", "Kaal", "Shubh", "Rog"]
+
+DAY_START_INDEX = {0: 3, 1: 6, 2: 2, 3: 5, 4: 1, 5: 4, 6: 0}   # 0=Mon (Amrit), 1=Tue (Rog)... 6=Sun (Udveg)
+NIGHT_START_INDEX = {0: 1, 1: 4, 2: 0, 3: 3, 4: 6, 5: 2, 6: 5} # 0=Mon (Char), 1=Tue (Kaal)... 6=Sun (Shubh)
+
+def compute_choghadiya(date_obj: datetime.date, rise_min: float, set_min: float, lang: str = "en") -> dict:
+    lang_key = "bn" if "bn" in lang.lower() else ("hi" if "hi" in lang.lower() else "en")
+    weekday = date_obj.weekday()
+    
+    # দিবা চৌঘড়িয়া (Day)
+    day_span = (set_min - rise_min) if set_min > rise_min else (1440 - rise_min + set_min)
+    day_part = day_span / 8.0
+    day_start_idx = DAY_START_INDEX[weekday]
+    
+    # রাত্রি চৌঘড়িয়া (Night)
+    night_span = (1440 - day_span)
+    night_part = night_span / 8.0
+    night_start_idx = NIGHT_START_INDEX[weekday]
+
+    def min_to_t_str(m):
+        h = int((m % 1440) // 60)
+        mins = int(m % 60)
+        s = int((m * 60) % 60)
+        return f"{h:02d}:{mins:02d}:{s:02d}"
+
+    day_list, night_list = [], []
+
+    for i in range(8):
+        # Day
+        raw_day_type = CHOGHADIYA_ORDER[(day_start_idx + i) % 7]
+        st_d = rise_min + (i * day_part)
+        en_d = st_d + day_part
+        day_list.append({
+            "name": CHOGHADIYA_NAMES[lang_key][raw_day_type],
+            "raw_name": raw_day_type,
+            "start": min_to_t_str(st_d),
+            "end": min_to_t_str(en_d),
+            "is_auspicious": raw_day_type in ["Amrit", "Shubh", "Labh", "Char"]
+        })
+
+        # Night
+        raw_night_type = CHOGHADIYA_ORDER[(night_start_idx + i) % 7]
+        st_n = set_min + (i * night_part)
+        en_n = st_n + night_part
+        night_list.append({
+            "name": CHOGHADIYA_NAMES[lang_key][raw_night_type],
+            "raw_name": raw_night_type,
+            "start": min_to_t_str(st_n),
+            "end": min_to_t_str(en_n),
+            "is_auspicious": raw_night_type in ["Amrit", "Shubh", "Labh", "Char"]
+        })
+
+    return {"day": day_list, "night": night_list}
 
 def compute_sunrise_sunset(date_obj: datetime.date, lat: float, lon: float):
     day_of_year = date_obj.timetuple().tm_yday
