@@ -95,37 +95,45 @@ ERROR_MESSAGES = {
 
 def resolve_user_language(contents: list, sys_text: str = "") -> str:
     """
-    ১. AI Report-এর জন্য পাঠানো নির্দিষ্ট ভাষার নির্দেশিকা চেক করে।
-    ২. চ্যাটের ক্ষেত্রে ইউজারের টাইপ করা অক্ষরের ইউনিকোড স্ক্যান করে (হিন্দি/বাংলা/ইংরেজি)।
+    ১. ইউজার চ্যাটে যে ভাষায় প্রশ্ন টাইপ করেছেন (English/বাংলা/हिंदी) সবার আগে সেটি শনাক্ত করে।
+    ২. কোনো অবস্থাতেই সিস্টেম প্রম্পটের টেক্সট দেখে চ্যাটের ভাষা পরিবর্তন করবে না।
     """
-    last_user_text = ""
+    user_text = ""
     for item in reversed(contents):
-        role = str(item.role or "user").lower()
+        role = str(getattr(item, "role", "") or "user").lower()
         if role in ["user", "human"]:
-            last_user_text = " ".join(p.text for p in item.parts if p.text and p.text.strip())
-            if last_user_text:
+            parts = getattr(item, "parts", [])
+            user_text = " ".join(getattr(p, "text", "") for p in parts if getattr(p, "text", "")).strip()
+            if user_text:
                 break
 
-    if not last_user_text and contents:
-        last_user_text = " ".join(p.text for p in contents[-1].parts if p.text)
+    if not user_text and contents:
+        parts = getattr(contents[-1], "parts", [])
+        user_text = " ".join(getattr(p, "text", "") for p in parts if getattr(p, "text", "")).strip()
 
-    full_raw = (sys_text + " " + last_user_text).lower()
+    # চ্যাটের টেক্সটে অক্ষরের সংখ্যা গণনা
+    bn_letters = sum(1 for ch in user_text if "\u0980" <= ch <= "\u09ff")
+    hi_letters = sum(1 for ch in user_text if "\u0900" <= ch <= "\u097f")
+    en_letters = sum(1 for ch in user_text if ("a" <= ch <= "z" or "A" <= ch <= "Z"))
 
-    # ১. এআই রিপোর্ট বা সিস্টেমের সুস্পষ্ট ভাষা নির্দেশ (Explicit Language Check)
-    if any(k in full_raw for k in ["language: hi", "language: hindi", "respond in hindi", "in hindi"]):
-        return "hi"
-    if any(k in full_raw for k in ["language: bn", "language: bengali", "respond in bengali", "in bengali"]):
+    # ১. চ্যাটে বাংলা অক্ষর থাকলে -> ১০০% বাংলা
+    if bn_letters > 0 and bn_letters >= hi_letters:
         return "bn"
-    if any(k in full_raw for k in ["language: en", "language: english", "respond in english", "in english"]):
+
+    # ২. চ্যাটে হিন্দি/দেবনাগরী অক্ষর থাকলে -> ১০০% হিন্দি
+    if hi_letters > 0 and hi_letters > bn_letters:
+        return "hi"
+
+    # ৩. চ্যাটে ইংরেজি প্রশ্ন থাকলে -> ১০০% ইংরেজি
+    if en_letters > 0:
         return "en"
 
-    # ২. চ্যাটে টাইপ করা মেসেজ (User Chat Message Detection)
-    # হিন্দি অক্ষর থাকলে
-    if any("\u0900" <= ch <= "\u097f" for ch in last_user_text):
-        return "hi"
-    # বাংলা অক্ষর থাকলে
-    if any("\u0980" <= ch <= "\u09ff" for ch in last_user_text):
+    # ৪. শুধুমাত্র AI Report তৈরির ক্ষেত্রে (যদি চ্যাট টেক্সট খালি থাকে)
+    s_lower = sys_text.lower()
+    if "language: bn" in s_lower or "respond in bengali" in s_lower or any("\u0980" <= ch <= "\u09ff" for ch in sys_text):
         return "bn"
+    if "language: hi" in s_lower or "respond in hindi" in s_lower or any("\u0900" <= ch <= "\u097f" for ch in sys_text):
+        return "hi"
 
     return "en"
 
