@@ -95,8 +95,10 @@ ERROR_MESSAGES = {
 
 def resolve_user_language(contents: list, sys_text: str = "") -> str:
     """
-    ১. ইউজারের পাঠানো শেষ মেসেজ স্ক্যান করে।
-    ২. যে ভাষার অক্ষরের সংখ্যা বেশি (Majority Count), নির্ভুলভাবে সেই ভাষাকে নির্বাচন করে।
+    ইউনিকোড স্ক্রিপ্ট ডিটেক্টর:
+    - বাংলা অক্ষর থাকলে -> 'bn'
+    - হিন্দি অক্ষর থাকলে -> 'hi'
+    - কোনোটি না থাকলে (সম্পূর্ণ ইংরেজি) -> 'en'
     """
     user_text = ""
     for item in reversed(contents):
@@ -111,27 +113,27 @@ def resolve_user_language(contents: list, sys_text: str = "") -> str:
         parts = getattr(contents[-1], "parts", [])
         user_text = " ".join(getattr(p, "text", "") for p in parts if getattr(p, "text", "")).strip()
 
-    # অক্ষরের সংখ্যা গণনা
-    bn_count = sum(1 for ch in user_text if "\u0980" <= ch <= "\u09ff")
-    hi_count = sum(1 for ch in user_text if "\u0900" <= ch <= "\u097f")
-    en_count = sum(1 for ch in user_text if ("a" <= ch <= "z" or "A" <= ch <= "Z"))
+    # বাংলা ও হিন্দি অক্ষর স্ক্যান
+    has_bengali = any("\u0980" <= ch <= "\u09ff" for ch in user_text)
+    has_hindi = any("\u0900" <= ch <= "\u097f" for ch in user_text)
 
-    # ১. যে ভাষার অক্ষরের সংখ্যা সবচেয়ে বেশি (Majority Check)
-    if en_count > bn_count and en_count > hi_count:
-        return "en"
-    if hi_count > bn_count and hi_count > en_count:
-        return "hi"
-    if bn_count > hi_count and bn_count > en_count:
+    # ১. বাংলা থাকলে সরাসরি বাংলা
+    if has_bengali and not has_hindi:
         return "bn"
 
-    # ২. সিস্টেম বা ডিফল্ট ফলব্যাক
-    s_lower = sys_text.lower()
-    if any(k in s_lower for k in ["language: hi", "in hindi", "respond in hindi"]):
+    # ২. হিন্দি থাকলে সরাসরি হিন্দি
+    if has_hindi and not has_bengali:
         return "hi"
-    if any(k in s_lower for k in ["language: bn", "in bengali", "respond in bengali"]):
-        return "bn"
 
+    # ৩. দুটোই থাকলে যার সংখ্যা বেশি
+    if has_bengali and has_hindi:
+        bn_count = sum(1 for ch in user_text if "\u0980" <= ch <= "\u09ff")
+        hi_count = sum(1 for ch in user_text if "\u0900" <= ch <= "\u097f")
+        return "bn" if bn_count >= hi_count else "hi"
+
+    # ৪. বাংলা বা হিন্দি না থাকলে সম্পূর্ণ ইংরেজি
     return "en"
+
 
 
 @app.post("/generate-chat-response", response_model=BackendChatResponse)
