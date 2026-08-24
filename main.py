@@ -94,6 +94,10 @@ ERROR_MESSAGES = {
 }
 
 def resolve_user_language(contents: list, sys_text: str = "") -> str:
+    """
+    প্রম্পটের আসল ভাষা সঠিকভাবে শনাক্ত করে।
+    প্রোফাইলের নাম (যেমন 'গোপাল') থাকলেও ইংরেজি/হিন্দি মোড ভুল হবে না।
+    """
     last_user_text = ""
     for item in reversed(contents):
         role = str(item.role or "user").lower()
@@ -105,10 +109,28 @@ def resolve_user_language(contents: list, sys_text: str = "") -> str:
     if not last_user_text and contents:
         last_user_text = " ".join(p.text for p in contents[-1].parts if p.text)
 
-    if any("\u0980" <= ch <= "\u09ff" for ch in last_user_text):
-        return "bn"
-    if any("\u0900" <= ch <= "\u097f" for ch in last_user_text):
+    full_text = (sys_text + " " + last_user_text).lower()
+
+    # ১. প্রম্পট বা সিস্টেমে সুস্পষ্ট ভাষার নির্দেশ থাকলে
+    if any(k in full_text for k in ["in english", "language: en", "respond in english", "english"]):
+        return "en"
+    if any(k in full_text for k in ["in hindi", "language: hi", "respond in hindi", "हिंदी", "hindi"]):
         return "hi"
+    if any(k in full_text for k in ["in bengali", "language: bn", "respond in bengali", "বাংলা", "bengali"]):
+        return "bn"
+
+    # ২. অক্ষরের অনুপাত গণনা (নামের কারণে যেন ভাষা বিভ্রান্তি না হয়)
+    bn_count = sum(1 for ch in last_user_text if "\u0980" <= ch <= "\u09ff")
+    hi_count = sum(1 for ch in last_user_text if "\u0900" <= ch <= "\u097f")
+    en_count = sum(1 for ch in last_user_text if ("a" <= ch <= "z" or "A" <= ch <= "Z"))
+
+    if en_count > bn_count and en_count > hi_count:
+        return "en"
+    if hi_count > bn_count and hi_count > en_count:
+        return "hi"
+    if bn_count > 0:
+        return "bn"
+
     return "en"
 
 @app.post("/generate-chat-response", response_model=BackendChatResponse)
