@@ -17,7 +17,6 @@ from typing import List, Optional, Dict, Any
 from fastapi import FastAPI, Query, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from panchang import compute_mantri_mandala
 
 # Try importing pyswisseph; provide mathematical fallback if compiled C extensions are absent
 try:
@@ -369,17 +368,109 @@ def calculate_planet_positions(dt: datetime.datetime, lat: float = 28.6139, lon:
 
     return planets_data
 
-PLANET_LORDS = {
-    0: {"name_bn": "চন্দ্র", "deity_bn": "চন্দ্র দেব", "name_en": "Moon", "icon": "☽"},
-    1: {"name_bn": "মঙ্গল", "deity_bn": "কার্তিকেয় / মঙ্গল দেব", "name_en": "Mars", "icon": "♂"},
-    2: {"name_bn": "বুধ", "deity_bn": "ভগবান বিষ্ণু", "name_en": "Mercury", "icon": "☿"},
-    3: {"name_bn": "বৃহস্পতি", "deity_bn": "দেবগুরু বৃহস্পতি", "name_en": "Jupiter", "icon": "♃"},
-    4: {"name_bn": "শুক্র", "deity_bn": "শুক্রাচার্য", "name_en": "Venus", "icon": "♀"},
-    5: {"name_bn": "শনি", "deity_bn": "শনৈশ্চর দেব", "name_en": "Saturn", "icon": "♄"},
-    6: {"name_bn": "রবি", "deity_bn": "সূর্য নারায়ণ", "name_en": "Sun", "icon": "☉"},
+# ==============================================================================
+# MULTILINGUAL MANTRI MANDAL DATA & LOGIC
+# ==============================================================================
+
+PLANET_NAMES = {
+    "en": {0: "Sun", 1: "Moon", 2: "Mars", 3: "Mercury", 4: "Jupiter", 5: "Venus", 6: "Saturn"},
+    "hi": {0: "सूर्य", 1: "चन्द्र", 2: "मंगल", 3: "बुध", 4: "बृहस्पति", 5: "शुक्र", 6: "शनि"},
+    "bn": {0: "সূর্য", 1: "চন্দ্র", 2: "মঙ্গল", 3: "বুধ", 4: "বৃহস্পতি", 5: "শুক্র", 6: "শনি"}
 }
 
-def calculate_online_mantri_mandal(year: int):
+DEITY_NAMES = {
+    "en": {
+        0: "Surya Deva", 1: "Chandra Deva", 2: "Lord Kartikeya / Mangal",
+        3: "Lord Vishnu", 4: "Brihaspati Deva", 5: "Shukracharya", 6: "Shani Deva"
+    },
+    "hi": {
+        0: "भगवान सूर्य देव", 1: "चन्द्र देव", 2: "कार्तिकेय / मंगल देव",
+        3: "भगवान विष्णु", 4: "देवगुरु बृहस्पति", 5: "शुक्राचार्य", 6: "शनैश्चर देव"
+    },
+    "bn": {
+        0: "সূর্য দেব", 1: "চন্দ্র দেব", 2: "কার্তিকেয় / মঙ্গল দেব",
+        3: "ভগবান বিষ্ণু", 4: "দেবগুরু বৃহস্পতি", 5: "শুক্রাচার্য", 6: "শনৈশ্চর দেব"
+    }
+}
+
+PORTFOLIOS = {
+    "en": [
+        ("Raja (King)", "Supreme governance, state rulers & national destiny"),
+        ("Mantri (Prime Minister)", "Executive leadership, council decisions & policy advisory"),
+        ("Senapati (Commander)", "National defense, armed forces & internal security"),
+        ("Sasyadhipati (Lord of Grains)", "Kharif agriculture, monsoon crops & food production"),
+        ("Dhanyadhipati (Lord of Crops)", "Rabi harvest, pulse storage & agricultural commodities"),
+        ("Meghadhipati (Lord of Clouds)", "Rainfall distribution, monsoon health & water bodies"),
+        ("Rasadhipati (Lord of Liquids)", "Dairy, oils, medicinal juices, sugarcane & beverages"),
+        ("Phaladhipati (Lord of Fruits)", "Orchards, horticulture, flowers & seasonal fruit yield"),
+        ("Dhanadhipati (Lord of Wealth)", "Economic reserves, treasury wealth & fiscal prosperity"),
+        ("Nirashesh / Dhatvadhipati (Minerals Lord)", "Minerals, gems, metals & underground resources")
+    ],
+    "hi": [
+        ("राजा (King)", "राज्य शासन, प्रशासनिक व्यवस्था एवं राष्ट्रीय संप्रभुता"),
+        ("मन्त्री (Prime Minister)", "मंत्रिमंडल, नीति निर्धारण एवं प्रशासनिक परामर्श"),
+        ("सेनापति (Commander)", "राष्ट्रीय रक्षा, सैन्य बल एवं आंतरिक सुरक्षा"),
+        ("सस्याधिपति (Grains Lord)", "खरीफ फसल, वर्षाकालीन धान्य एवं मुख्य खाद्य उत्पादन"),
+        ("धान्याधिपति (Crops Lord)", "रबी फसल, दलहन एवं धान्य संचयन"),
+        ("मेघाधिपति (Clouds Lord)", "वर्षा, मेघ एवं जल संसाधनों की स्थिति"),
+        ("रसाधिपति (Liquids Lord)", "दुग्ध, तेल, औषधीय रस, शर्करा एवं पेय पदार्थ"),
+        ("फलाधिपति (Fruits Lord)", "फलोद्यान, बागवानी, पुष्प एवं मौसमी फल उत्पादन"),
+        ("धनाधिपति (Wealth Lord)", "आर्थिक कोष, राजकोष एवं वित्तीय समृद्धि"),
+        ("नीरसेश / धात्वाधिपति (Minerals Lord)", "खनिज संपदा, धातु, रत्न एवं भूगर्भीय वस्तुएं")
+    ],
+    "bn": [
+        ("রাজা (King)", "রাষ্ট্র পরিচালনা, শাসন ব্যবস্থা ও জাতীয় ভাগ্য"),
+        ("মন্ত্রী (Prime Minister)", "মন্ত্রিসভা, নীতি নির্ধারণ ও প্রশাসনিক পরামর্শ"),
+        ("সেনাপতি (Commander)", "প্রতিরক্ষা, সামরিক বাহিনী ও অভ্যন্তরীণ নিরাপত্তা"),
+        ("শস্যাধিপতি (Grains Lord)", "খারিফ ফসল, বর্ষাকালীন শস্য ও মূল খাদ্য উৎপাদন"),
+        ("ধান্যাধিপতি (Crops Lord)", "রবি ফসল, ডাল ও খাদ্যশস্য সঞ্চয়"),
+        ("মেঘাধিপতি (Clouds Lord)", "বৃষ্টিপাত, বর্ষা ও জলাশয়ের অবস্থা"),
+        ("রসাধিপতি (Liquids Lord)", "দুগ্ধজাত দ্রব্য, তেল, ঔষধি রস ও পানীয়"),
+        ("ফলাধিপতি (Fruits Lord)", "ফলবাগান, উদ্যানপালন ও বৃক্ষজাত ফলন"),
+        ("ধনাধিপতি (Wealth Lord)", "অর্থনৈতিক সঞ্চয়, কোষাগার ও আর্থিক সমৃদ্ধি"),
+        ("নীরসেশ / ধাত্বাধিপতি (Minerals Lord)", "খনিজ সম্পদ, ধাতু, রত্ন ও ভূগর্ভস্থ বস্তু")
+    ]
+}
+
+PLANET_ICONS = {0: "☉", 1: "☽", 2: "♂", 3: "☿", 4: "♃", 5: "♀", 6: "♄"}
+
+def compute_mantri_mandala(date_obj, lat: float, lon: float, lang: str = "en") -> list:
+    lang_key = lang.lower() if lang.lower() in ["en", "hi", "bn"] else "en"
+    
+    # চৈত্র শুক্লা প্রতিপদ ও সংক্রান্তি ভিত্তিক বার গণনা
+    year = date_obj.year
+    base_pratipada_day = (year + year // 4 - year // 100 + year // 400 + 3) % 7
+
+    portfolios_weekdays = [
+        base_pratipada_day,
+        (base_pratipada_day + 2) % 7,
+        (base_pratipada_day + 0) % 7,
+        (base_pratipada_day + 3) % 7,
+        (base_pratipada_day + 2) % 7,
+        (base_pratipada_day + 0) % 7,
+        (base_pratipada_day + 2) % 7,
+        (base_pratipada_day + 5) % 7,
+        (base_pratipada_day + 4) % 7,
+        (base_pratipada_day + 1) % 7
+    ]
+
+    result = []
+    for i in range(10):
+        p_idx = portfolios_weekdays[i]
+        title, desc = PORTFOLIOS[lang_key][i]
+        result.append({
+            "id": i + 1,
+            "title": title,
+            "description": desc,
+            "planet_name": PLANET_NAMES[lang_key][p_idx],
+            "deity_name": DEITY_NAMES[lang_key][p_idx],
+            "planet_icon": PLANET_ICONS[p_idx]
+        })
+    return result
+
+
+def compute_sunrise_sunset(date_obj: datetime.date, lat: float, lon: float):
+    # ... [আপনার বিদ্যমান compute_sunrise_sunset কোড অপরিবর্তিত থাকবে]
     base_pratipada_day = (year + year // 4 - year // 100 + year // 400 + 3) % 7
     
     portfolios = [
@@ -479,8 +570,10 @@ def compute_moon_events(dt: datetime.datetime, lat: float, lon: float):
 async def get_panchang(
     iso_date: str = Query(..., description="Date in YYYY-MM-DD format"),
     lat: float = Query(28.6139, description="Latitude"),
-    lon: float = Query(77.2090, description="Longitude")
+    lon: float = Query(77.2090, description="Longitude"),
+    lang: str = Query("en", description="Language: 'en', 'hi', or 'bn'")  # <--- যোগ করুন
 ):
+    
     try:
         date_obj = datetime.date.fromisoformat(iso_date)
         dt = datetime.datetime(date_obj.year, date_obj.month, date_obj.day, 12, 0, 0)
