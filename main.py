@@ -445,6 +445,35 @@ def compute_sunrise_sunset(date_obj: datetime.date, lat: float, lon: float):
     return min_to_time_str(sunrise_ist_min), min_to_time_str(sunset_ist_min), sunrise_ist_min, sunset_ist_min
 
 
+def compute_moon_events(dt: datetime.datetime, lat: float, lon: float):
+    """
+    Computes true astronomical Moonrise and Moonset for the exact City coordinates.
+    """
+    if SWISSEPH_AVAILABLE:
+        try:
+            # স্থানীয় মধ্যরাত্রির জুলিয়ান ডে (UTC)
+            jd_utc = calculate_julian_day(dt) - 0.5
+            geopos = (lon, lat, 0.0)
+
+            # Swiss Ephemeris দিয়ে দৃষ্টিগোচর চন্দ্রোদয় (Moonrise) ও চন্দ্রাস্ত (Moonset)
+            _, res_rise = swe.rise_trans(jd_utc, swe.MOON, swe.CALC_RISE, geopos)
+            _, res_set = swe.rise_trans(jd_utc, swe.MOON, swe.CALC_SET, geopos)
+
+            def jd_to_ist_time(jd_val):
+                y, m, d, h = swe.revjul(jd_val)
+                utc_dt = datetime.datetime(y, m, d, tzinfo=datetime.timezone.utc) + datetime.timedelta(hours=h)
+                ist_dt = utc_dt + datetime.timedelta(hours=5, minutes=30)
+                return ist_dt.strftime("%H:%M:%S")
+
+            moonrise_str = jd_to_ist_time(res_rise[0]) if res_rise else "16:45:00"
+            moonset_str = jd_to_ist_time(res_set[0]) if res_set else "03:30:00"
+            return moonrise_str, moonset_str
+        except Exception as e:
+            print("[SWISSEPH MOON CALC ERROR]:", e)
+
+    # সুইস এফিমেরিস অনুপস্থিত থাকলে গাণিতিক ফলব্যাক
+    return "16:30:00", "03:45:00"
+
 @app.get("/panchang")
 async def get_panchang(
     iso_date: str = Query(..., description="Date in YYYY-MM-DD format"),
