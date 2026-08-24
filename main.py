@@ -17,6 +17,7 @@ from typing import List, Optional, Dict, Any
 from fastapi import FastAPI, Query, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from panchang import compute_mantri_mandala
 
 # Try importing pyswisseph; provide mathematical fallback if compiled C extensions are absent
 try:
@@ -569,7 +570,7 @@ async def get_panchang(
             "vijaya_muhurta": {"start": "14:15:00", "end": "15:05:00"},
             "amrit_kaal": {"start": "08:30:00", "end": "10:15:00"}
         },
-        "mantri_mandal": calculate_online_mantri_mandal(date_obj.year)
+        "mantri_mandal": compute_mantri_mandala(date_obj, lat, lon)
     }
 
 @app.get("/calculate")
