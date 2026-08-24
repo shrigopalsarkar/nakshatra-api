@@ -525,17 +525,17 @@ async def get_panchang(
     yoga_idx = int(((sun_lon + moon_lon) % 360.0) / (360.0 / 27.0)) % 27
     karana_idx = int(diff_tithi / 6.0) % 60
     karana_name = KARANAS[karana_idx % 7] if karana_idx < 57 else KARANAS[7 + (karana_idx - 57)]
-
+    
     brahma_start = (rise_min - 96 + 1440) % 1440
     brahma_end = (rise_min - 48 + 1440) % 1440
-
+    moonrise_str, moonset_str = compute_moon_events(dt, lat, lon)
     return {
         "date_local": iso_date,
         "sunrise": sunrise_str,
         "sunset": sunset_str,
         "next_sunrise": sunrise_str,
-        "moonrise": "19:15:00",
-        "moonset": "07:45:00",
+        "moonrise": moonrise_str,
+        "moonset": moonset_str,
         "tithi_name": TITHIS[tithi_idx],
         "tithi_end": f"{iso_date}T23:59:59",
         "tithi_next_name": TITHIS[(tithi_idx + 1) % 30],
