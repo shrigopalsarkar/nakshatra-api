@@ -18,6 +18,9 @@ from fastapi import FastAPI, Query, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+# ১. panchang.py থেকে আসল ও ১০০% নিখুঁত অ্যাস্ট্রোনমিক্যাল মন্ত্রিমণ্ডল ফাংশন ইমপোর্ট
+from panchang import compute_mantri_mandala
+
 # Try importing pyswisseph; provide mathematical fallback if compiled C extensions are absent
 try:
     import swisseph as swe
@@ -86,10 +89,6 @@ class BackendChatResponse(BaseModel):
 
 @app.post("/generate-chat-response", response_model=BackendChatResponse)
 async def generate_chat_response(request: BackendChatRequest):
-    """
-    Direct endpoint matching Android BackendChatRequest DTO.
-    Connects securely to Google Gemini via Gemini API Key.
-    """
     api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
     if not api_key:
         raise HTTPException(
@@ -97,13 +96,11 @@ async def generate_chat_response(request: BackendChatRequest):
             detail="GEMINI_API_KEY environment variable is not configured on the server."
         )
 
-    # 1. Extract system instruction text if provided
     system_prompt = None
     sys_inst = request.systemInstruction or request.system_instruction
     if sys_inst and sys_inst.parts:
         system_prompt = "\n".join([p.text for p in sys_inst.parts if p.text and p.text.strip()])
 
-    # 2. Build and sanitize contents payload
     raw_contents = []
     for c in request.contents:
         role = c.role or "user"
@@ -115,11 +112,9 @@ async def generate_chat_response(request: BackendChatRequest):
                 "parts": [{"text": combined_text}]
             })
 
-    # 3. Strip any leading "model" messages
     while raw_contents and raw_contents[0]["role"] == "model":
         raw_contents.pop(0)
 
-    # 4. Enforce strict alternating sequence (user -> model -> user -> model)
     alternating_contents = []
     for item in raw_contents:
         if not alternating_contents or alternating_contents[-1]["role"] != item["role"]:
@@ -129,20 +124,17 @@ async def generate_chat_response(request: BackendChatRequest):
             new_text = item["parts"][0]["text"]
             alternating_contents[-1]["parts"][0]["text"] = f"{existing_text}\n{new_text}"
 
-    # 5. Ensure at least one valid "user" message exists
     if not alternating_contents:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No valid user prompt provided in the chat request."
         )
 
-    # 6. Ensure the first message is strictly "user"
     while alternating_contents and alternating_contents[0]["role"] != "user":
         alternating_contents.pop(0)
 
     response_text = ""
 
-    # 7. Generate response using gemini-3.5-flash
     try:
         if NEW_GENAI_AVAILABLE:
             client = genai.Client(api_key=api_key)
@@ -151,7 +143,6 @@ async def generate_chat_response(request: BackendChatRequest):
                 config_params["system_instruction"] = system_prompt
 
             gen_config = genai_types.GenerateContentConfig(**config_params) if config_params else None
-
             sdk_contents = [
                 genai_types.Content(
                     role=item["role"],
@@ -184,16 +175,10 @@ async def generate_chat_response(request: BackendChatRequest):
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
             payload: Dict[str, Any] = {"contents": alternating_contents}
             if system_prompt:
-                payload["systemInstruction"] = {
-                    "parts": [{"text": system_prompt}]
-                }
+                payload["systemInstruction"] = {"parts": [{"text": system_prompt}]}
 
             req_data = json.dumps(payload).encode("utf-8")
-            http_req = urllib.request.Request(
-                url,
-                data=req_data,
-                headers={"Content-Type": "application/json"}
-            )
+            http_req = urllib.request.Request(url, data=req_data, headers={"Content-Type": "application/json"})
             with urllib.request.urlopen(http_req, timeout=45) as response:
                 res_body = json.loads(response.read().decode("utf-8"))
                 candidates = res_body.get("candidates", [])
@@ -212,11 +197,7 @@ async def generate_chat_response(request: BackendChatRequest):
             if system_prompt:
                 payload["systemInstruction"] = {"parts": [{"text": system_prompt}]}
             req_data = json.dumps(payload).encode("utf-8")
-            http_req = urllib.request.Request(
-                fallback_url,
-                data=req_data,
-                headers={"Content-Type": "application/json"}
-            )
+            http_req = urllib.request.Request(fallback_url, data=req_data, headers={"Content-Type": "application/json"})
             with urllib.request.urlopen(http_req, timeout=45) as response:
                 res_body = json.loads(response.read().decode("utf-8"))
                 candidates = res_body.get("candidates", [])
@@ -225,7 +206,7 @@ async def generate_chat_response(request: BackendChatRequest):
                     response_text = "".join([p.get("text", "") for p in parts])
         except Exception as inner_e:
             full_context = (system_prompt or "") + " " + " ".join([p["parts"][0]["text"] for item in alternating_contents for p in item.get("parts", [])])
-            if any(char in full_context for char in "अआइईउऊऋएऐओऔकखगঘचछजझटठडढणतथदधनपफबभमयरलवशषसह"):
+            if any(char in full_context for char in "अआइईउऊऋएऐओऔकखगघचछजझटठडढणतथदधनपफबभमयरलवशषसह"):
                 fallback_msg = "क्षमा करें, एआई सर्वर से कनेक्शन स्थापित नहीं हो सका। कृपया कुछ समय बाद पुनः प्रयास करें।"
             elif any(char in full_context for char in "অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলবশষসহ"):
                 fallback_msg = "দুঃখিত, এআই সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি। অনুগ্রহ করে কিছুক্ষণ পর পুনরায় চেষ্টা করুন।"
@@ -239,12 +220,7 @@ async def generate_chat_response(request: BackendChatRequest):
                 error=f"Gemini API error: {str(e)} | Fallback error: {str(inner_e)}"
             )
 
-    return BackendChatResponse(
-        text=response_text,
-        responseText=response_text,
-        status="success",
-        error=None
-    )
+    return BackendChatResponse(text=response_text, responseText=response_text, status="success", error=None)
 
 
 # ==============================================================================
@@ -367,111 +343,124 @@ def calculate_planet_positions(dt: datetime.datetime, lat: float = 28.6139, lon:
 
     return planets_data
 
+
 # ==============================================================================
-# MULTILINGUAL MANTRI MANDAL DATA & LOGIC
+# MULTILINGUAL MAPPING FOR ASTRONOMICAL MANTRI MANDAL
 # ==============================================================================
 
-PLANET_NAMES = {
-    "en": {0: "Sun", 1: "Moon", 2: "Mars", 3: "Mercury", 4: "Jupiter", 5: "Venus", 6: "Saturn"},
-    "hi": {0: "सूर्य", 1: "चन्द्र", 2: "मंगल", 3: "बुध", 4: "बृहस्पति", 5: "शुक्र", 6: "शनि"},
-    "bn": {0: "সূর্য", 1: "চন্দ্র", 2: "মঙ্গল", 3: "বুধ", 4: "বৃহস্পতি", 5: "শুক্র", 6: "শনি"}
-}
-
-DEITY_NAMES = {
-    "en": {
-        0: "Surya Deva", 1: "Chandra Deva", 2: "Lord Kartikeya / Mangal",
-        3: "Lord Vishnu", 4: "Brihaspati Deva", 5: "Shukracharya", 6: "Shani Deva"
+PORTFOLIO_META = {
+    1: {
+        "en": ("Raja (King)", "Supreme governance, state rulers & national destiny"),
+        "hi": ("राजा (King)", "राज्य शासन, प्रशासनिक व्यवस्था एवं राष्ट्रीय संप्रभुता"),
+        "bn": ("রাজা (King)", "রাষ্ট্র পরিচালনা, শাসন ব্যবস্থা ও জাতীয় ভাগ্য")
     },
-    "hi": {
-        0: "भगवान सूर्य देव", 1: "चन्द्र देव", 2: "कार्तिकेय / मंगल देव",
-        3: "भगवान विष्णु", 4: "देवगुरु बृहस्पति", 5: "शुक्राचार्य", 6: "शनैश्चर देव"
+    2: {
+        "en": ("Mantri (Prime Minister)", "Executive leadership, council decisions & policy advisory"),
+        "hi": ("मन्त्री (Prime Minister)", "मंत्रिमंडल, नीति निर्धारण एवं प्रशासनिक परामर्श"),
+        "bn": ("মন্ত্রী (Prime Minister)", "মন্ত্রিসভা, নীতি নির্ধারণ ও প্রশাসনিক পরামর্শ")
     },
-    "bn": {
-        0: "সূর্য দেব", 1: "চন্দ্র দেব", 2: "কার্তিকেয় / মঙ্গল দেব",
-        3: "ভগবান বিষ্ণু", 4: "দেবগুরু বৃহস্পতি", 5: "শুক্রাচার্য", 6: "শনৈশ্চর দেব"
+    3: {
+        "en": ("Senapati (Commander)", "National defense, armed forces & internal security"),
+        "hi": ("सेनापति (Commander)", "राष्ट्रीय रक्षा, सैन्य बल एवं आंतरिक सुरक्षा"),
+        "bn": ("সেনাপতি (Commander)", "প্রতিরক্ষা, সামরিক বাহিনী ও অভ্যন্তরীণ নিরাপত্তা")
+    },
+    4: {
+        "en": ("Sasyadhipati (Lord of Grains)", "Kharif agriculture, monsoon crops & primary food production"),
+        "hi": ("सस्याधिपति (Grains Lord)", "खरीफ फसल, वर्षाकालीन धान्य एवं मुख्य खाद्य उत्पादन"),
+        "bn": ("শস্যাধিপতি (Grains Lord)", "খারিফ ফসল, বর্ষাকালীন শস্য ও মূল খাদ্য উৎপাদন")
+    },
+    5: {
+        "en": ("Dhanyadhipati (Lord of Crops)", "Rabi harvest, pulse storage & agricultural commodities"),
+        "hi": ("धान्याधिपति (Crops Lord)", "रबी फसल, दलहन एवं धान्य संचयन"),
+        "bn": ("ধান্যাধিপতি (Crops Lord)", "রবি ফসল, ডাল ও খাদ্যশস্য সঞ্চয়")
+    },
+    6: {
+        "en": ("Meghadhipati (Lord of Clouds)", "Rainfall distribution, monsoon health & water bodies"),
+        "hi": ("मेघाधिपति (Clouds Lord)", "वर्षा, मेघ एवं जल संसाधनों की स्थिति"),
+        "bn": ("মেঘাধিপতি (Clouds Lord)", "বৃষ্টিপাত, বর্ষা ও জলাশয়ের অবস্থা")
+    },
+    7: {
+        "en": ("Rasadhipati (Lord of Liquids)", "Dairy, oils, medicinal juices, sugarcane & beverages"),
+        "hi": ("रसाधिपति (Liquids Lord)", "दुग्ध, तेल, औषधीय रस, शर्करा एवं पेय पदार्थ"),
+        "bn": ("রসাধিপতি (Liquids Lord)", "দুগ্ধজাত দ্রব্য, তেল, ঔষধি রস ও পানীয়")
+    },
+    8: {
+        "en": ("Phaladhipati (Lord of Fruits)", "Orchards, horticulture, flowers & seasonal fruit yield"),
+        "hi": ("फलाधिपति (Fruits Lord)", "फलोद्यान, बागवानी, पुष्प एवं मौसमी फल उत्पादन"),
+        "bn": ("ফলাধিপতি (Fruits Lord)", "ফলবাগান, উদ্যানপালন ও বৃক্ষজাত ফলন")
+    },
+    9: {
+        "en": ("Dhanadhipati (Lord of Wealth)", "Economic reserves, treasury wealth & fiscal prosperity"),
+        "hi": ("धनाधिपति (Wealth Lord)", "आर्थिक कोष, राजकोष एवं वित्तीय समृद्धि"),
+        "bn": ("ধনাধিপতি (Wealth Lord)", "অর্থনৈতিক সঞ্চয়, কোষাগার ও আর্থিক সমৃদ্ধি")
+    },
+    10: {
+        "en": ("Nirashesh / Dhatvadhipati (Minerals Lord)", "Minerals, gems, metals & underground resources"),
+        "hi": ("नीरसेश / धात्वाधिपति (Minerals Lord)", "खनिज संपदा, धातु, रत्न एवं भूगर्भीय वस्तुएं"),
+        "bn": ("নীরসেশ / ধাত্বাধিপতি (Minerals Lord)", "খনিজ সম্পদ, ধাতু, রত্ন ও ভূগর্ভস্থ বস্তু")
     }
 }
 
-PORTFOLIOS = {
-    "en": [
-        ("Raja (King)", "Supreme governance, state rulers & national destiny"),
-        ("Mantri (Prime Minister)", "Executive leadership, council decisions & policy advisory"),
-        ("Senapati (Commander)", "National defense, armed forces & internal security"),
-        ("Sasyadhipati (Lord of Grains)", "Kharif agriculture, monsoon crops & food production"),
-        ("Dhanyadhipati (Lord of Crops)", "Rabi harvest, pulse storage & agricultural commodities"),
-        ("Meghadhipati (Lord of Clouds)", "Rainfall distribution, monsoon health & water bodies"),
-        ("Rasadhipati (Lord of Liquids)", "Dairy, oils, medicinal juices, sugarcane & beverages"),
-        ("Phaladhipati (Lord of Fruits)", "Orchards, horticulture, flowers & seasonal fruit yield"),
-        ("Dhanadhipati (Lord of Wealth)", "Economic reserves, treasury wealth & fiscal prosperity"),
-        ("Nirashesh / Dhatvadhipati (Minerals Lord)", "Minerals, gems, metals & underground resources")
-    ],
-    "hi": [
-        ("राजा (King)", "राज्य शासन, प्रशासनिक व्यवस्था एवं राष्ट्रीय संप्रभुता"),
-        ("मन्त्री (Prime Minister)", "मंत्रिमंडल, नीति निर्धारण एवं प्रशासनिक परामर्श"),
-        ("सेनापति (Commander)", "राष्ट्रीय रक्षा, सैन्य बल एवं आंतरिक सुरक्षा"),
-        ("सस्याधिपति (Grains Lord)", "खरीफ फसल, वर्षाकालीन धान्य एवं मुख्य खाद्य उत्पादन"),
-        ("धान्याधिपति (Crops Lord)", "रबी फसल, दलहन एवं धान्य संचयन"),
-        ("मेघाधिपति (Clouds Lord)", "वर्षा, मेघ एवं जल संसाधनों की स्थिति"),
-        ("रसाधिपति (Liquids Lord)", "दुग्ध, तेल, औषधीय रस, शर्करा एवं पेय पदार्थ"),
-        ("फलाधिपति (Fruits Lord)", "फलोद्यान, बागवानी, पुष्प एवं मौसमी फल उत्पादन"),
-        ("धनाधिपति (Wealth Lord)", "आर्थिक कोष, राजकोष एवं वित्तीय समृद्धि"),
-        ("नीरसेश / धात्वाधिपति (Minerals Lord)", "खनिज संपदा, धातु, रत्न एवं भूगर्भीय वस्तुएं")
-    ],
-    "bn": [
-        ("রাজা (King)", "রাষ্ট্র পরিচালনা, শাসন ব্যবস্থা ও জাতীয় ভাগ্য"),
-        ("মন্ত্রী (Prime Minister)", "মন্ত্রিসভা, নীতি নির্ধারণ ও প্রশাসনিক পরামর্শ"),
-        ("সেনাপতি (Commander)", "প্রতিরক্ষা, সামরিক বাহিনী ও অভ্যন্তরীণ নিরাপত্তা"),
-        ("শস্যাধিপতি (Grains Lord)", "খারিফ ফসল, বর্ষাকালীন শস্য ও মূল খাদ্য উৎপাদন"),
-        ("ধান্যাধিপতি (Crops Lord)", "রবি ফসল, ডাল ও খাদ্যশস্য সঞ্চয়"),
-        ("মেঘাধিপতি (Clouds Lord)", "বৃষ্টিপাত, বর্ষা ও জলাশয়ের অবস্থা"),
-        ("রসাধিপতি (Liquids Lord)", "দুগ্ধজাত দ্রব্য, তেল, ঔষধি রস ও পানীয়"),
-        ("ফলাধিপতি (Fruits Lord)", "ফলবাগান, উদ্যানপালন ও বৃক্ষজাত ফলন"),
-        ("ধনাধিপতি (Wealth Lord)", "অর্থনৈতিক সঞ্চয়, কোষাগার ও আর্থিক সমৃদ্ধি"),
-        ("নীরসেশ / ধাত্বাধিপতি (Minerals Lord)", "খনিজ সম্পদ, ধাতু, রত্ন ও ভূগর্ভস্থ বস্তু")
-    ]
+PLANET_MAPPING = {
+    "সূর্য": {"name": {"en": "Sun", "hi": "सूर्य", "bn": "সূর্য"}, "deity": {"en": "Surya Deva", "hi": "भगवान सूर्य देव", "bn": "সূর্য দেব"}, "icon": "☉"},
+    "রবি": {"name": {"en": "Sun", "hi": "सूर्य", "bn": "রবি"}, "deity": {"en": "Surya Deva", "hi": "भगवान सूर्य देव", "bn": "সূর্য দেব"}, "icon": "☉"},
+    "Sun": {"name": {"en": "Sun", "hi": "सूर्य", "bn": "সূর্য"}, "deity": {"en": "Surya Deva", "hi": "भगवान सूर्य देव", "bn": "সূর্য দেব"}, "icon": "☉"},
+    "চন্দ্র": {"name": {"en": "Moon", "hi": "चन्द्र", "bn": "চন্দ্র"}, "deity": {"en": "Chandra Deva", "hi": "चन्द्र देव", "bn": "চন্দ্র দেব"}, "icon": "☽"},
+    "Moon": {"name": {"en": "Moon", "hi": "चन्द्र", "bn": "চন্দ্র"}, "deity": {"en": "Chandra Deva", "hi": "चन्द्र देव", "bn": "চন্দ্র দেব"}, "icon": "☽"},
+    "মঙ্গল": {"name": {"en": "Mars", "hi": "मंगल", "bn": "মঙ্গল"}, "deity": {"en": "Lord Kartikeya / Mangal", "hi": "कार्तिकेय / मंगल देव", "bn": "কার্তিকেয় / মঙ্গল দেব"}, "icon": "♂"},
+    "Mars": {"name": {"en": "Mars", "hi": "मंगल", "bn": "মঙ্গল"}, "deity": {"en": "Lord Kartikeya / Mangal", "hi": "कार्तिकेय / मंगल देव", "bn": "কার্তিকেয় / মঙ্গল দেব"}, "icon": "♂"},
+    "বুধ": {"name": {"en": "Mercury", "hi": "बुध", "bn": "বুধ"}, "deity": {"en": "Lord Vishnu", "hi": "भगवान विष्णु", "bn": "ভগবান বিষ্ণু"}, "icon": "☿"},
+    "Mercury": {"name": {"en": "Mercury", "hi": "बुध", "bn": "বুধ"}, "deity": {"en": "Lord Vishnu", "hi": "भगवान विष्णु", "bn": "ভগবান বিষ্ণু"}, "icon": "☿"},
+    "বৃহস্পতি": {"name": {"en": "Jupiter", "hi": "बृहस्पति", "bn": "বৃহস্পতি"}, "deity": {"en": "Brihaspati Deva", "hi": "देवगुरु बृहस्पति", "bn": "দেবগুরু বৃহস্পতি"}, "icon": "♃"},
+    "Jupiter": {"name": {"en": "Jupiter", "hi": "बृहस्पति", "bn": "বৃহস্পতি"}, "deity": {"en": "Brihaspati Deva", "hi": "देवगुरु बृहस्पति", "bn": "দেবগুরু বৃহস্পতি"}, "icon": "♃"},
+    "শুক্র": {"name": {"en": "Venus", "hi": "शुक्र", "bn": "শুক্র"}, "deity": {"en": "Shukracharya", "hi": "शुक्राचार्य", "bn": "শুক্রাচার্য"}, "icon": "♀"},
+    "Venus": {"name": {"en": "Venus", "hi": "शुक्र", "bn": "শুক্র"}, "deity": {"en": "Shukracharya", "hi": "शुक्राचार्य", "bn": "শুক্রাচার্য"}, "icon": "♀"},
+    "শনি": {"name": {"en": "Saturn", "hi": "शनि", "bn": "শনি"}, "deity": {"en": "Shani Deva", "hi": "शनैश्चर देव", "bn": "শনৈশ্চর দেব"}, "icon": "♄"},
+    "Saturn": {"name": {"en": "Saturn", "hi": "शनि", "bn": "শনি"}, "deity": {"en": "Shani Deva", "hi": "शनैश्चर देव", "bn": "শনৈশ্চর দেব"}, "icon": "♄"}
 }
 
-PLANET_ICONS = {0: "☉", 1: "☽", 2: "♂", 3: "☿", 4: "♃", 5: "♀", 6: "♄"}
-
-def compute_mantri_mandala(date_obj: datetime.date, lat: float, lon: float, lang: str = "en") -> list:
+def get_localized_mantri_mandala(date_obj: datetime.date, lat: float, lon: float, lang: str = "en") -> list:
+    """
+    panchang.py এর ১০০% সঠিক বৈদিক ও সুইস এফিমেরিস ফলাফলকে সরাসরি 
+    English, Hindi অথবা Bengali তে অনুবাদ করে রিটার্ন করে।
+    """
     lang_key = lang.lower() if lang.lower() in ["en", "hi", "bn"] else "en"
     
-    # চৈত্র শুক্লা প্রতিপদ ও সংক্রান্তি ভিত্তিক বার গণনা
-    year = date_obj.year
-    base_pratipada_day = (year + year // 4 - year // 100 + year // 400 + 3) % 7
+    # আসল panchang.py এর ১০০% সঠিক জ্যোতির্বৈজ্ঞানিক ক্যালকুলেশন কল
+    raw_mandal = compute_mantri_mandala(date_obj, lat, lon)
+    
+    localized_mandal = []
+    for idx, item in enumerate(raw_mandal, start=1):
+        portfolio_id = item.get("id", idx)
+        
+        # পোর্টফোলিও টাইটেল ও বিবরণ অনুবাদ
+        title, desc = PORTFOLIO_META.get(portfolio_id, {}).get(lang_key, (item.get("title", ""), item.get("description", "")))
+        
+        # panchang.py থেকে পাওয়া আসল গ্রহের নাম অনুবাদ
+        raw_planet = item.get("planet_name", "").strip()
+        p_info = PLANET_MAPPING.get(raw_planet, None)
+        
+        if p_info:
+            planet_name = p_info["name"].get(lang_key, raw_planet)
+            deity_name = p_info["deity"].get(lang_key, item.get("deity_name", ""))
+            icon = p_info.get("icon", item.get("planet_icon", ""))
+        else:
+            planet_name = raw_planet
+            deity_name = item.get("deity_name", "")
+            icon = item.get("planet_icon", "")
 
-    portfolios_weekdays = [
-        base_pratipada_day,
-        (base_pratipada_day + 2) % 7,
-        (base_pratipada_day + 0) % 7,
-        (base_pratipada_day + 3) % 7,
-        (base_pratipada_day + 2) % 7,
-        (base_pratipada_day + 0) % 7,
-        (base_pratipada_day + 2) % 7,
-        (base_pratipada_day + 5) % 7,
-        (base_pratipada_day + 4) % 7,
-        (base_pratipada_day + 1) % 7
-    ]
-
-    result = []
-    for i in range(10):
-        p_idx = portfolios_weekdays[i]
-        title, desc = PORTFOLIOS[lang_key][i]
-        result.append({
-            "id": i + 1,
+        localized_mandal.append({
+            "id": portfolio_id,
             "title": title,
             "description": desc,
-            "planet_name": PLANET_NAMES[lang_key][p_idx],
-            "deity_name": DEITY_NAMES[lang_key][p_idx],
-            "planet_icon": PLANET_ICONS[p_idx]
+            "planet_name": planet_name,
+            "deity_name": deity_name,
+            "planet_icon": icon
         })
-    return result
+    return localized_mandal
 
 
 def compute_sunrise_sunset(date_obj: datetime.date, lat: float, lon: float):
-    """
-    Computes precise local sunrise and sunset using standard solar zenith formulas.
-    """
     day_of_year = date_obj.timetuple().tm_yday
     gamma = 2 * math.pi / 365 * (day_of_year - 1 + (12 - lon / 15) / 24)
     
@@ -505,16 +494,11 @@ def compute_sunrise_sunset(date_obj: datetime.date, lat: float, lon: float):
 
 
 def compute_moon_events(dt: datetime.datetime, lat: float, lon: float):
-    """
-    Computes true astronomical Moonrise and Moonset for the exact City coordinates.
-    """
     if SWISSEPH_AVAILABLE:
         try:
-            # স্থানীয় মধ্যরাত্রির জুলিয়ান ডে (UTC)
             jd_utc = calculate_julian_day(dt) - 0.5
             geopos = (lon, lat, 0.0)
 
-            # Swiss Ephemeris দিয়ে দৃষ্টিগোচর চন্দ্রোদয় (Moonrise) ও চন্দ্রাস্ত (Moonset)
             _, res_rise = swe.rise_trans(jd_utc, swe.MOON, swe.CALC_RISE, geopos)
             _, res_set = swe.rise_trans(jd_utc, swe.MOON, swe.CALC_SET, geopos)
 
@@ -530,7 +514,6 @@ def compute_moon_events(dt: datetime.datetime, lat: float, lon: float):
         except Exception as e:
             print("[SWISSEPH MOON CALC ERROR]:", e)
 
-    # সুইস এফিমেরিস অনুপস্থিত থাকলে গাণিতিক ফলব্যাক
     return "16:30:00", "03:45:00"
 
 
@@ -631,7 +614,8 @@ async def get_panchang(
             "vijaya_muhurta": {"start": "14:15:00", "end": "15:05:00"},
             "amrit_kaal": {"start": "08:30:00", "end": "10:15:00"}
         },
-        "mantri_mandal": compute_mantri_mandala(date_obj, lat, lon, lang=lang)
+        # panchang.py এর ১০০% সঠিক ফলাফল অনুবাদসহ রিটার্ন
+        "mantri_mandal": get_localized_mantri_mandala(date_obj, lat, lon, lang=lang)
     }
 
 @app.get("/calculate")
