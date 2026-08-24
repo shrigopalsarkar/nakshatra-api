@@ -95,8 +95,8 @@ ERROR_MESSAGES = {
 
 def resolve_user_language(contents: list, sys_text: str = "") -> str:
     """
-    ১. ইউজার চ্যাটে যে ভাষায় প্রশ্ন টাইপ করেছেন (English/বাংলা/हिंदी) সবার আগে সেটি শনাক্ত করে।
-    ২. কোনো অবস্থাতেই সিস্টেম প্রম্পটের টেক্সট দেখে চ্যাটের ভাষা পরিবর্তন করবে না।
+    ১. ইউজারের পাঠানো শেষ মেসেজ স্ক্যান করে।
+    ২. যে ভাষার অক্ষরের সংখ্যা বেশি (Majority Count), নির্ভুলভাবে সেই ভাষাকে নির্বাচন করে।
     """
     user_text = ""
     for item in reversed(contents):
@@ -111,31 +111,28 @@ def resolve_user_language(contents: list, sys_text: str = "") -> str:
         parts = getattr(contents[-1], "parts", [])
         user_text = " ".join(getattr(p, "text", "") for p in parts if getattr(p, "text", "")).strip()
 
-    # চ্যাটের টেক্সটে অক্ষরের সংখ্যা গণনা
-    bn_letters = sum(1 for ch in user_text if "\u0980" <= ch <= "\u09ff")
-    hi_letters = sum(1 for ch in user_text if "\u0900" <= ch <= "\u097f")
-    en_letters = sum(1 for ch in user_text if ("a" <= ch <= "z" or "A" <= ch <= "Z"))
+    # অক্ষরের সংখ্যা গণনা
+    bn_count = sum(1 for ch in user_text if "\u0980" <= ch <= "\u09ff")
+    hi_count = sum(1 for ch in user_text if "\u0900" <= ch <= "\u097f")
+    en_count = sum(1 for ch in user_text if ("a" <= ch <= "z" or "A" <= ch <= "Z"))
 
-    # ১. চ্যাটে বাংলা অক্ষর থাকলে -> ১০০% বাংলা
-    if bn_letters > 0 and bn_letters >= hi_letters:
-        return "bn"
-
-    # ২. চ্যাটে হিন্দি/দেবনাগরী অক্ষর থাকলে -> ১০০% হিন্দি
-    if hi_letters > 0 and hi_letters > bn_letters:
-        return "hi"
-
-    # ৩. চ্যাটে ইংরেজি প্রশ্ন থাকলে -> ১০০% ইংরেজি
-    if en_letters > 0:
+    # ১. যে ভাষার অক্ষরের সংখ্যা সবচেয়ে বেশি (Majority Check)
+    if en_count > bn_count and en_count > hi_count:
         return "en"
-
-    # ৪. শুধুমাত্র AI Report তৈরির ক্ষেত্রে (যদি চ্যাট টেক্সট খালি থাকে)
-    s_lower = sys_text.lower()
-    if "language: bn" in s_lower or "respond in bengali" in s_lower or any("\u0980" <= ch <= "\u09ff" for ch in sys_text):
-        return "bn"
-    if "language: hi" in s_lower or "respond in hindi" in s_lower or any("\u0900" <= ch <= "\u097f" for ch in sys_text):
+    if hi_count > bn_count and hi_count > en_count:
         return "hi"
+    if bn_count > hi_count and bn_count > en_count:
+        return "bn"
+
+    # ২. সিস্টেম বা ডিফল্ট ফলব্যাক
+    s_lower = sys_text.lower()
+    if any(k in s_lower for k in ["language: hi", "in hindi", "respond in hindi"]):
+        return "hi"
+    if any(k in s_lower for k in ["language: bn", "in bengali", "respond in bengali"]):
+        return "bn"
 
     return "en"
+
 
 @app.post("/generate-chat-response", response_model=BackendChatResponse)
 async def generate_chat_response(request: BackendChatRequest):
