@@ -192,7 +192,7 @@ async def generate_chat_response(request: BackendChatRequest):
         try:
             import urllib.request
             import json
-            fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+            fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
             payload = {"contents": alternating_contents}
             if system_prompt:
                 payload["systemInstruction"] = {"parts": [{"text": system_prompt}]}
