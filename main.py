@@ -84,143 +84,105 @@ class BackendChatResponse(BaseModel):
 
 
 # ==============================================================================
-# 1. GOOGLE GEMINI CHAT ENDPOINT (POST /generate-chat-response)
+# 1. MULTILINGUAL AI CHAT & FALLBACK LOGIC
 # ==============================================================================
+
+ERROR_MESSAGES = {
+    "bn": "দুঃখিত, এআই সংযোগে সাময়িক বিলম্ব হচ্ছে। অনুগ্রহ করে 'Retry' বাটনে চাপ দিন।",
+    "hi": "क्षमा करें, एआई सर्वर कनेक्शन में विलंब हो रहा है। कृपया 'Retry' पर क्लिक करें।",
+    "en": "Astrological synthesis is temporarily delayed. Please tap 'Retry Request'."
+}
+
+def resolve_user_language(contents: list, sys_text: str = "") -> str:
+    combined = sys_text + " " + " ".join(
+        part.text for item in contents for part in item.parts if part.text
+    )
+    if any("\u0980" <= ch <= "\u09ff" for ch in combined):
+        return "bn"
+    if any("\u0900" <= ch <= "\u097f" for ch in combined):
+        return "hi"
+    return "en"
+
 
 @app.post("/generate-chat-response", response_model=BackendChatResponse)
 async def generate_chat_response(request: BackendChatRequest):
-    api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
-    if not api_key:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="GEMINI_API_KEY environment variable is not configured on the server."
-        )
-
-    system_prompt = None
-    sys_inst = request.systemInstruction or request.system_instruction
-    if sys_inst and sys_inst.parts:
-        system_prompt = "\n".join([p.text for p in sys_inst.parts if p.text and p.text.strip()])
-
-    raw_contents = []
-    for c in request.contents:
-        role = c.role or "user"
-        gemini_role = "model" if role.lower() in ["ai", "assistant", "model"] else "user"
-        combined_text = "\n".join([p.text for p in c.parts if p.text and p.text.strip()])
-        if combined_text.strip():
-            raw_contents.append({
-                "role": gemini_role,
-                "parts": [{"text": combined_text}]
-            })
-
-    while raw_contents and raw_contents[0]["role"] == "model":
-        raw_contents.pop(0)
-
-    alternating_contents = []
-    for item in raw_contents:
-        if not alternating_contents or alternating_contents[-1]["role"] != item["role"]:
-            alternating_contents.append(item)
-        else:
-            existing_text = alternating_contents[-1]["parts"][0]["text"]
-            new_text = item["parts"][0]["text"]
-            alternating_contents[-1]["parts"][0]["text"] = f"{existing_text}\n{new_text}"
-
-    if not alternating_contents:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No valid user prompt provided in the chat request."
-        )
-
-    while alternating_contents and alternating_contents[0]["role"] != "user":
-        alternating_contents.pop(0)
-
-    response_text = ""
-
+    lang_code = "en"
     try:
-        if NEW_GENAI_AVAILABLE:
-            client = genai.Client(api_key=api_key)
-            config_params = {}
-            if system_prompt:
-                config_params["system_instruction"] = system_prompt
+        sys_prompt = ""
+        sys_inst = request.systemInstruction or request.system_instruction
+        if sys_inst and sys_inst.parts:
+            sys_prompt = "\n".join(p.text for p in sys_inst.parts if p.text and p.text.strip())
 
-            gen_config = genai_types.GenerateContentConfig(**config_params) if config_params else None
-            sdk_contents = [
-                genai_types.Content(
-                    role=item["role"],
-                    parts=[genai_types.Part.from_text(text=p["text"]) for p in item["parts"]]
-                )
-                for item in alternating_contents
-            ]
+        lang_code = resolve_user_language(request.contents, sys_prompt)
 
-            res = client.models.generate_content(
-                model="gemini-3.5-flash",
-                contents=sdk_contents,
-                config=gen_config
-            )
-            response_text = res.text or ""
+        api_key = (
+            os.environ.get("GEMINI_API_KEY")
+            or os.environ.get("GOOGLE_API_KEY")
+            or os.environ.get("API_KEY")
+        )
+        if not api_key:
+            err_txt = ERROR_MESSAGES[lang_code]
+            return BackendChatResponse(text=err_txt, responseText=err_txt, status="success")
 
-        elif LEGACY_GENAI_AVAILABLE:
-            legacy_genai.configure(api_key=api_key)
-            model_kwargs = {"model_name": "gemini-3.5-flash"}
-            if system_prompt:
-                model_kwargs["system_instruction"] = system_prompt
+        raw_items = []
+        for c in request.contents:
+            role = "model" if str(c.role or "user").lower() in ["ai", "assistant", "model"] else "user"
+            txt = "\n".join(p.text for p in c.parts if p.text and p.text.strip())
+            if txt.strip():
+                raw_items.append({"role": role, "parts": [{"text": txt}]})
 
-            model = legacy_genai.GenerativeModel(**model_kwargs)
-            res = model.generate_content(alternating_contents)
-            response_text = res.text or ""
+        while raw_items and raw_items[0]["role"] == "model":
+            raw_items.pop(0)
 
-        else:
-            import urllib.request
-            import json
+        cleaned_contents = []
+        for item in raw_items:
+            if not cleaned_contents or cleaned_contents[-1]["role"] != item["role"]:
+                cleaned_contents.append(item)
+            else:
+                cleaned_contents[-1]["parts"][0]["text"] += f"\n{item['parts'][0]['text']}"
 
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
-            payload: Dict[str, Any] = {"contents": alternating_contents}
-            if system_prompt:
-                payload["systemInstruction"] = {"parts": [{"text": system_prompt}]}
+        while cleaned_contents and cleaned_contents[0]["role"] != "user":
+            cleaned_contents.pop(0)
 
-            req_data = json.dumps(payload).encode("utf-8")
-            http_req = urllib.request.Request(url, data=req_data, headers={"Content-Type": "application/json"})
-            with urllib.request.urlopen(http_req, timeout=45) as response:
-                res_body = json.loads(response.read().decode("utf-8"))
-                candidates = res_body.get("candidates", [])
-                if candidates:
-                    parts = candidates[0].get("content", {}).get("parts", [])
-                    response_text = "".join([p.get("text", "") for p in parts])
+        if not cleaned_contents:
+            err_txt = ERROR_MESSAGES[lang_code]
+            return BackendChatResponse(text=err_txt, responseText=err_txt, status="success")
+
+        import urllib.request
+        import json
+
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
+        payload = {"contents": cleaned_contents}
+        if sys_prompt:
+            payload["systemInstruction"] = {"parts": [{"text": sys_prompt}]}
+
+        req_data = json.dumps(payload).encode("utf-8")
+        http_req = urllib.request.Request(
+            url,
+            data=req_data,
+            headers={"Content-Type": "application/json"}
+        )
+
+        with urllib.request.urlopen(http_req, timeout=35) as res:
+            res_body = json.loads(res.read().decode("utf-8"))
+            candidates = res_body.get("candidates", [])
+            if candidates:
+                parts = candidates[0].get("content", {}).get("parts", [])
+                result_text = "".join(p.get("text", "") for p in parts if "text" in p)
+                if result_text.strip():
+                    return BackendChatResponse(
+                        text=result_text,
+                        responseText=result_text,
+                        status="success"
+                    )
+
+        fallback = ERROR_MESSAGES[lang_code]
+        return BackendChatResponse(text=fallback, responseText=fallback, status="success")
 
     except Exception as e:
-        print("[BACKEND ERROR /generate-chat-response]:", str(e))
-        traceback.print_exc()
-        try:
-            import urllib.request
-            import json
-            fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
-            payload = {"contents": alternating_contents}
-            if system_prompt:
-                payload["systemInstruction"] = {"parts": [{"text": system_prompt}]}
-            req_data = json.dumps(payload).encode("utf-8")
-            http_req = urllib.request.Request(fallback_url, data=req_data, headers={"Content-Type": "application/json"})
-            with urllib.request.urlopen(http_req, timeout=45) as response:
-                res_body = json.loads(response.read().decode("utf-8"))
-                candidates = res_body.get("candidates", [])
-                if candidates:
-                    parts = candidates[0].get("content", {}).get("parts", [])
-                    response_text = "".join([p.get("text", "") for p in parts])
-        except Exception as inner_e:
-            full_context = (system_prompt or "") + " " + " ".join([p["parts"][0]["text"] for item in alternating_contents for p in item.get("parts", [])])
-            if any(char in full_context for char in "अआइईउऊऋएऐओऔकखगघचछजझटठडढणतथदधनपफबभमयरलवशषसह"):
-                fallback_msg = "क्षमा करें, एआई सर्वर से कनेक्शन स्थापित नहीं हो सका। कृपया कुछ समय बाद पुनः प्रयास करें।"
-            elif any(char in full_context for char in "অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলবশষসহ"):
-                fallback_msg = "দুঃখিত, এআই সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি। অনুগ্রহ করে কিছুক্ষণ পর পুনরায় চেষ্টা করুন।"
-            else:
-                fallback_msg = "Sorry, unable to connect to the AI server. Please try again in a few moments."
-
-            return BackendChatResponse(
-                text=fallback_msg,
-                responseText=fallback_msg,
-                status="error",
-                error=f"Gemini API error: {str(e)} | Fallback error: {str(inner_e)}"
-            )
-
-    return BackendChatResponse(text=response_text, responseText=response_text, status="success", error=None)
+        print("[AI ERROR]:", str(e))
+        fallback = ERROR_MESSAGES.get(lang_code, ERROR_MESSAGES["en"])
+        return BackendChatResponse(text=fallback, responseText=fallback, status="success")
 
 
 # ==============================================================================
