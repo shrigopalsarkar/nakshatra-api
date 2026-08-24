@@ -680,6 +680,7 @@ async def get_panchang(
         },
         # panchang.py এর ১০০% সঠিক ফলাফল অনুবাদসহ রিটার্ন
         "mantri_mandal": get_localized_mantri_mandala(date_obj, lat, lon, lang=lang)
+        "choghadiya": compute_choghadiya(date_obj, rise_min, set_min, lang=lang)
     }
 
 @app.get("/calculate")
