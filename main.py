@@ -345,7 +345,7 @@ def calculate_planet_positions(dt: datetime.datetime, lat: float = 28.6139, lon:
 
 
 # ==============================================================================
-# MULTILINGUAL MAPPING FOR ASTRONOMICAL MANTRI MANDAL
+# MULTILINGUAL 10 MANTRI MANDAL ENGINE
 # ==============================================================================
 
 PORTFOLIO_META = {
@@ -401,53 +401,54 @@ PORTFOLIO_META = {
     }
 }
 
-PLANET_MAPPING = {
-    "সূর্য": {"name": {"en": "Sun", "hi": "सूर्य", "bn": "সূর্য"}, "deity": {"en": "Surya Deva", "hi": "भगवान सूर्य देव", "bn": "সূর্য দেব"}, "icon": "☉"},
-    "রবি": {"name": {"en": "Sun", "hi": "सूर्य", "bn": "রবি"}, "deity": {"en": "Surya Deva", "hi": "भगवान सूर्य देव", "bn": "সূর্য দেব"}, "icon": "☉"},
-    "Sun": {"name": {"en": "Sun", "hi": "सूर्य", "bn": "সূর্য"}, "deity": {"en": "Surya Deva", "hi": "भगवान सूर्य देव", "bn": "সূর্য দেব"}, "icon": "☉"},
-    "চন্দ্র": {"name": {"en": "Moon", "hi": "चन्द्र", "bn": "চন্দ্র"}, "deity": {"en": "Chandra Deva", "hi": "चन्द्र देव", "bn": "চন্দ্র দেব"}, "icon": "☽"},
-    "Moon": {"name": {"en": "Moon", "hi": "चन्द्र", "bn": "চন্দ্র"}, "deity": {"en": "Chandra Deva", "hi": "चन्द्र देव", "bn": "চন্দ্র দেব"}, "icon": "☽"},
-    "মঙ্গল": {"name": {"en": "Mars", "hi": "मंगल", "bn": "মঙ্গল"}, "deity": {"en": "Lord Kartikeya / Mangal", "hi": "कार्तिकेय / मंगल देव", "bn": "কার্তিকেয় / মঙ্গল দেব"}, "icon": "♂"},
-    "Mars": {"name": {"en": "Mars", "hi": "मंगल", "bn": "মঙ্গল"}, "deity": {"en": "Lord Kartikeya / Mangal", "hi": "कार्तिकेय / मंगल देव", "bn": "কার্তিকেয় / মঙ্গল দেব"}, "icon": "♂"},
-    "বুধ": {"name": {"en": "Mercury", "hi": "बुध", "bn": "বুধ"}, "deity": {"en": "Lord Vishnu", "hi": "भगवान विष्णु", "bn": "ভগবান বিষ্ণু"}, "icon": "☿"},
-    "Mercury": {"name": {"en": "Mercury", "hi": "बुध", "bn": "বুধ"}, "deity": {"en": "Lord Vishnu", "hi": "भगवान विष्णु", "bn": "ভগবান বিষ্ণু"}, "icon": "☿"},
-    "বৃহস্পতি": {"name": {"en": "Jupiter", "hi": "बृहस्पति", "bn": "বৃহস্পতি"}, "deity": {"en": "Brihaspati Deva", "hi": "देवगुरु बृहस्पति", "bn": "দেবগুরু বৃহস্পতি"}, "icon": "♃"},
-    "Jupiter": {"name": {"en": "Jupiter", "hi": "बृहस्पति", "bn": "বৃহস্পতি"}, "deity": {"en": "Brihaspati Deva", "hi": "देवगुरु बृहस्पति", "bn": "দেবগুরু বৃহস্পতি"}, "icon": "♃"},
-    "শুক্র": {"name": {"en": "Venus", "hi": "शुक्र", "bn": "শুক্র"}, "deity": {"en": "Shukracharya", "hi": "शुक्राचार्य", "bn": "শুক্রাচার্য"}, "icon": "♀"},
-    "Venus": {"name": {"en": "Venus", "hi": "शुक्र", "bn": "শুক্র"}, "deity": {"en": "Shukracharya", "hi": "शुक्राचार्य", "bn": "শুক্রাচার্য"}, "icon": "♀"},
-    "শনি": {"name": {"en": "Saturn", "hi": "शनि", "bn": "শনি"}, "deity": {"en": "Shani Deva", "hi": "शनैश्चर देव", "bn": "শনৈশ্চর দেব"}, "icon": "♄"},
-    "Saturn": {"name": {"en": "Saturn", "hi": "शनि", "bn": "শনি"}, "deity": {"en": "Shani Deva", "hi": "शनैश्चर देव", "bn": "শনৈশ্চর দেব"}, "icon": "♄"}
+PLANET_TRANSLATIONS = {
+    "sun": {"name": {"en": "Sun", "hi": "सूर्य", "bn": "সূর্য"}, "deity": {"en": "Surya Deva", "hi": "भगवान सूर्य देव", "bn": "সূর্য দেব"}, "icon": "☉"},
+    "moon": {"name": {"en": "Moon", "hi": "चन्द्र", "bn": "চন্দ্র"}, "deity": {"en": "Chandra Deva", "hi": "चन्द्र देव", "bn": "চন্দ্র দেব"}, "icon": "☽"},
+    "mars": {"name": {"en": "Mars", "hi": "मंगल", "bn": "মঙ্গল"}, "deity": {"en": "Lord Kartikeya / Mangal", "hi": "कार्तिकेय / मंगल देव", "bn": "কার্তিকেয় / মঙ্গল দেব"}, "icon": "♂"},
+    "mercury": {"name": {"en": "Mercury", "hi": "बुध", "bn": "বুধ"}, "deity": {"en": "Lord Vishnu", "hi": "भगवान विष्णु", "bn": "ভগবান বিষ্ণু"}, "icon": "☿"},
+    "jupiter": {"name": {"en": "Jupiter", "hi": "बृहस्पति", "bn": "বৃহস্পতি"}, "deity": {"en": "Brihaspati Deva", "hi": "देवगुरु बृहस्पति", "bn": "দেবগুরু বৃহস্পতি"}, "icon": "♃"},
+    "venus": {"name": {"en": "Venus", "hi": "शुक्र", "bn": "শুক্র"}, "deity": {"en": "Shukracharya", "hi": "शुक्राचार्य", "bn": "শুক্রাচার্য"}, "icon": "♀"},
+    "saturn": {"name": {"en": "Saturn", "hi": "शनि", "bn": "শনি"}, "deity": {"en": "Shani Deva", "hi": "शनैश्चर देव", "bn": "শনৈশ্চর দেব"}, "icon": "♄"}
 }
 
+def normalize_planet_key(raw_name: str) -> str:
+    s = str(raw_name).lower()
+    if any(k in s for k in ["রবি", "সূর্য", "sun", "surya"]): return "sun"
+    if any(k in s for k in ["চন্দ্র", "চাঁদ", "moon", "chandra", "som"]): return "moon"
+    if any(k in s for k in ["মঙ্গল", "mars", "mangal"]): return "mars"
+    if any(k in s for k in ["বুধ", "mercury", "budh"]): return "mercury"
+    if any(k in s for k in ["বৃহস্পতি", "গুরু", "jupiter", "guru", "brihaspati"]): return "jupiter"
+    if any(k in s for k in ["শুক্র", "venus", "shukra"]): return "venus"
+    if any(k in s for k in ["শনি", "saturn", "shani"]): return "saturn"
+    return "jupiter"
+
 def get_localized_mantri_mandala(date_obj: datetime.date, lat: float, lon: float, lang: str = "en") -> list:
-    """
-    panchang.py এর ১০০% সঠিক বৈদিক ও সুইস এফিমেরিস ফলাফলকে সরাসরি 
-    English, Hindi অথবা Bengali তে অনুবাদ করে রিটার্ন করে।
-    """
-    lang_key = lang.lower() if lang.lower() in ["en", "hi", "bn"] else "en"
-    
-    # আসল panchang.py এর ১০০% সঠিক জ্যোতির্বৈজ্ঞানিক ক্যালকুলেশন কল
+    lang_str = str(lang).lower().strip()
+    if lang_str.startswith("bn") or "বাংলা" in lang_str:
+        lang_key = "bn"
+    elif lang_str.startswith("hi") or "हिन्दू" in lang_str or "हिंदी" in lang_str:
+        lang_key = "hi"
+    else:
+        lang_key = "en"
+
     raw_mandal = compute_mantri_mandala(date_obj, lat, lon)
-    
+
     localized_mandal = []
     for idx, item in enumerate(raw_mandal, start=1):
-        portfolio_id = item.get("id", idx)
-        
-        # পোর্টফোলিও টাইটেল ও বিবরণ অনুবাদ
-        title, desc = PORTFOLIO_META.get(portfolio_id, {}).get(lang_key, (item.get("title", ""), item.get("description", "")))
-        
-        # panchang.py থেকে পাওয়া আসল গ্রহের নাম অনুবাদ
-        raw_planet = item.get("planet_name", "").strip()
-        p_info = PLANET_MAPPING.get(raw_planet, None)
-        
-        if p_info:
-            planet_name = p_info["name"].get(lang_key, raw_planet)
-            deity_name = p_info["deity"].get(lang_key, item.get("deity_name", ""))
-            icon = p_info.get("icon", item.get("planet_icon", ""))
-        else:
-            planet_name = raw_planet
-            deity_name = item.get("deity_name", "")
-            icon = item.get("planet_icon", "")
+        try:
+            portfolio_id = int(item.get("id", idx))
+        except Exception:
+            portfolio_id = idx
+
+        title, desc = PORTFOLIO_META.get(portfolio_id, {}).get(lang_key, PORTFOLIO_META[portfolio_id]["en"])
+
+        raw_p_name = item.get("planet_name", "")
+        p_key = normalize_planet_key(raw_p_name)
+        p_data = PLANET_TRANSLATIONS[p_key]
+
+        planet_name = p_data["name"][lang_key]
+        deity_name = p_data["deity"][lang_key]
+        icon = p_data["icon"]
 
         localized_mandal.append({
             "id": portfolio_id,
