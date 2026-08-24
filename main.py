@@ -95,43 +95,68 @@ ERROR_MESSAGES = {
 
 def resolve_user_language(contents: list, sys_text: str = "") -> str:
     """
-    ইউনিকোড স্ক্রিপ্ট ডিটেক্টর:
-    - বাংলা অক্ষর থাকলে -> 'bn'
-    - হিন্দি অক্ষর থাকলে -> 'hi'
-    - কোনোটি না থাকলে (সম্পূর্ণ ইংরেজি) -> 'en'
+    অ্যাপের সব পেজের (AI Report, Kundli Matching, Raja Yogas, Lal Kitab, AI Chat)
+    সিলেক্টেড ভাষা ১০০% নির্ভুলভাবে শনাক্ত করার ইউনিভার্সাল লজিক।
     """
-    user_text = ""
-    for item in reversed(contents):
+    all_parts = []
+    user_parts = []
+
+    for item in contents:
         role = str(getattr(item, "role", "") or "user").lower()
-        if role in ["user", "human"]:
-            parts = getattr(item, "parts", [])
-            user_text = " ".join(getattr(p, "text", "") for p in parts if getattr(p, "text", "")).strip()
-            if user_text:
-                break
+        parts = getattr(item, "parts", [])
+        item_text = " ".join(getattr(p, "text", "") for p in parts if getattr(p, "text", "")).strip()
+        if item_text:
+            all_parts.append(item_text)
+            if role in ["user", "human"]:
+                user_parts.append(item_text)
 
-    if not user_text and contents:
-        parts = getattr(contents[-1], "parts", [])
-        user_text = " ".join(getattr(p, "text", "") for p in parts if getattr(p, "text", "")).strip()
+    full_prompt = " ".join(all_parts) + " " + str(sys_text)
+    prompt_lower = full_prompt.lower()
+    last_user_text = user_parts[-1] if user_parts else (all_parts[-1] if all_parts else "")
 
-    # বাংলা ও হিন্দি অক্ষর স্ক্যান
-    has_bengali = any("\u0980" <= ch <= "\u09ff" for ch in user_text)
-    has_hindi = any("\u0900" <= ch <= "\u097f" for ch in user_text)
-
-    # ১. বাংলা থাকলে সরাসরি বাংলা
-    if has_bengali and not has_hindi:
+    # ১. পেজের সিলেক্টেড ল্যাঙ্গুয়েজ কম্যান্ড চেক (AI Report, Kundli Matching, Raja Yogas ইত্যাদির জন্য)
+    if any(k in prompt_lower for k in [
+        "language: bn", "language: bengali", "respond in bengali", "in bengali",
+        "in bangla", "language: bangla", "বাংলায় উত্তর", "বাংলা ভাষা"
+    ]):
         return "bn"
 
-    # ২. হিন্দি থাকলে সরাসরি হিন্দি
-    if has_hindi and not has_bengali:
+    if any(k in prompt_lower for k in [
+        "language: hi", "language: hindi", "respond in hindi", "in hindi",
+        "हिंदी में उत्तर", "हिंदी भाषा"
+    ]):
         return "hi"
 
-    # ৩. দুটোই থাকলে যার সংখ্যা বেশি
-    if has_bengali and has_hindi:
-        bn_count = sum(1 for ch in user_text if "\u0980" <= ch <= "\u09ff")
-        hi_count = sum(1 for ch in user_text if "\u0900" <= ch <= "\u097f")
-        return "bn" if bn_count >= hi_count else "hi"
+    if any(k in prompt_lower for k in [
+        "language: en", "language: english", "respond in english", "in english",
+        "english language"
+    ]):
+        return "en"
 
-    # ৪. বাংলা বা হিন্দি না থাকলে সম্পূর্ণ ইংরেজি
+    # ২. AI Chat পেজ: ইউজার নিজে যে ভাষায় টাইপ করেছেন
+    bn_user = sum(1 for ch in last_user_text if "\u0980" <= ch <= "\u09ff")
+    hi_user = sum(1 for ch in last_user_text if "\u0900" <= ch <= "\u097f")
+    en_user = sum(1 for ch in last_user_text if ("a" <= ch <= "z" or "A" <= ch <= "Z"))
+
+    if bn_user > 3 and bn_user > hi_user:
+        return "bn"
+    if hi_user > 3 and hi_user > bn_user:
+        return "hi"
+    if en_user > 3 and en_user > (bn_user + hi_user):
+        return "en"
+
+    # ৩. অন্যান্য সব স্ক্রিনের কন্টেন্ট ডেনসিটি স্ক্যান (যদি কম্যান্ড না থাকে)
+    total_bn = sum(1 for ch in full_prompt if "\u0980" <= ch <= "\u09ff")
+    total_hi = sum(1 for ch in full_prompt if "\u0900" <= ch <= "\u097f")
+    total_en = sum(1 for ch in full_prompt if ("a" <= ch <= "z" or "A" <= ch <= "Z"))
+
+    if total_bn > 15 and total_bn > total_hi:
+        return "bn"
+    if total_hi > 15 and total_hi > total_bn:
+        return "hi"
+    if total_en > total_bn and total_en > total_hi:
+        return "en"
+
     return "en"
 
 
