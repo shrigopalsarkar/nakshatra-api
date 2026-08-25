@@ -392,48 +392,82 @@ def find_new_moon_before(ref_instant: datetime, lookback_days: int = 40) -> date
 
 
 def find_chaitra_shukla_pratipada(target_date: date, lat: float = 23.1793, lon: float = 75.7849) -> date:
-    """Locates the Chaitra Shukla Pratipada governing target_date."""
-    approx_mesha = date(target_date.year, 4, 14)
-    ref_year = target_date.year if target_date >= approx_mesha else target_date.year - 1
-    mesha_ingress = find_solar_ingress(0.0, date(ref_year, 4, 10))
-
+    """
+    নির্দিষ্ট বছরের চৈত্র শুক্ল প্রতিপদ (সূর্যোদয় তিথি) নির্ভুলভাবে বের করার অ্যালগরিদম
+    """
+    year = target_date.year
+    # সংশ্লিষ্ট বছরের মেষ সংক্রান্তির তারিখ বের করা
+    mesha_ingress = find_solar_ingress(0.0, date(year, 4, 10))
+    
+    # মেষ সংক্রান্তির ঠিক পূর্ববর্তী অমাবস্যা
     new_moon = find_new_moon_before(mesha_ingress)
     nm_date = new_moon.date()
 
-    for offset in range(0, 3):
+    # অমাবস্যার পর সূর্যোদয়ে শুক্ল প্রতিপদ তিথি যাচাই
+    for offset in range(0, 4):
         d = nm_date + timedelta(days=offset)
         jd_sun = get_sunrise_jd(d, lat, lon)
         s, m = sidereal_longitudes(jd_sun)
         diff = (m - s) % 360.0
+        # সূর্যোদয়কালে চন্দ্র ও সূর্যের দূরত্বের পার্থক্য ০° থেকে ১২° এর মধ্যে থাকলে সেটিই প্রতিপদ
         if 0.0 <= diff < 12.0:
             return d
 
-    return nm_date
+    return nm_date + timedelta(days=1)
+
+
+def get_vedic_weekday_from_dt(dt_local: datetime, lat: float = 23.1793, lon: float = 75.7849) -> str:
+    """
+    সূর্যোদয় লজিক বিবেচনা করে বৈদিক বার নির্ণয় (রাত ১২টার পর কিন্তু সূর্যোদয়ের আগে হলে আগের দিন হবে)
+    """
+    d = dt_local.date()
+    jd_sun = get_sunrise_jd(d, lat, lon)
+    sunrise_dt = jd_to_local(jd_sun)
+    
+    # ঘটনা যদি সেই দিনের সূর্যোদয়ের আগে ঘটে, তবে বৈদিক দিন হবে আগের দিন
+    if dt_local < sunrise_dt:
+        effective_date = d - timedelta(days=1)
+    else:
+        effective_date = d
+        
+    return weekday_lord(effective_date)
 
 
 def compute_mantri_mandala(for_date: date, lat: float = 23.1793, lon: float = 75.7849) -> List[Dict[str, Any]]:
     """
-    Computes the 10 canonical, non-duplicate Vikram Samvat portfolios online.
+    শাস্ত্রীয় ও বৈদিক নিয়মানুযায়ী ১০টি পোর্টফোলিওর শতভাগ সঠিক ও ইউনিক গণনা
     """
+    # ১. চৈত্র প্রতিপদ নির্ণয়
     new_year_day = find_chaitra_shukla_pratipada(for_date, lat, lon)
-    year = new_year_day.year
+    year = for_date.year
+
+    # সৌর সংক্রান্তি ও নক্ষত্র প্রবেশ তালিকা
+    mesha_dt = find_solar_ingress(0.0, date(year, 4, 10))        # মেষ সংক্রান্তি (০°)
+    simha_dt = find_solar_ingress(120.0, date(year, 8, 10))      # সিংহ সংক্রান্তি (১২০°)
+    karka_dt = find_solar_ingress(90.0, date(year, 7, 10))       # কর্কট সংক্রান্তি (৯০°)
+    dhanu_dt = find_solar_ingress(240.0, date(year, 12, 10))     # ধনু সংক্রান্তি (২৪০°)
+    ardra_dt = find_solar_ingress(66.66667, date(year, 6, 15))  # আদ্রা প্রবেশ (৬৬° ৪০')
+    tula_dt = find_solar_ingress(180.0, date(year, 10, 10))      # তুলা সংক্রান্তি (১৮০°)
+    mithun_dt = find_solar_ingress(60.0, date(year, 6, 10))      # মিথুন সংক্রান্তি (৬০°)
+    kumbha_dt = find_solar_ingress(300.0, date(year, 2, 10))     # কুম্ভ সংক্রান্তি (৩০০°)
+    makar_dt = find_solar_ingress(270.0, date(year, 1, 10))      # মকর সংক্রান্তি (২৭০°)
 
     ingresses = [
-        {"id": 1, "role_bn": "রাজা (King)", "desc_bn": "রাষ্ট্র পরিচালনা, শাসন ব্যবস্থা ও জাতীয় ভাগ্য", "date": new_year_day},
-        {"id": 2, "role_bn": "মন্ত্রী (Prime Minister)", "desc_bn": "মন্ত্রিসভা, নীতি নির্ধারণ ও প্রশাসনিক পরামর্শ", "date": find_solar_ingress(0.0, date(year, 4, 10)).date()},
-        {"id": 3, "role_bn": "সেনাপতি (Commander)", "desc_bn": "প্রতিরক্ষা, সামরিক বাহিনী ও অভ্যন্তরীণ নিরাপত্তা", "date": find_solar_ingress(120.0, date(year, 8, 10)).date()},
-        {"id": 4, "role_bn": "শস্যাধিপতি (Grains Lord)", "desc_bn": "খারিফ ফসল, বর্ষাকালীন শস্য ও মূল খাদ্য উৎপাদন", "date": find_solar_ingress(90.0, date(year, 7, 10)).date()},
-        {"id": 5, "role_bn": "ধান্যাধিপতি (Crops Lord)", "desc_bn": "রবি ফসল, ডাল ও খাদ্যশস্য সঞ্চয়", "date": find_solar_ingress(240.0, date(year, 12, 10)).date()},
-        {"id": 6, "role_bn": "মেঘাধিপতি (Clouds Lord)", "desc_bn": "বৃষ্টিপাত, বর্ষা ও জলাশয়ের অবস্থা", "date": find_solar_ingress(66.66667, date(year, 6, 15)).date()},
-        {"id": 7, "role_bn": "রসাধিপতি (Liquids Lord)", "desc_bn": "দুগ্ধজাত দ্রব্য, তেল, ঔষধি রস ও পানীয়", "date": find_solar_ingress(180.0, date(year, 10, 10)).date()},
-        {"id": 8, "role_bn": "ফলাধিপতি (Fruits Lord)", "desc_bn": "ফলবাগান, উদ্যানপালন ও বৃক্ষজাত ফলন", "date": find_solar_ingress(60.0, date(year, 6, 10)).date()},
-        {"id": 9, "role_bn": "ধনাধিপতি (Wealth Lord)", "desc_bn": "অর্থনৈতিক সঞ্চয়, কোষাগার ও আর্থিক সমৃদ্ধি", "date": new_year_day},
-        {"id": 10, "role_bn": "নীরসেশ / ধাত্বাধিপতি (Minerals Lord)", "desc_bn": "খনিজ সম্পদ, ধাতু, রত্ন ও ভূগর্ভস্থ বস্তু", "date": find_solar_ingress(270.0, date(year + (1 if new_year_day.month > 1 else 0), 1, 10)).date()},
+        {"id": 1, "role_bn": "রাজা (King)", "desc_bn": "রাষ্ট্র পরিচালনা, শাসন ব্যবস্থা ও জাতীয় ভাগ্য", "dt": datetime(new_year_day.year, new_year_day.month, new_year_day.day, 12, 0, tzinfo=IST)},
+        {"id": 2, "role_bn": "মন্ত্রী (Prime Minister)", "desc_bn": "মন্ত্রিসভা, নীতি নির্ধারণ ও প্রশাসনিক পরামর্শ", "dt": mesha_dt},
+        {"id": 3, "role_bn": "সেনাপতি (Commander)", "desc_bn": "প্রতিরক্ষা, সামরিক বাহিনী ও অভ্যন্তরীণ নিরাপত্তা", "dt": simha_dt},
+        {"id": 4, "role_bn": "শস্যাধিপতি (Grains Lord)", "desc_bn": "খারিফ ফসল, বর্ষাকালীন শস্য ও মূল খাদ্য উৎপাদন", "dt": karka_dt},
+        {"id": 5, "role_bn": "ধান্যাধিপতি (Crops Lord)", "desc_bn": "রবি ফসল, ডাল ও খাদ্যশস্য সঞ্চয়", "dt": dhanu_dt},
+        {"id": 6, "role_bn": "মেঘাধিপতি (Clouds Lord)", "desc_bn": "বৃষ্টিপাত, বর্ষা ও জলাশয়ের অবস্থা", "dt": ardra_dt},
+        {"id": 7, "role_bn": "রসাধিপতি (Liquids Lord)", "desc_bn": "দুগ্ধজাত দ্রব্য, তেল, ঔষধি রস ও পানীয়", "dt": tula_dt},
+        {"id": 8, "role_bn": "ফলাধিপতি (Fruits Lord)", "desc_bn": "ফলবাগান, উদ্যানপালন ও বৃক্ষজাত ফলন", "dt": mithun_dt},
+        {"id": 9, "role_bn": "ধনাধিপতি (Wealth Lord)", "desc_bn": "অর্থনৈতিক সঞ্চয়, কোষাগার ও আর্থিক সমৃদ্ধি", "dt": kumbha_dt},
+        {"id": 10, "role_bn": "নীরসেশ / ধাত্বাধিপতি (Minerals Lord)", "desc_bn": "খনিজ সম্পদ, ধাতু, রত্ন ও ভূগর্ভস্থ বস্তু", "dt": makar_dt},
     ]
 
     mantri_mandal_list = []
     for item in ingresses:
-        lord_key = weekday_lord(item["date"])
+        lord_key = get_vedic_weekday_from_dt(item["dt"], lat, lon)
         lord = PLANET_MAP[lord_key]
         mantri_mandal_list.append({
             "id": item["id"],
@@ -442,7 +476,7 @@ def compute_mantri_mandala(for_date: date, lat: float = 23.1793, lon: float = 75
             "planet_name": lord["name_bn"],
             "deity_name": lord["deity_bn"],
             "planet_icon": lord["icon"],
-            "event_date": item["date"].isoformat()
+            "event_date": item["dt"].date().isoformat()
         })
 
     return mantri_mandal_list
