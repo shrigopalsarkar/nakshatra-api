@@ -1,8 +1,7 @@
 """
-panchang.py
 Astronomical Daily Panchang & Vikram Samvat Mantri Mandala Engine.
 Calculates Tithi, Nakshatra, Yoga, Karana transitions, Sun/Moon events,
-and 10-office Planetary Cabinet (Navadhikaris) with 100% deduplication.
+and 10-office Planetary Cabinet (Navadhikaris) in English, Hindi & Bengali.
 """
 
 from __future__ import annotations
@@ -50,14 +49,103 @@ YOGA_NAMES = [
 KARANA_NAMES_MOVABLE = ["Bava", "Balava", "Kaulava", "Taitila", "Garaja", "Vanija", "Vishti"]
 KARANA_FIXED = {0: "Kimstughna", 57: "Shakuni", 58: "Chatushpada", 59: "Naga"}
 
+# ==============================================================================
+# ১. বহুমাত্রিক ১০টি মন্ত্রিসভা দপ্তর মেটাডেটা (PORTFOLIO METADATA)
+# ==============================================================================
+
+PORTFOLIO_META = {
+    1: {
+        "en": ("King (Raja)", "Supreme governance, state leadership & national destiny"),
+        "hi": ("राजा (King)", "राज्य शासन, प्रशासनिक व्यवस्था एवं राष्ट्रीय संप्रभुता"),
+        "bn": ("রাজা (King)", "রাষ্ট্র পরিচালনা, শাসন ব্যবস্থা ও জাতীয় ভাগ্য")
+    },
+    2: {
+        "en": ("Prime Minister (Mantri)", "Cabinet leadership, policy decisions & advisory"),
+        "hi": ("मन्त्री (Prime Minister)", "मंत्रिमंडल, नीति निर्धारण एवं प्रशासनिक परामर्श"),
+        "bn": ("মন্ত্রী (Prime Minister)", "মন্ত্রিসভা, নীতি নির্ধারণ ও প্রশাসনিক পরামর্শ")
+    },
+    3: {
+        "en": ("Commander (Senapati)", "National defense, armed forces & internal security"),
+        "hi": ("सेनापति (Commander)", "राष्ट्रीय रक्षा, सैन्य बल एवं आंतरिक सुरक्षा"),
+        "bn": ("সেনাপতি (Commander)", "প্রতিরক্ষা, সামরিক বাহিনী ও অভ্যন্তরীণ নিরাপত্তা")
+    },
+    4: {
+        "en": ("Lord of Grains (Sasyadhipati)", "Kharif agriculture, monsoon crops & grain yield"),
+        "hi": ("सस्याधिपति (Grains Lord)", "खरीफ फसल, वर्षाकालीन धान्य एवं मुख्य खाद्य उत्पादन"),
+        "bn": ("শস্যাধিপতি (Grains Lord)", "খারিফ ফসল, বর্ষাকালীন শস্য ও মূল খাদ্য উৎপাদন")
+    },
+    5: {
+        "en": ("Lord of Crops (Dhanyadhipati)", "Rabi harvest, pulse storage & agricultural trade"),
+        "hi": ("धान्याधिपति (Crops Lord)", "रबी फसल, दलहन एवं धान्य संचयन"),
+        "bn": ("ধান্যাধিপতি (Crops Lord)", "রবি ফসল, ডাল ও খাদ্যশস্য সঞ্চয়")
+    },
+    6: {
+        "en": ("Lord of Clouds (Meghadhipati)", "Rainfall distribution, monsoon & water bodies"),
+        "hi": ("मेघाधिपति (Clouds Lord)", "वर्षा, मेघ एवं जल संसाधनों की स्थिति"),
+        "bn": ("মেঘাধিপতি (Clouds Lord)", "বৃষ্টিপাত, বর্ষা ও জলাশয়ের অবস্থা")
+    },
+    7: {
+        "en": ("Lord of Liquids (Rasadhipati)", "Dairy, edible oils, sugarcane, medicine & juices"),
+        "hi": ("रसाधिपति (Liquids Lord)", "दुग्ध, तेल, औषधीय रस, शर्करा एवं पेय पदार्थ"),
+        "bn": ("রসাধিপতি (Liquids Lord)", "দুগ্ধজাত দ্রব্য, তেল, ঔষধি রস ও পানীয়")
+    },
+    8: {
+        "en": ("Lord of Fruits (Phaladhipati)", "Orchards, horticulture, flowers & fruit production"),
+        "hi": ("फलाधिपति (Fruits Lord)", "फलोद्यान, बागवानी, पुष्प एवं मौसमी फल उत्पादन"),
+        "bn": ("ফলাধিপতি (Fruits Lord)", "ফলবাগান, উদ্যানপালন ও বৃক্ষজাত ফলন")
+    },
+    9: {
+        "en": ("Lord of Wealth (Dhanadhipati)", "Economic treasury, financial markets & wealth"),
+        "hi": ("धनाधिपति (Wealth Lord)", "आर्थिक कोष, राजकोष एवं वित्तीय समृद्धि"),
+        "bn": ("ধনাধিপতি (Wealth Lord)", "অর্থনৈতিক সঞ্চয়, কোষাগার ও আর্থিক সমৃদ্ধি")
+    },
+    10: {
+        "en": ("Lord of Minerals (Dhatvadhipati)", "Minerals, metals, gems & underground resources"),
+        "hi": ("नीरसेश / धात्वाधिपति (Minerals Lord)", "खनिज संपदा, धातु, रत्न एवं भूगर्भीय वस्तुएं"),
+        "bn": ("নীরসেশ / ধাত্বাধিপতি (Minerals Lord)", "খনিজ সম্পদ, ধাতু, রত্ন ও ভূগর্ভস্থ বস্তু")
+    }
+}
+
+# ==============================================================================
+# ২. বহুমাত্রিক গ্রহ ও দেবতা ম্যাপিং (PLANET & DEITY MAPPING)
+# ==============================================================================
+
 PLANET_MAP = {
-    "Surya": {"name_bn": "রবি", "deity_bn": "সূর্য নারায়ণ", "name_en": "Sun", "icon": "☉"},
-    "Chandra": {"name_bn": "চন্দ্র", "deity_bn": "চন্দ্র দেব", "name_en": "Moon", "icon": "☽"},
-    "Mangal": {"name_bn": "মঙ্গল", "deity_bn": "কার্তিকেয় / মঙ্গল দেব", "name_en": "Mars", "icon": "♂"},
-    "Budha": {"name_bn": "বুধ", "deity_bn": "ভগবান বিষ্ণু", "name_en": "Mercury", "icon": "☿"},
-    "Guru": {"name_bn": "বৃহস্পতি", "deity_bn": "দেবগুরু বৃহস্পতি", "name_en": "Jupiter", "icon": "♃"},
-    "Shukra": {"name_bn": "শুক্র", "deity_bn": "শুক্রাচার্য", "name_en": "Venus", "icon": "♀"},
-    "Shani": {"name_bn": "শনি", "deity_bn": "শনৈশ্চর দেব", "name_en": "Saturn", "icon": "♄"},
+    "Surya": {
+        "name": {"en": "Sun (Surya)", "hi": "सूर्य", "bn": "সূর্য"},
+        "deity": {"en": "Surya Deva", "hi": "भगवान सूर्य देव", "bn": "সূর্য নারায়ণ"},
+        "icon": "☉"
+    },
+    "Chandra": {
+        "name": {"en": "Moon (Chandra)", "hi": "चन्द्र", "bn": "চন্দ্র"},
+        "deity": {"en": "Chandra Deva", "hi": "चन्द्र देव", "bn": "চন্দ্র দেব"},
+        "icon": "☽"
+    },
+    "Mangal": {
+        "name": {"en": "Mars (Mangal)", "hi": "मंगल", "bn": "মঙ্গল"},
+        "deity": {"en": "Lord Kartikeya / Mangal", "hi": "कार्तिकेय / मंगल देव", "bn": "কার্তিকেয় / মঙ্গল দেব"},
+        "icon": "♂"
+    },
+    "Budha": {
+        "name": {"en": "Mercury (Budha)", "hi": "बुध", "bn": "বুধ"},
+        "deity": {"en": "Lord Vishnu", "hi": "भगवान विष्णु", "bn": "ভগবান বিষ্ণু"},
+        "icon": "☿"
+    },
+    "Guru": {
+        "name": {"en": "Jupiter (Guru)", "hi": "बृहस्पति (गुरु)", "bn": "বৃহস্পতি"},
+        "deity": {"en": "Brihaspati Deva", "hi": "देवगुरु बृहस्पति", "bn": "দেবগুরু বৃহস্পতি"},
+        "icon": "♃"
+    },
+    "Shukra": {
+        "name": {"en": "Venus (Shukra)", "hi": "शुक्र", "bn": "শুক্র"},
+        "deity": {"en": "Shukracharya", "hi": "शुक्राचार्य", "bn": "শুক্রাচার্য"},
+        "icon": "♀"
+    },
+    "Shani": {
+        "name": {"en": "Saturn (Shani)", "hi": "शनि", "bn": "শনি"},
+        "deity": {"en": "Shani Deva", "hi": "शनैश्चर देव", "bn": "শনৈশ্চর দেব"},
+        "icon": "♄"
+    }
 }
 
 WEEKDAY_LORDS = ["Surya", "Chandra", "Mangal", "Budha", "Guru", "Shukra", "Shani"]
@@ -87,7 +175,6 @@ def jd_to_local(jd_ut: float) -> datetime:
         y, m, d, h = swe.revjul(jd_ut)
         base = datetime(y, m, d, tzinfo=UTC) + timedelta(hours=h)
         return base.astimezone(IST)
-    # Mathematical fallback
     z = int(jd_ut + 0.5)
     f = (jd_ut + 0.5) - z
     alpha = int((z - 1867216.25) / 36524.25)
@@ -202,7 +289,6 @@ class PanchangResult:
 
 
 def compute_panchang(local_date: date, lat: float = 28.6139, lon: float = 77.2090) -> PanchangResult:
-    """Computes precision Panchang elements for the given location."""
     noon_local = datetime(local_date.year, local_date.month, local_date.day, 6, 0, tzinfo=IST)
     jd_approx = to_jd_ut(noon_local) - 0.25
     jd_sunrise, jd_sunset, jd_next_sunrise, jd_moonrise, jd_moonset = sun_moon_events(jd_approx, lat, lon)
@@ -247,7 +333,6 @@ def compute_panchang(local_date: date, lat: float = 28.6139, lon: float = 77.209
     def fmt_time(jd):
         return jd_to_local(jd).strftime("%H:%M:%S") if jd else None
 
-    # Dina Mana calculations (8-fold and 15-fold divisions)
     dt_rise = jd_to_local(jd_sunrise)
     dt_set = jd_to_local(jd_sunset)
     dina_mana_sec = (dt_set - dt_rise).total_seconds()
@@ -340,7 +425,6 @@ def compute_panchang(local_date: date, lat: float = 28.6139, lon: float = 77.209
 
 
 def find_solar_ingress(target_deg: float, approx_start: date) -> datetime:
-    """Finds exact moment Sun reaches a specific sidereal longitude (a Sankranti)."""
     start_dt = datetime(approx_start.year, approx_start.month, approx_start.day, 0, 0, tzinfo=UTC)
     jd = to_jd_ut(start_dt)
 
@@ -366,7 +450,6 @@ def find_solar_ingress(target_deg: float, approx_start: date) -> datetime:
 
 
 def find_new_moon_before(ref_instant: datetime, lookback_days: int = 40) -> datetime:
-    """Finds the exact New Moon immediately preceding ref_instant."""
     jd = to_jd_ut(ref_instant)
     step = 1.0 / 24.0
     prev_diff = None
@@ -392,24 +475,16 @@ def find_new_moon_before(ref_instant: datetime, lookback_days: int = 40) -> date
 
 
 def find_chaitra_shukla_pratipada(target_date: date, lat: float = 23.1793, lon: float = 75.7849) -> date:
-    """
-    নির্দিষ্ট বছরের চৈত্র শুক্ল প্রতিপদ (সূর্যোদয় তিথি) নির্ভুলভাবে বের করার অ্যালগরিদম
-    """
     year = target_date.year
-    # সংশ্লিষ্ট বছরের মেষ সংক্রান্তির তারিখ বের করা
     mesha_ingress = find_solar_ingress(0.0, date(year, 4, 10))
-    
-    # মেষ সংক্রান্তির ঠিক পূর্ববর্তী অমাবস্যা
     new_moon = find_new_moon_before(mesha_ingress)
     nm_date = new_moon.date()
 
-    # অমাবস্যার পর সূর্যোদয়ে শুক্ল প্রতিপদ তিথি যাচাই
     for offset in range(0, 4):
         d = nm_date + timedelta(days=offset)
         jd_sun = get_sunrise_jd(d, lat, lon)
         s, m = sidereal_longitudes(jd_sun)
         diff = (m - s) % 360.0
-        # সূর্যোদয়কালে চন্দ্র ও সূর্যের দূরত্বের পার্থক্য ০° থেকে ১২° এর মধ্যে থাকলে সেটিই প্রতিপদ
         if 0.0 <= diff < 12.0:
             return d
 
@@ -417,14 +492,10 @@ def find_chaitra_shukla_pratipada(target_date: date, lat: float = 23.1793, lon: 
 
 
 def get_vedic_weekday_from_dt(dt_local: datetime, lat: float = 23.1793, lon: float = 75.7849) -> str:
-    """
-    সূর্যোদয় লজিক বিবেচনা করে বৈদিক বার নির্ণয় (রাত ১২টার পর কিন্তু সূর্যোদয়ের আগে হলে আগের দিন হবে)
-    """
     d = dt_local.date()
     jd_sun = get_sunrise_jd(d, lat, lon)
     sunrise_dt = jd_to_local(jd_sun)
     
-    # ঘটনা যদি সেই দিনের সূর্যোদয়ের আগে ঘটে, তবে বৈদিক দিন হবে আগের দিন
     if dt_local < sunrise_dt:
         effective_date = d - timedelta(days=1)
     else:
@@ -433,49 +504,71 @@ def get_vedic_weekday_from_dt(dt_local: datetime, lat: float = 23.1793, lon: flo
     return weekday_lord(effective_date)
 
 
-def compute_mantri_mandala(for_date: date, lat: float = 23.1793, lon: float = 75.7849) -> List[Dict[str, Any]]:
+# ==============================================================================
+# ৩. ত্রিভাষিক বিক্রম সংবৎ মন্ত্রিসভা গণনা ইঞ্জিন (TRI-LINGUAL MANTRI MANDALA)
+# ==============================================================================
+
+def compute_mantri_mandala(
+    for_date: date,
+    lat: float = 23.1793,
+    lon: float = 75.7849,
+    lang: str = "en"
+) -> List[Dict[str, Any]]:
     """
-    শাস্ত্রীয় ও বৈদিক নিয়মানুযায়ী ১০টি পোর্টফোলিওর শতভাগ সঠিক ও ইউনিক গণনা
+    Computes canonical Vikram Samvat 10-office Planetary Cabinet dynamically in EN, HI & BN.
     """
-    # ১. চৈত্র প্রতিপদ নির্ণয়
+    l_str = str(lang).lower().strip()
+    if l_str.startswith("bn") or "বাংলা" in l_str:
+        lang_key = "bn"
+    elif l_str.startswith("hi") or "हि" in l_str:
+        lang_key = "hi"
+    else:
+        lang_key = "en"
+
+    # ১. চৈত্র শুক্ল প্রতিপদ (নববর্ষের দিন)
     new_year_day = find_chaitra_shukla_pratipada(for_date, lat, lon)
-    year = for_date.year
+    year = new_year_day.year
 
-    # সৌর সংক্রান্তি ও নক্ষত্র প্রবেশ তালিকা
-    mesha_dt = find_solar_ingress(0.0, date(year, 4, 10))        # মেষ সংক্রান্তি (০°)
-    simha_dt = find_solar_ingress(120.0, date(year, 8, 10))      # সিংহ সংক্রান্তি (১২০°)
-    karka_dt = find_solar_ingress(90.0, date(year, 7, 10))       # কর্কট সংক্রান্তি (৯০°)
-    dhanu_dt = find_solar_ingress(240.0, date(year, 12, 10))     # ধনু সংক্রান্তি (২৪০°)
-    ardra_dt = find_solar_ingress(66.66667, date(year, 6, 15))  # আদ্রা প্রবেশ (৬৬° ৪০')
-    tula_dt = find_solar_ingress(180.0, date(year, 10, 10))      # তুলা সংক্রান্তি (১৮০°)
-    mithun_dt = find_solar_ingress(60.0, date(year, 6, 10))      # মিথুন সংক্রান্তি (৬০°)
-    kumbha_dt = find_solar_ingress(300.0, date(year, 2, 10))     # কুম্ভ সংক্রান্তি (৩০০°)
-    makar_dt = find_solar_ingress(270.0, date(year, 1, 10))      # মকর সংক্রান্তি (২৭০°)
+    # ২. সৌর সংক্রান্তি ও নক্ষত্র প্রবেশ সময়সূচী (পরবর্তী ক্যালেন্ডার বছর সমন্বয়সহ)
+    mesha_dt = find_solar_ingress(0.0, date(year, 4, 10))            # মেষ সংক্রান্তি (০°)
+    mithun_dt = find_solar_ingress(60.0, date(year, 6, 10))          # মিথুন সংক্রান্তি (৬০°)
+    ardra_dt = find_solar_ingress(66.66667, date(year, 6, 15))      # আদ্রা নক্ষত্র প্রবেশ (৬৬° ৪০')
+    karka_dt = find_solar_ingress(90.0, date(year, 7, 10))           # কর্কট সংক্রান্তি (৯০°)
+    simha_dt = find_solar_ingress(120.0, date(year, 8, 10))          # সিংহ সংক্রান্তি (১২০°)
+    tula_dt = find_solar_ingress(180.0, date(year, 10, 10))          # তুলা সংক্রান্তি (১৮০°)
+    dhanu_dt = find_solar_ingress(240.0, date(year, 12, 10))         # ধনু সংক্রান্তি (২৪০°)
+    makar_dt = find_solar_ingress(270.0, date(year + 1, 1, 10))      # মকর সংক্রান্তি (২৭০° - পরবর্তী জানুয়ারি)
+    kumbha_dt = find_solar_ingress(300.0, date(year + 1, 2, 10))     # কুম্ভ সংক্রান্তি (৩০০° - পরবর্তী ফেব্রুয়ারি)
 
+    # ৩. ১০টি দপ্তরের টাইমলাইন
     ingresses = [
-        {"id": 1, "role_bn": "রাজা (King)", "desc_bn": "রাষ্ট্র পরিচালনা, শাসন ব্যবস্থা ও জাতীয় ভাগ্য", "dt": datetime(new_year_day.year, new_year_day.month, new_year_day.day, 12, 0, tzinfo=IST)},
-        {"id": 2, "role_bn": "মন্ত্রী (Prime Minister)", "desc_bn": "মন্ত্রিসভা, নীতি নির্ধারণ ও প্রশাসনিক পরামর্শ", "dt": mesha_dt},
-        {"id": 3, "role_bn": "সেনাপতি (Commander)", "desc_bn": "প্রতিরক্ষা, সামরিক বাহিনী ও অভ্যন্তরীণ নিরাপত্তা", "dt": simha_dt},
-        {"id": 4, "role_bn": "শস্যাধিপতি (Grains Lord)", "desc_bn": "খারিফ ফসল, বর্ষাকালীন শস্য ও মূল খাদ্য উৎপাদন", "dt": karka_dt},
-        {"id": 5, "role_bn": "ধান্যাধিপতি (Crops Lord)", "desc_bn": "রবি ফসল, ডাল ও খাদ্যশস্য সঞ্চয়", "dt": dhanu_dt},
-        {"id": 6, "role_bn": "মেঘাধিপতি (Clouds Lord)", "desc_bn": "বৃষ্টিপাত, বর্ষা ও জলাশয়ের অবস্থা", "dt": ardra_dt},
-        {"id": 7, "role_bn": "রসাধিপতি (Liquids Lord)", "desc_bn": "দুগ্ধজাত দ্রব্য, তেল, ঔষধি রস ও পানীয়", "dt": tula_dt},
-        {"id": 8, "role_bn": "ফলাধিপতি (Fruits Lord)", "desc_bn": "ফলবাগান, উদ্যানপালন ও বৃক্ষজাত ফলন", "dt": mithun_dt},
-        {"id": 9, "role_bn": "ধনাধিপতি (Wealth Lord)", "desc_bn": "অর্থনৈতিক সঞ্চয়, কোষাগার ও আর্থিক সমৃদ্ধি", "dt": kumbha_dt},
-        {"id": 10, "role_bn": "নীরসেশ / ধাত্বাধিপতি (Minerals Lord)", "desc_bn": "খনিজ সম্পদ, ধাতু, রত্ন ও ভূগর্ভস্থ বস্তু", "dt": makar_dt},
+        {"id": 1, "dt": datetime(new_year_day.year, new_year_day.month, new_year_day.day, 12, 0, tzinfo=IST)},
+        {"id": 2, "dt": mesha_dt},
+        {"id": 3, "dt": simha_dt},
+        {"id": 4, "dt": karka_dt},
+        {"id": 5, "dt": dhanu_dt},
+        {"id": 6, "dt": ardra_dt},
+        {"id": 7, "dt": tula_dt},
+        {"id": 8, "dt": mithun_dt},
+        {"id": 9, "dt": kumbha_dt},
+        {"id": 10, "dt": makar_dt},
     ]
 
     mantri_mandal_list = []
     for item in ingresses:
+        p_id = item["id"]
+        title, desc = PORTFOLIO_META[p_id][lang_key]
+
         lord_key = get_vedic_weekday_from_dt(item["dt"], lat, lon)
-        lord = PLANET_MAP[lord_key]
+        planet_info = PLANET_MAP[lord_key]
+
         mantri_mandal_list.append({
-            "id": item["id"],
-            "title": item["role_bn"],
-            "description": item["desc_bn"],
-            "planet_name": lord["name_bn"],
-            "deity_name": lord["deity_bn"],
-            "planet_icon": lord["icon"],
+            "id": p_id,
+            "title": title,
+            "description": desc,
+            "planet_name": planet_info["name"][lang_key],
+            "deity_name": planet_info["deity"][lang_key],
+            "planet_icon": planet_info["icon"],
             "event_date": item["dt"].date().isoformat()
         })
 
