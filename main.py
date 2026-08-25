@@ -17,6 +17,7 @@ from typing import List, Optional, Dict, Any
 from fastapi import FastAPI, Query, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from panchang import compute_full_drik_panchang
 
 # ১. panchang.py থেকে আসল ও ১০০% নিখুঁত অ্যাস্ট্রোনমিক্যাল মন্ত্রিমণ্ডল ফাংশন ইমপোর্ট
 from panchang import compute_mantri_mandala
@@ -603,15 +604,18 @@ def compute_moon_events(dt: datetime.datetime, lat: float, lon: float):
 @app.get("/panchang")
 async def get_panchang(
     iso_date: str = Query(..., description="Date in YYYY-MM-DD format"),
-    lat: float = Query(28.6139, description="Latitude"),
-    lon: float = Query(77.2090, description="Longitude"),
+    lat: float = Query(22.5726, description="Latitude (Default Kolkata: 22.5726)"),
+    lon: float = Query(88.3639, description="Longitude (Default Kolkata: 88.3639)"),
     lang: str = Query("en", description="Language: 'en', 'hi', or 'bn'")
 ):
     try:
         date_obj = datetime.date.fromisoformat(iso_date)
-        dt = datetime.datetime(date_obj.year, date_obj.month, date_obj.day, 12, 0, 0)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid iso_date format.")
+
+    # Drik Panchang Complete Replica Engine Call
+    data = compute_full_drik_panchang(date_obj, lat=lat, lon=lon, lang=lang)
+    return data
 
     sunrise_str, sunset_str, rise_min, set_min = compute_sunrise_sunset(date_obj, lat, lon)
     
