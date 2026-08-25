@@ -698,7 +698,7 @@ async def get_panchang(
             "amrit_kaal": {"start": "08:30:00", "end": "10:15:00"}
         },
         # panchang.py এর ১০০% সঠিক ফলাফল অনুবাদসহ রিটার্ন
-        "mantri_mandal": get_localized_mantri_mandala(date_obj, lat, lon, lang=lang),
+        "mantri_mandal": compute_mantri_mandala(date_obj, lat, lon, lang=lang),
         "choghadiya": compute_choghadiya(date_obj, rise_min, set_min, lang=lang)
     }
 
