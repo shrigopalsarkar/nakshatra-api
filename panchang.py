@@ -707,6 +707,12 @@ def compute_full_drik_panchang(local_date: date, lat: float = 22.5726, lon: floa
     dur_varjyam = compute_dur_muhurtam_and_varjyam(dt_rise, dt_set, weekday, n_idx)
     epochs = compute_epochs_and_calendars(local_date, jd_sunrise)
 
+    # সংবৎ সাল ও ডাইনামিক টাইটেল নির্ণয় (চৈত্র প্রতিপদের বছর + ৫৭)
+    # ==========================================================================
+    new_year_day, _ = get_governing_chaitra_pratipada(local_date, lat, lon)
+    samvat_year = new_year_day.year + 57
+    mantri_title = get_mantri_mandala_title(samvat_year, lang_key)
+
     return {
         # মূল পঞ্চাঙ্গ ও রেট্রোফিট ডিটিও
         "date_local": local_date.isoformat(),
