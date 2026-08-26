@@ -660,8 +660,16 @@ async def get_panchang(
     brahma_end = (rise_min - 48 + 1440) % 1440
     moonrise_str, moonset_str = compute_moon_events(dt, lat, lon)
 
+    target_date = dt.date() if hasattr(dt, "date") else dt
+    samvat_year = target_date.year + 57
+    mantri_list = compute_mantri_mandala(target_date, lat=lat, lon=lon, lang="en")
+
     return {
         "date_local": iso_date,
+        "samvat_year": samvat_year,
+        "vikram_samvat": samvat_year,
+        "mantri_mandal_title": f"Mantri Mandala of Vikram Samvat {samvat_year}",
+        "mantri_mandala": mantri_list,
         "sunrise": sunrise_str,
         "sunset": sunset_str,
         "next_sunrise": sunrise_str,
