@@ -68,15 +68,15 @@ PORTFOLIO_META = {
 # (66*40' = 66.6667 deg), not a rashi sankranti -- this is the standard
 # Tajik-system distinction between rashi and nakshatra based offices.
 PORTFOLIO_SANKRANTI = {
-    2: 0.0,        # Mesha (Aries) sankranti -> Mantri
-    3: 120.0,      # Simha (Leo) sankranti -> Senapati
-    4: 90.0,       # Karka (Cancer) sankranti -> Sasyadhipati
-    5: 240.0,      # Dhanu (Sagittarius) sankranti -> Dhanyadhipati
-    6: 66.66667,   # Ardra nakshatra entry -> Meghadhipati
-    7: 180.0,      # Tula (Libra) sankranti -> Rasadhipati
-    8: 60.0,       # Mithuna (Gemini) sankranti -> Phaladhipati
-    9: 300.0,      # Kumbha (Aquarius) sankranti -> Dhanadhipati
-    10: 270.0,     # Makara (Capricorn) sankranti -> Neerasadhipati
+    2: 0.0,        # Mesha -> Mantri
+    3: 120.0,      # Simha -> Senapati
+    4: 90.0,       # Karka -> Sasyadhipati
+    5: 240.0,      # Dhanu -> Dhanyadhipati
+    6: 66.66667,   # Ardra -> Meghadhipati
+    7: 180.0,      # Tula -> Rasadhipati
+    8: 60.0,       # Mithuna -> Phaladhipati
+    9: 150.0,      # Kanya -> Dhanadhipati (150.0 ডিগ্রি)
+    10: 270.0,     # Makara -> Neerasadhipati
 }
 
 
