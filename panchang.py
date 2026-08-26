@@ -557,7 +557,29 @@ def compute_epochs_and_calendars(target_date: date, jd_noon: float) -> dict:
         "julian_date": round(jd_noon, 4),
         "modified_julian_date": round(mjd, 4)
     }
+# ==============================================================================
+# ডাইনামিক বিক্রম সংবৎ টাইটেল জেনারেটর (DYNAMIC SAMVAT TITLE GENERATOR)
+# ==============================================================================
 
+def to_indic_digits(number: int, lang_key: str) -> str:
+    """সংখ্যাকে বাংলা (০-৯), হিন্দি (०-९) বা ইংরেজিতে রূপান্তর করে।"""
+    s = str(number)
+    if lang_key == "bn":
+        bn_map = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'}
+        return "".join(bn_map.get(c, c) for c in s)
+    elif lang_key == "hi":
+        hi_map = {'0': '०', '1': '१', '2': '२', '3': '३', '4': '४', '5': '५', '6': '६', '7': '७', '8': '८', '9': '९'}
+        return "".join(hi_map.get(c, c) for c in s)
+    return s
+
+def get_mantri_mandala_title(samvat_year: int, lang_key: str) -> str:
+    """ভাষা অনুযায়ী স্বয়ংক্রিয় বিক্রম সংবৎ হেডার তৈরি করে।"""
+    year_str = to_indic_digits(samvat_year, lang_key)
+    if lang_key == "bn":
+        return f"বিক্রম সংবৎ {year_str}-এর মন্ত্রিসভা"
+    elif lang_key == "hi":
+        return f"विक्रम संवत {year_str} का मंत्रिमंडल"
+    return f"Mantri Mandala of Vikram Samvat {year_str}"
 # ==============================================================================
 # ৬. সম্পূর্ণ পঞ্চাঙ্গ (ANDROID DTO & DRIK PANCHANG 100% REPLICA)
 # ==============================================================================
