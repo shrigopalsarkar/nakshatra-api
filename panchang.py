@@ -268,8 +268,8 @@ def compute_mantri_mandala(for_date: date, lat: float = 23.1793, lon: float = 75
 
     new_year_day, cycle_start_jd = get_governing_chaitra_pratipada(for_date, lat, lon)
 
+    # ১০টি দপ্তরের সঠিক সংক্রান্তি ও প্রবেশকাল (Solar Ingresses)
     mesha_dt = find_solar_ingress_forward(cycle_start_jd - 10.0, 0.0)
-    vrishabha_dt = find_solar_ingress_forward(cycle_start_jd + 20.0, 30.0)
     mithun_dt = find_solar_ingress_forward(cycle_start_jd + 50.0, 60.0)
     ardra_dt = find_solar_ingress_forward(cycle_start_jd + 60.0, 66.66667)
     karka_dt = find_solar_ingress_forward(cycle_start_jd + 80.0, 90.0)
@@ -277,18 +277,19 @@ def compute_mantri_mandala(for_date: date, lat: float = 23.1793, lon: float = 75
     tula_dt = find_solar_ingress_forward(cycle_start_jd + 170.0, 180.0)
     dhanu_dt = find_solar_ingress_forward(cycle_start_jd + 230.0, 240.0)
     makar_dt = find_solar_ingress_forward(cycle_start_jd + 260.0, 270.0)
+    kumbha_dt = find_solar_ingress_forward(cycle_start_jd + 290.0, 300.0)  # <- কুম্ভ সংক্রান্তি (ধনধিপতির জন্য)
 
     ingresses = [
-        {"id": 1, "dt": datetime(new_year_day.year, new_year_day.month, new_year_day.day, 12, 0, tzinfo=IST)},
-        {"id": 2, "dt": mesha_dt},
-        {"id": 3, "dt": simha_dt},
-        {"id": 4, "dt": karka_dt},
-        {"id": 5, "dt": dhanu_dt},
-        {"id": 6, "dt": ardra_dt},
-        {"id": 7, "dt": tula_dt},
-        {"id": 8, "dt": mithun_dt},
-        {"id": 9, "dt": vrishabha_dt},
-        {"id": 10, "dt": makar_dt},
+        {"id": 1, "dt": datetime(new_year_day.year, new_year_day.month, new_year_day.day, 12, 0, tzinfo=IST)}, # 1. রাজা (চৈত্র শুক্লা প্রতিপদ)
+        {"id": 2, "dt": mesha_dt},      # 2. মন্ত্রী (মেষ সংক্রান্তি)
+        {"id": 3, "dt": simha_dt},      # 3. সেনাপতি (সিংহ সংক্রান্তি)
+        {"id": 4, "dt": karka_dt},      # 4. সস্যাধিপতি (কর্কট সংক্রান্তি)
+        {"id": 5, "dt": dhanu_dt},      # 5. ধান্যাধিপতি (ধনু সংক্রান্তি)
+        {"id": 6, "dt": ardra_dt},      # 6. মেঘাধিপতি (আর্দ্রা প্রবেশ)
+        {"id": 7, "dt": tula_dt},       # 7. রসাধিপতি (তুলা সংক্রান্তি)
+        {"id": 8, "dt": mithun_dt},     # 8. ফলাধিপতি (মিথুন সংক্রান্তি)
+        {"id": 9, "dt": kumbha_dt},     # 9. ধনধিপতি (কুম্ভ সংক্রান্তি - ফিক্সড)
+        {"id": 10, "dt": makar_dt},     # 10. নীরসাধিপতি (মকর সংক্রান্তি)
     ]
 
     mantri_mandal_list = []
