@@ -717,6 +717,7 @@ def compute_full_drik_panchang(local_date: date, lat: float = 22.5726, lon: floa
         # মূল পঞ্চাঙ্গ ও রেট্রোফিট ডিটিও
         "date_local": local_date.isoformat(),
         "samvat_year": samvat_year,               # <- এই লাইনটি যোগ করুন
+        "vikram_samvat": samvat_year,
         "mantri_mandal_title": mantri_title,       # <- এই লাইনটি যোগ করুন
         "weekday_name": WEEKDAY_NAMES[lang_key][(weekday + 1) % 7],
         "sunrise": fmt_time(dt_rise),
