@@ -262,51 +262,194 @@ def get_governing_chaitra_pratipada(query_date: date, lat: float, lon: float) ->
 # ৩. বিক্রম সংবৎ মন্ত্রিসভা (১০টি পদ - DRIK MATCH)
 # ==============================================================================
 
-def compute_mantri_mandala(for_date: date, lat: float = 23.1793, lon: float = 75.7849, lang: str = "en") -> List[Dict[str, Any]]:
+def compute_mantri_mandala(
+    for_date: date,
+    lat: float = 23.1793,
+    lon: float = 75.7849,
+    lang: str = "en"
+) -> List[Dict[str, Any]]:
+
     l_str = str(lang).lower().strip()
-    lang_key = "bn" if (l_str.startswith("bn") or "বাংলা" in l_str) else ("hi" if (l_str.startswith("hi") or "हि" in l_str) else "en")
 
-    new_year_day, cycle_start_jd = get_governing_chaitra_pratipada(for_date, lat, lon)
+    lang_key = (
+        "bn" if (l_str.startswith("bn") or "বাংলা" in l_str)
+        else "hi" if (l_str.startswith("hi") or "हि" in l_str)
+        else "en"
+    )
 
-    # ১০টি দপ্তরের সঠিক সংক্রান্তি ও প্রবেশকাল (Solar Ingresses)
-    mesha_dt = find_solar_ingress_forward(cycle_start_jd - 10.0, 0.0)
-    mithun_dt = find_solar_ingress_forward(cycle_start_jd + 50.0, 60.0)
-    ardra_dt = find_solar_ingress_forward(cycle_start_jd + 60.0, 66.66667)
-    karka_dt = find_solar_ingress_forward(cycle_start_jd + 80.0, 90.0)
-    simha_dt = find_solar_ingress_forward(cycle_start_jd + 110.0, 120.0)
-    tula_dt = find_solar_ingress_forward(cycle_start_jd + 170.0, 180.0)
-    dhanu_dt = find_solar_ingress_forward(cycle_start_jd + 230.0, 240.0)
-    makar_dt = find_solar_ingress_forward(cycle_start_jd + 260.0, 270.0)
-    kumbha_dt = find_solar_ingress_forward(cycle_start_jd + 290.0, 300.0)  # <- কুম্ভ সংক্রান্তি (ধনধিপতির জন্য)
+    # ---------------------------------------------------------
+    # 1. Find governing Vikram Samvat / Chaitra Shukla Pratipada
+    # ---------------------------------------------------------
+    new_year_day, cycle_start_jd = get_governing_chaitra_pratipada(
+        for_date,
+        lat,
+        lon
+    )
+
+    # ---------------------------------------------------------
+    # 2. Solar / astronomical events
+    #    Longitudes are SIDEREAL
+    # ---------------------------------------------------------
+
+    # Minister — Mesha Sankranti (0°)
+    mesha_dt = find_solar_ingress_forward(
+        cycle_start_jd - 10.0,
+        0.0
+    )
+
+    # Phaladhipati — Mithuna Sankranti (60°)
+    mithun_dt = find_solar_ingress_forward(
+        cycle_start_jd + 50.0,
+        60.0
+    )
+
+    # Meghadhipati — Ardra Pravesha
+    ardra_dt = find_solar_ingress_forward(
+        cycle_start_jd + 60.0,
+        66.66667
+    )
+
+    # Sasyadhipati — Karka Sankranti (90°)
+    karka_dt = find_solar_ingress_forward(
+        cycle_start_jd + 80.0,
+        90.0
+    )
+
+    # Senadhipati — Simha Sankranti (120°)
+    simha_dt = find_solar_ingress_forward(
+        cycle_start_jd + 110.0,
+        120.0
+    )
+
+    # ---------------------------------------------------------
+    # IMPORTANT:
+    # Dhanadhipati = Kanya Sankranti (150°)
+    #
+    # NOT Kumbha Sankranti (300°)
+    # ---------------------------------------------------------
+    kanya_dt = find_solar_ingress_forward(
+        cycle_start_jd + 140.0,
+        150.0
+    )
+
+    # Rasadhipati — Tula Sankranti (180°)
+    tula_dt = find_solar_ingress_forward(
+        cycle_start_jd + 170.0,
+        180.0
+    )
+
+    # Dhanyadhipati — Dhanu Sankranti (240°)
+    dhanu_dt = find_solar_ingress_forward(
+        cycle_start_jd + 230.0,
+        240.0
+    )
+
+    # Neerasadhipati — Makara Sankranti (270°)
+    makar_dt = find_solar_ingress_forward(
+        cycle_start_jd + 260.0,
+        270.0
+    )
+
+    # ---------------------------------------------------------
+    # 3. Mantri Mandala events
+    # ---------------------------------------------------------
 
     ingresses = [
-        {"id": 1, "dt": datetime(new_year_day.year, new_year_day.month, new_year_day.day, 12, 0, tzinfo=IST)}, # 1. রাজা (চৈত্র শুক্লা প্রতিপদ)
-        {"id": 2, "dt": mesha_dt},      # 2. মন্ত্রী (মেষ সংক্রান্তি)
-        {"id": 3, "dt": simha_dt},      # 3. সেনাপতি (সিংহ সংক্রান্তি)
-        {"id": 4, "dt": karka_dt},      # 4. সস্যাধিপতি (কর্কট সংক্রান্তি)
-        {"id": 5, "dt": dhanu_dt},      # 5. ধান্যাধিপতি (ধনু সংক্রান্তি)
-        {"id": 6, "dt": ardra_dt},      # 6. মেঘাধিপতি (আর্দ্রা প্রবেশ)
-        {"id": 7, "dt": tula_dt},       # 7. রসাধিপতি (তুলা সংক্রান্তি)
-        {"id": 8, "dt": mithun_dt},     # 8. ফলাধিপতি (মিথুন সংক্রান্তি)
-        {"id": 9, "dt": kumbha_dt},     # 9. ধনধিপতি (কুম্ভ সংক্রান্তি - ফিক্সড)
-        {"id": 10, "dt": makar_dt},     # 10. নীরসাধিপতি (মকর সংক্রান্তি)
+        {
+            "id": 1,
+            "dt": datetime(
+                new_year_day.year,
+                new_year_day.month,
+                new_year_day.day,
+                12,
+                0,
+                tzinfo=IST
+            )
+        },  # Raja — Chaitra Shukla Pratipada
+
+        {
+            "id": 2,
+            "dt": mesha_dt
+        },  # Mantri — Mesha Sankranti
+
+        {
+            "id": 3,
+            "dt": simha_dt
+        },  # Senadhipati — Simha Sankranti
+
+        {
+            "id": 4,
+            "dt": karka_dt
+        },  # Sasyadhipati — Karka Sankranti
+
+        {
+            "id": 5,
+            "dt": dhanu_dt
+        },  # Dhanyadhipati — Dhanu Sankranti
+
+        {
+            "id": 6,
+            "dt": ardra_dt
+        },  # Meghadhipati — Ardra Pravesha
+
+        {
+            "id": 7,
+            "dt": tula_dt
+        },  # Rasadhipati — Tula Sankranti
+
+        {
+            "id": 8,
+            "dt": mithun_dt
+        },  # Phaladhipati — Mithuna Sankranti
+
+        {
+            "id": 9,
+            "dt": kanya_dt
+        },  # Dhanadhipati — Kanya Sankranti
+
+        {
+            "id": 10,
+            "dt": makar_dt
+        },  # Neerasadhipati — Makara Sankranti
     ]
 
+    # ---------------------------------------------------------
+    # 4. Determine planetary lord from weekday
+    # ---------------------------------------------------------
+
     mantri_mandal_list = []
+
     for item in ingresses:
+
         p_id = item["id"]
+
         title, desc = PORTFOLIO_META[p_id][lang_key]
-        lord_key = get_vedic_weekday_from_dt(item["dt"], lat, lon)
+
+        lord_key = get_vedic_weekday_from_dt(
+            item["dt"],
+            lat,
+            lon
+        )
+
         planet_info = PLANET_MAP[lord_key]
 
         mantri_mandal_list.append({
             "id": p_id,
             "title": title,
             "description": desc,
+
             "planet_name": planet_info["name"][lang_key],
+
             "deity_name": planet_info["deity"][lang_key],
+
             "planet_icon": planet_info["icon"],
-            "event_date": item["dt"].date().isoformat()
+
+            "event_date": item["dt"].date().isoformat(),
+
+            # Useful for debugging / verification
+            "event_weekday": lord_key,
+
+            "event_datetime": item["dt"].isoformat()
         })
 
     return mantri_mandal_list
