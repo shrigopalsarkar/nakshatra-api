@@ -729,7 +729,7 @@ async def get_panchang(
         "karana_end": f"{iso_date}T15:45:00",
         "karana_next_name": KARANAS[(karana_idx + 1) % 11],
         "karana_type": "Chara",
-        "paksha": paksha_val
+        "paksha": paksha_val,
         "pada_timeline": [
             {"nakshatra": NAKSHATRAS[nak_idx], "pada": pada, "end": f"{iso_date}T18:00:00"}
         ],
