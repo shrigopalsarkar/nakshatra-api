@@ -665,6 +665,22 @@ async def get_panchang(
     samvat_year = target_date.year + 57
     mantri_list = compute_mantri_mandala(target_date, lat=lat, lon=lon, lang="en")
 
+   tithi_num = (tithi_idx % 15) + 1
+    paksha_val = "Shukla" if tithi_idx < 15 else "Krishna"
+
+    # --- সৌর মাসের নাম (সংক্রান্তি / মাস) ---
+    zodiac_names = ["Mesha", "Vrishabha", "Mithuna", "Karka", "Simha", "Kanya", "Tula", "Vrischika", "Dhanu", "Makara", "Kumbha", "Meena"]
+    solar_month = zodiac_names[int(sun_lon / 30.0) % 12]
+
+    # --- হিন্দু উৎসব ও ব্রত নির্ণয় ---
+    today_festivals = get_festivals_for_day(
+        lunar_month=solar_month,
+        paksha=paksha_val,
+        tithi_num=tithi_num,
+        sankranti_name=solar_month,
+        lang=lang if 'lang' in locals() else "en"
+    )
+
     return {
         "date_local": iso_date,
         "samvat_year": samvat_year,
