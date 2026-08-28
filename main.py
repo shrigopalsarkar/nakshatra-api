@@ -674,6 +674,7 @@ async def get_panchang(
 
     # --- হিন্দু উৎসব ও ব্রত নির্ণয় ---
     today_festivals = get_festivals_for_day(
+        current_date=target_date,
         lunar_month=solar_month,
         paksha=paksha_val,
         tithi_num=tithi_num,
@@ -682,6 +683,7 @@ async def get_panchang(
     )
 
     return {
+        "festivals": today_festivals
         "date_local": iso_date,
         "samvat_year": samvat_year,
         "vikram_samvat": samvat_year,
