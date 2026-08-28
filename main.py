@@ -683,7 +683,7 @@ async def get_panchang(
     )
 
     return {
-        "festivals": today_festivals
+        "festivals": today_festivals,
         "date_local": iso_date,
         "samvat_year": samvat_year,
         "vikram_samvat": samvat_year,
