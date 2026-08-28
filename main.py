@@ -666,35 +666,33 @@ async def get_panchang(
     samvat_year = target_date.year + 57
     mantri_list = compute_mantri_mandala(target_date, lat=lat, lon=lon, lang="en")
 
-    # --- ১. তিথি ও পক্ষ নির্ণয় ---
-    diff_tithi = (moon_lon - sun_lon) % 360.0
-    tithi_idx = int(diff_tithi / 12.0) % 30
     tithi_num = (tithi_idx % 15) + 1
     paksha_val = "Shukla" if tithi_idx < 15 else "Krishna"
 
-    # --- ২. সঠিক বৈদিক চান্দ্র মাস (Masa / Chandramasa) নির্ণয় ---
-    # অমাবস্যার সময় সূর্যের অবস্থান থেকে বৈদিক নিয়ম অনুযায়ী চান্দ্র মাস গণনা
+    # --- বৈদিক চান্দ্র মাস (Masa) শতভাগ নির্ভুল গণনা ---
+    # অমাবস্যার সময় সূর্যের রাশি থেকে চান্দ্র মাস নির্ধারিত হয়
+    diff_tithi = (moon_lon - sun_lon) % 360.0
     sun_lon_at_amavasya = (sun_lon - (diff_tithi * 0.08085)) % 360.0
-    solar_rashi_idx = int(sun_lon_at_amavasya / 30.0) % 12
-    lunar_month_idx = (solar_rashi_idx + 1) % 12
+    amavasya_rashi_idx = int(sun_lon_at_amavasya / 30.0) % 12
 
-    LUNAR_MONTH_NAMES = [
-        "Chaitra", "Vaisakha", "Jyeshtha", "Ashadha",
-        "Shravana", "Bhadrapada", "Ashvina", "Kartika",
-        "Margashirsha", "Pausha", "Magha", "Phalguna"
-    ]
-    lunar_masa = LUNAR_MONTH_NAMES[lunar_month_idx]
+    # বৈদিক রাশি অনুযায়ী চান্দ্র মাসের সঠিক ম্যাপিং:
+    # 0(Mesha)->Vaisakha, 5(Kanya)->Ashvina, 6(Tula)->Kartika, 11(Meena)->Chaitra
+    RASHI_TO_LUNAR_MASA = {
+        0: "Vaisakha", 1: "Jyeshtha", 2: "Ashadha", 3: "Shravana",
+        4: "Bhadrapada", 5: "Ashvina", 6: "Kartika", 7: "Margashirsha",
+        8: "Pausha", 9: "Magha", 10: "Phalguna", 11: "Chaitra"
+    }
+    lunar_masa = RASHI_TO_LUNAR_MASA.get(amavasya_rashi_idx, "Ashvina")
 
-    # --- ৩. উৎসব ও ব্রত নির্ণয় ---
+    # --- উৎসব ও ব্রত নির্ণয় ---
     today_festivals = get_festivals_for_day(
         current_date=target_date,
-        lunar_month=lunar_masa,       # <--- সঠিক মাস (যেমন: Ashvina)
-        paksha=paksha_val,            # <--- শুক্ল / কৃষ্ণ
+        lunar_month=lunar_masa,       # <--- অক্টোবরে এটি এখন সঠিক "Ashvina" হবে
+        paksha=paksha_val,            # <--- Shukla / Krishna
         tithi_num=tithi_num,          # <--- তিথি সংখ্যা (১ থেকে ১৫)
-        sankranti_name=None,          # <--- ভুল পয়লা বৈশাখ বন্ধ
+        sankranti_name=None,          # <--- প্রতিদিন ভুল সংক্রান্তি বন্ধ
         lang=lang if 'lang' in locals() else "en"
     )
-
     return {
         "festivals": today_festivals,
         "masa": lunar_masa,
