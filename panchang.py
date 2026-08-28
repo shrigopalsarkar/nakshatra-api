@@ -732,7 +732,13 @@ def get_mantri_mandala_title(samvat_year: int, lang_key: str) -> str:
 # ৬. সম্পূর্ণ পঞ্চাঙ্গ (ANDROID DTO & DRIK PANCHANG 100% REPLICA)
 # ==============================================================================
 
-def compute_full_drik_panchang(local_date: date, lat: float = 22.5726, lon: float = 88.3639, lang: str = "en") -> dict:
+def compute_full_drik_panchang(
+    local_date: date,
+    lat: float = 22.5726,
+    lon: float = 88.3639,
+    lang: str = "en",
+    time_format: str = "12hr"  # <--- 12hr / 24hr / 24+hr ফরম্যাট প্যারামিটার
+) -> dict:
     l_str = str(lang).lower().strip()
     lang_key = "bn" if (l_str.startswith("bn") or "বাংলা" in l_str) else ("hi" if (l_str.startswith("hi") or "हि" in l_str) else "en")
 
@@ -891,6 +897,100 @@ def compute_full_drik_panchang(local_date: date, lat: float = 22.5726, lon: floa
         sankranti_name=None,
         lang=lang
     )
+
+    # --------------------------------------------------------------------------
+    # সুইস এফিমেরিস থেকে ডায়নামিক মুহূর্তের সময়সূচি গণনা (12hr / 24hr / 24+hr Support)
+    # --------------------------------------------------------------------------
+    def format_time_mode(dt_obj: datetime, base_date: date, mode: str = "12hr") -> str:
+        m = str(mode or "12hr").lower().replace(" ", "").replace("-", "")
+        
+        # ১. 24+ Hr মোড (বৈদিক দিন: মধ্যরাত্রির পরের সময়ে ২৪ যোগ হবে, যেমন: 24:15, 25:30)
+        if "24+" in m or "24plus" in m or "plus" in m:
+            if dt_obj.date() > base_date:
+                h = dt_obj.hour + 24
+            else:
+                h = dt_obj.hour
+            return f"{h:02d}:{dt_obj.minute:02d}"
+        
+        # ২. 24 Hr মোড (স্ট্যান্ডার্ড মিলিটারি টাইম: 17:30, 00:15)
+        elif "24" in m:
+            return dt_obj.strftime("%H:%M")
+        
+        # ৩. 12 Hr মোড (স্ট্যান্ডার্ড 12-ঘণ্টা: 05:30 PM)
+        else:
+            return dt_obj.strftime("%I:%M %p")
+
+    # সময় ফরম্যাট করার সহায়ক ফাংশন
+    def fmt_m(dt_val):
+        return format_time_mode(dt_val, local_date, time_format)
+
+    # ১. প্রদোষ কাল (সূর্যাস্ত থেকে ২ ঘণ্টা ২৪ মিনিট)
+    pradosh_timing = f"{fmt_m(dt_set)} - {fmt_m(dt_set + timedelta(minutes=144))}"
+
+    # ২. নিশীথ কাল (রাত্রির মধ্যভাগ / ৮ম মুহূর্ত)
+    night_sec = (jd_next_sunrise - jd_sunset) * 86400.0
+    night_muhurta = night_sec / 15.0
+    nishita_st = dt_set + timedelta(seconds=7 * night_muhurta)
+    nishita_en = dt_set + timedelta(seconds=8 * night_muhurta)
+    nishita_timing = f"{fmt_m(nishita_st)} - {fmt_m(nishita_en)}"
+
+    # ৩. মধ্যাহ্ন কাল (দিনের মধ্যভাগ / ৭ম ও ৮ম মুহূর্ত)
+    madhyahna_st = dt_rise + timedelta(seconds=6 * part_15th)
+    madhyahna_en = dt_rise + timedelta(seconds=8 * part_15th)
+    madhyahna_timing = f"{fmt_m(madhyahna_st)} - {fmt_m(madhyahna_en)}"
+
+    # ৪. পূর্বাহ্ন কাল (সূর্যোদয় থেকে দিনের ১ম তৃতীয়াংশ)
+    purvahna_en = dt_rise + timedelta(seconds=5 * part_15th)
+    purvahna_timing = f"{fmt_m(dt_rise)} - {fmt_m(purvahna_en)}"
+
+    # ৫. সায়ংকাল / গোধূলি কাল (সূর্যাস্তের ২৪ মিনিট আগে থেকে ২৪ মিনিট পর)
+    sayankal_st = dt_set - timedelta(minutes=24)
+    sayankal_en = dt_set + timedelta(minutes=24)
+    sayankal_timing = f"{fmt_m(sayankal_st)} - {fmt_m(sayankal_en)}"
+
+    # ৬. সূর্যোদয় ও অরুণোদয় স্নান মুহূর্ত (সূর্যোদয়ের প্রাক্কাল থেকে ১ম প্রহর)
+    sunrise_snan_timing = f"{fmt_m(dt_rise - timedelta(minutes=30))} - {fmt_m(dt_rise + timedelta(minutes=45))}"
+
+    # ৭. অপরাহ্ন কাল (দিনের ৪র্থ ভাগ)
+    aparahna_st = dt_rise + timedelta(seconds=9 * part_15th)
+    aparahna_en = dt_rise + timedelta(seconds=12 * part_15th)
+    aparahna_timing = f"{fmt_m(aparahna_st)} - {fmt_m(aparahna_en)}"
+
+    # ৮. ব্রাহ্ম মুহূর্ত (সূর্যোদয়ের ৯৬ মিনিট পূর্বে থেকে ৪৮ মিনিট পূর্বে)
+    brahma_timing = f"{fmt_m(brahma_s)} - {fmt_m(brahma_e)}"
+
+    # ৯. সন্ধিপূজা মুহূর্ত (অষ্টমী তিথি সমাপ্তির ২৪ মিনিট আগে থেকে নবমী শুরুর ২৪ মিনিট পর)
+    if t_end:
+        t_end_dt = jd_to_local(t_end)
+        sandhi_timing = f"{fmt_m(t_end_dt - timedelta(minutes=24))} - {fmt_m(t_end_dt + timedelta(minutes=24))}"
+    else:
+        sandhi_timing = f"{fmt_m(dt_set - timedelta(minutes=24))} - {fmt_m(dt_set + timedelta(minutes=24))}"
+
+    # উৎসবের কার্ডে সঠিক শহর, দিন ও নির্বাচিত ফরম্যাটের মুহূর্ত ইনজেক্ট করা
+    for fest in today_festivals:
+        m_type = fest.get("muhurta_type", "pradosh")
+        lbl = fest.get("muhurta_label", "")
+        
+        if m_type == "pradosh":
+            fest["muhurta"] = f"{lbl} ({pradosh_timing})"
+        elif m_type == "nishita":
+            fest["muhurta"] = f"{lbl} ({nishita_timing})"
+        elif m_type == "madhyahna":
+            fest["muhurta"] = f"{lbl} ({madhyahna_timing})"
+        elif m_type == "purvahna":
+            fest["muhurta"] = f"{lbl} ({purvahna_timing})"
+        elif m_type == "sayankal":
+            fest["muhurta"] = f"{lbl} ({sayankal_timing})"
+        elif m_type == "sunrise_snan":
+            fest["muhurta"] = f"{lbl} ({sunrise_snan_timing})"
+        elif m_type == "aparahna":
+            fest["muhurta"] = f"{lbl} ({aparahna_timing})"
+        elif m_type == "sandhi":
+            fest["muhurta"] = f"{lbl} ({sandhi_timing})"
+        elif m_type == "brahma":
+            fest["muhurta"] = f"{lbl} ({brahma_timing})"
+        else:
+            fest["muhurta"] = f"{lbl} ({pradosh_timing})"
 
     return {
         # মূল পঞ্চাঙ্গ ও রেট্রোফিট ডিটিও
