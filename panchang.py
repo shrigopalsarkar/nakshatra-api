@@ -20,6 +20,7 @@ from datetime import datetime, timedelta, date
 from zoneinfo import ZoneInfo
 from dataclasses import dataclass
 from typing import List, Dict, Any, Optional
+from festivals import get_festivals_for_day
 
 try:
     import swisseph as swe
@@ -860,8 +861,50 @@ def compute_full_drik_panchang(local_date: date, lat: float = 22.5726, lon: floa
     samvat_year = new_year_day.year + 57
     mantri_title = get_mantri_mandala_title(samvat_year, lang_key)
 
+    # --------------------------------------------------------------------------
+    # উৎসব ও চান্দ্র তারিখের অনলাইন গণনা (Existing Math 100% Intact)
+    # --------------------------------------------------------------------------
+    tithi_num = (t_idx % 15) + 1
+    paksha_val = "Shukla" if t_idx < 15 else "Krishna"
+    paksha_display = "শুক্ল পক্ষ" if paksha_val == "Shukla" else "কৃষ্ণ পক্ষ"
+
+    # সুইস এফিমেরিস চান্দ্র মাস
+    diff_tithi = (moon_lon - sun_lon) % 360.0
+    days_since_amavasya = (diff_tithi / 360.0) * 29.530588853
+    jd_amavasya = jd_sunrise - days_since_amavasya
+    sun_amavasya_res, _ = swe.calc_ut(jd_amavasya, swe.SUN, swe.FLG_SWIEPH | swe.FLG_SIDEREAL)
+    amavasya_rashi_idx = int(sun_amavasya_res[0] / 30.0) % 12
+
+    LUNAR_MASA_LIST = [
+        "Vaisakha", "Jyeshtha", "Ashadha", "Shravana",
+        "Bhadrapada", "Ashvina", "Kartika", "Margashirsha",
+        "Pausha", "Magha", "Phalguna", "Chaitra"
+    ]
+    lunar_masa = LUNAR_MASA_LIST[amavasya_rashi_idx]
+
+    # festivals.py থেকে উৎসব লোড
+    today_festivals = get_festivals_for_day(
+        current_date=local_date,
+        lunar_month=lunar_masa,
+        paksha=paksha_val,
+        tithi_num=tithi_num,
+        sankranti_name=None,
+        lang=lang
+    )
+
     return {
         # মূল পঞ্চাঙ্গ ও রেট্রোফিট ডিটিও
+        # ডানপাশের ইংরেজি ও বামপাশের হিন্দু ক্যালেন্ডার ফিল্ড:
+        "gregorian_day": local_date.day,
+        "gregorian_month_year": local_date.strftime("%B %Y"),
+        "weekday": local_date.strftime("%A"),
+        "lunar_day": tithi_num,
+        "lunar_month": lunar_masa,
+        "masa": lunar_masa,
+        "paksha": paksha_val,
+        "paksha_display": paksha_display,
+        "tithi_display": TITHI_NAMES[t_idx],
+        "festivals": today_festivals,
         "date_local": local_date.isoformat(),
         "samvat_year": samvat_year,               # <- এই লাইনটি যোগ করুন
         "vikram_samvat": samvat_year,
