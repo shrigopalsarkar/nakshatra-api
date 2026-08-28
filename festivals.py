@@ -262,11 +262,15 @@ def get_festivals_for_day(
             }
         )
 
-    # 5. Solar Sankranti Festivals
-    s_name = normalize_sankranti_name(sankranti_name)
-
-    if "mesha" in s_name or "aries" in s_name:
-        mesha_names = {"en": "Mesha Sankranti / Poila Boishakh", "hi": "मेष संक्रांति / पोइला बैशाख", "bn": "পয়লা বৈশাখ / মেষ সংক্রান্তি"}
+    # 5. Solar Sankranti & Fixed Solar Puja (পয়লা বৈশাখ, মকর সংক্রান্তি, বিশ্বকর্মা)
+    m_d = (current_date.month, current_date.day)
+    
+    if m_d == (4, 15) or (sankranti_name and "mesha" in str(sankranti_name).lower()):
+        mesha_names = {
+            "en": "Mesha Sankranti / Poila Boishakh",
+            "hi": "मेष संक्रांति / पोइला बैशाख",
+            "bn": "পয়লা বৈশাখ / মেষ সংক্রান্তি"
+        }
         append_festival_once(
             festivals,
             {
@@ -278,8 +282,12 @@ def get_festivals_for_day(
             }
         )
 
-    if "makara" in s_name or "makar" in s_name or "capricorn" in s_name:
-        makar_names = {"en": "Makar Sankranti / Pongal", "hi": "मकर संक्रांति / पोंगल", "bn": "মকর সংক্রান্তি / পৌষ সংক্রান্তি"}
+    elif m_d == (1, 14) or (sankranti_name and "makar" in str(sankranti_name).lower()):
+        makar_names = {
+            "en": "Makar Sankranti / Pongal",
+            "hi": "मकर संक्रांति / पोंगल",
+            "bn": "মকর সংক্রান্তি / পৌষ সংক্রান্তি"
+        }
         append_festival_once(
             festivals,
             {
@@ -291,8 +299,12 @@ def get_festivals_for_day(
             }
         )
 
-    if "kanya" in s_name or "virgo" in s_name:
-        kanya_names = {"en": "Kanya Sankranti / Vishwakarma Puja", "hi": "कन्या संक्रांति / विश्वकर्मा पूजा", "bn": "কন্যা সংক্রান্তি / শ্রী শ্রী বিশ্বকর্মা পূজা"}
+    elif m_d == (9, 17) or (sankranti_name and "kanya" in str(sankranti_name).lower()):
+        kanya_names = {
+            "en": "Kanya Sankranti / Vishwakarma Puja",
+            "hi": "कन्या संक्रांति / विश्वकर्मा पूजा",
+            "bn": "কন্যা সংক্রান্তি / শ্রী শ্রী বিশ্বকর্মা পূজা"
+        }
         append_festival_once(
             festivals,
             {
