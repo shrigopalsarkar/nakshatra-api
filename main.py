@@ -665,7 +665,7 @@ async def get_panchang(
     samvat_year = target_date.year + 57
     mantri_list = compute_mantri_mandala(target_date, lat=lat, lon=lon, lang="en")
 
-   tithi_num = (tithi_idx % 15) + 1
+    tithi_num = (tithi_idx % 15) + 1
     paksha_val = "Shukla" if tithi_idx < 15 else "Krishna"
 
     # --- সৌর মাসের নাম (সংক্রান্তি / মাস) ---
