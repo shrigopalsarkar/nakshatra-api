@@ -606,15 +606,15 @@ async def get_panchang(
     iso_date: str = Query(..., description="Date in YYYY-MM-DD format"),
     lat: float = Query(22.5726, description="Latitude (Default Kolkata: 22.5726)"),
     lon: float = Query(88.3639, description="Longitude (Default Kolkata: 88.3639)"),
-    lang: str = Query("en", description="Language: 'en', 'hi', or 'bn'")
+    lang: str = Query("en", description="Language: 'en', 'hi', or 'bn'"),
+    time_format: str = Query("12hr", description="Time format: '12hr', '24hr', or '24+hr'") # <--- যুক্ত করুন
 ):
     try:
         date_obj = datetime.date.fromisoformat(iso_date)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid iso_date format.")
 
-    # Drik Panchang Complete Replica Engine Call
-    data = compute_full_drik_panchang(date_obj, lat=lat, lon=lon, lang=lang)
+    data = compute_full_drik_panchang(date_obj, lat=lat, lon=lon, lang=lang, time_format=time_format)
     return data
 
     sunrise_str, sunset_str, rise_min, set_min = compute_sunrise_sunset(date_obj, lat, lon)
