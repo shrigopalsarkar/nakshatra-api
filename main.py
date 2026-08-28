@@ -668,17 +668,26 @@ async def get_panchang(
     tithi_num = (tithi_idx % 15) + 1
     paksha_val = "Shukla" if tithi_idx < 15 else "Krishna"
 
-    # --- সৌর মাসের নাম (সংক্রান্তি / মাস) ---
-    zodiac_names = ["Mesha", "Vrishabha", "Mithuna", "Karka", "Simha", "Kanya", "Tula", "Vrischika", "Dhanu", "Makara", "Kumbha", "Meena"]
-    solar_month = zodiac_names[int(sun_lon / 30.0) % 12]
+    # --- বৈদিক চান্দ্র মাস (Lunar Month / Masa: Ashvina, Kartika ইত্যাদি) ---
+    diff_tithi = (moon_lon - sun_lon) % 360.0
+    sun_lon_at_amavasya = (sun_lon - diff_tithi * 0.08085) % 360.0
+    lunar_rashi_idx = int(sun_lon_at_amavasya / 30.0) % 12
+    lunar_month_idx = (lunar_rashi_idx + 1) % 12
 
-    # --- হিন্দু উৎসব ও ব্রত নির্ণয় ---
+    LUNAR_MONTH_NAMES = [
+        "Chaitra", "Vaisakha", "Jyeshtha", "Ashadha",
+        "Shravana", "Bhadrapada", "Ashvina", "Kartika",
+        "Margashirsha", "Pausha", "Magha", "Phalguna"
+    ]
+    lunar_masa = LUNAR_MONTH_NAMES[lunar_month_idx]
+
+    # --- হিন্দু, মুসলিম, খ্রীষ্টীয় ও জাতীয় উৎসব নির্ণয় ---
     today_festivals = get_festivals_for_day(
         current_date=target_date,
-        lunar_month=solar_month,
+        lunar_month=lunar_masa,
         paksha=paksha_val,
         tithi_num=tithi_num,
-        sankranti_name=solar_month,
+        sankranti_name=None,
         lang=lang if 'lang' in locals() else "en"
     )
 
