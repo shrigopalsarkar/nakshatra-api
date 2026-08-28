@@ -662,17 +662,21 @@ async def get_panchang(
     moonrise_str, moonset_str = compute_moon_events(dt, lat, lon)
 
     target_date = dt.date() if hasattr(dt, "date") else dt
+    iso_date = target_date.isoformat()
     samvat_year = target_date.year + 57
     mantri_list = compute_mantri_mandala(target_date, lat=lat, lon=lon, lang="en")
 
+    # --- ১. তিথি ও পক্ষ নির্ণয় ---
+    diff_tithi = (moon_lon - sun_lon) % 360.0
+    tithi_idx = int(diff_tithi / 12.0) % 30
     tithi_num = (tithi_idx % 15) + 1
     paksha_val = "Shukla" if tithi_idx < 15 else "Krishna"
 
-    # --- বৈদিক চান্দ্র মাস (Lunar Month / Masa: Ashvina, Kartika ইত্যাদি) ---
-    diff_tithi = (moon_lon - sun_lon) % 360.0
-    sun_lon_at_amavasya = (sun_lon - diff_tithi * 0.08085) % 360.0
-    lunar_rashi_idx = int(sun_lon_at_amavasya / 30.0) % 12
-    lunar_month_idx = (lunar_rashi_idx + 1) % 12
+    # --- ২. সঠিক বৈদিক চান্দ্র মাস (Masa / Chandramasa) নির্ণয় ---
+    # অমাবস্যার সময় সূর্যের অবস্থান থেকে বৈদিক নিয়ম অনুযায়ী চান্দ্র মাস গণনা
+    sun_lon_at_amavasya = (sun_lon - (diff_tithi * 0.08085)) % 360.0
+    solar_rashi_idx = int(sun_lon_at_amavasya / 30.0) % 12
+    lunar_month_idx = (solar_rashi_idx + 1) % 12
 
     LUNAR_MONTH_NAMES = [
         "Chaitra", "Vaisakha", "Jyeshtha", "Ashadha",
@@ -681,18 +685,20 @@ async def get_panchang(
     ]
     lunar_masa = LUNAR_MONTH_NAMES[lunar_month_idx]
 
-    # --- হিন্দু, মুসলিম, খ্রীষ্টীয় ও জাতীয় উৎসব নির্ণয় ---
+    # --- ৩. উৎসব ও ব্রত নির্ণয় ---
     today_festivals = get_festivals_for_day(
         current_date=target_date,
-        lunar_month=lunar_masa,
-        paksha=paksha_val,
-        tithi_num=tithi_num,
-        sankranti_name=None,
+        lunar_month=lunar_masa,       # <--- সঠিক মাস (যেমন: Ashvina)
+        paksha=paksha_val,            # <--- শুক্ল / কৃষ্ণ
+        tithi_num=tithi_num,          # <--- তিথি সংখ্যা (১ থেকে ১৫)
+        sankranti_name=None,          # <--- ভুল পয়লা বৈশাখ বন্ধ
         lang=lang if 'lang' in locals() else "en"
     )
 
     return {
         "festivals": today_festivals,
+        "masa": lunar_masa,
+        "lunar_month": lunar_masa,
         "date_local": iso_date,
         "samvat_year": samvat_year,
         "vikram_samvat": samvat_year,
