@@ -667,6 +667,7 @@ async def get_panchang(
     mantri_list = compute_mantri_mandala(target_date, lat=lat, lon=lon, lang="en")
 
     # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # ১. তিথি ও পক্ষ সঠিক বৈদিক গণনা
     # --------------------------------------------------------------------------
     diff_tithi = (moon_lon - sun_lon) % 360.0
@@ -675,30 +676,30 @@ async def get_panchang(
     paksha_val = "Shukla" if tithi_idx < 15 else "Krishna"
 
     # --------------------------------------------------------------------------
-    # ২. বৈদিক চান্দ্র মাস (Masa / Chandramasa) শতভাগ নির্ভুল গণনা
-    #    (অমাবস্যার সময় সূর্যের রাশি থেকে চান্দ্র মাস নির্ধারিত হয়)
+    # ২. সঠিক বৈদিক চান্দ্র মাস (Masa / Chandramasa) গণনা
+    #    (অমাবস্যার রাশিতে সূর্যের অবস্থানের ভিত্তিতে চান্দ্র মাস নির্ধারিত হয়)
     # --------------------------------------------------------------------------
-    sun_lon_at_amavasya = (sun_lon - (diff_tithi * 0.08085)) % 360.0
-    amavasya_rashi_idx = int(sun_lon_at_amavasya / 30.0) % 12
+    sun_lon_amavasya = (sun_lon - (diff_tithi / 12.0) * 0.9856) % 360.0
+    amavasya_rashi_idx = int(sun_lon_amavasya / 30.0) % 12
 
-    # বৈদিক রাশি অনুযায়ী চান্দ্র মাসের সঠিক ম্যাপিং:
-    # 0(Mesha)->Vaisakha, 5(Kanya)->Ashvina, 6(Tula)->Kartika, 11(Meena)->Chaitra
-    RASHI_TO_LUNAR_MASA = {
-        0: "Vaisakha", 1: "Jyeshtha", 2: "Ashadha", 3: "Shravana",
-        4: "Bhadrapada", 5: "Ashvina", 6: "Kartika", 7: "Margashirsha",
-        8: "Pausha", 9: "Magha", 10: "Phalguna", 11: "Chaitra"
-    }
-    lunar_masa = RASHI_TO_LUNAR_MASA.get(amavasya_rashi_idx, "Ashvina")
+    # বৈদিক আমান্ত নিয়ম: মীন রাশিতে অমাবস্যা -> চৈত্র, মেষ রাশিতে -> বৈশাখ, সিংহ রাশিতে -> ভাদ্রপদ
+    LUNAR_MONTH_NAMES = [
+        "Chaitra", "Vaisakha", "Jyeshtha", "Ashadha",
+        "Shravana", "Bhadrapada", "Ashvina", "Kartika",
+        "Margashirsha", "Pausha", "Magha", "Phalguna"
+    ]
+    lunar_masa_idx = (amavasya_rashi_idx + 1) % 12
+    lunar_masa = LUNAR_MONTH_NAMES[lunar_masa_idx]
 
     # --------------------------------------------------------------------------
-    # ৩. উৎসব ও পূজা তালিকা সংগ্রহ (সরাসরি festivals.py থেকে)
+    # ৩. উৎসব ও পূজা তালিকা (festivals.py থেকে সরাসরি লোড)
     # --------------------------------------------------------------------------
     today_festivals = get_festivals_for_day(
         current_date=target_date,
-        lunar_month=lunar_masa,       # <--- সঠিক চান্দ্র মাস (যেমন: Ashvina, Kartika)
+        lunar_month=lunar_masa,       # <--- সঠিক মাস (Chaitra, Ashadha, Bhadrapada, Ashvina)
         paksha=paksha_val,            # <--- Shukla / Krishna
         tithi_num=tithi_num,          # <--- তিথি সংখ্যা (১ থেকে ১৫)
-        sankranti_name=None,          # <--- সাধারণ দিনে সংক্রান্তি ফলস রাখা হলো
+        sankranti_name=None,
         lang=lang if 'lang' in locals() else "en"
     )
     
