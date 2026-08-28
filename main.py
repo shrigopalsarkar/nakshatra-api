@@ -19,6 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from panchang import compute_full_drik_panchang
 from mantri_mandala import compute_mantri_mandala
+from festivals import get_festivals_for_day
 
 
 # Try importing pyswisseph; provide mathematical fallback if compiled C extensions are absent
