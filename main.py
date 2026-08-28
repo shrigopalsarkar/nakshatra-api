@@ -666,16 +666,22 @@ async def get_panchang(
     samvat_year = target_date.year + 57
     mantri_list = compute_mantri_mandala(target_date, lat=lat, lon=lon, lang="en")
 
+    # --------------------------------------------------------------------------
+    # ১. তিথি ও পক্ষ সঠিক বৈদিক গণনা
+    # --------------------------------------------------------------------------
+    diff_tithi = (moon_lon - sun_lon) % 360.0
+    tithi_idx = int(diff_tithi / 12.0) % 30
     tithi_num = (tithi_idx % 15) + 1
     paksha_val = "Shukla" if tithi_idx < 15 else "Krishna"
 
-    # --- বৈদিক চান্দ্র মাস (Masa) শতভাগ নির্ভুল গণনা ---
-    # অমাবস্যার সময় সূর্যের রাশি থেকে চান্দ্র মাস নির্ধারিত হয়
-    diff_tithi = (moon_lon - sun_lon) % 360.0
+    # --------------------------------------------------------------------------
+    # ২. বৈদিক চান্দ্র মাস (Masa / Chandramasa) শতভাগ নির্ভুল গণনা
+    #    (অমাবস্যার সময় সূর্যের রাশি থেকে চান্দ্র মাস নির্ধারিত হয়)
+    # --------------------------------------------------------------------------
     sun_lon_at_amavasya = (sun_lon - (diff_tithi * 0.08085)) % 360.0
     amavasya_rashi_idx = int(sun_lon_at_amavasya / 30.0) % 12
 
-    # বৈদিক রাশি অনুযায়ী চান্দ্র মাসের সঠিক ম্যাপিং:
+    # বৈদিক রাশি অনুযায়ী চান্দ্র মাসের সঠিক ম্যাপিং:
     # 0(Mesha)->Vaisakha, 5(Kanya)->Ashvina, 6(Tula)->Kartika, 11(Meena)->Chaitra
     RASHI_TO_LUNAR_MASA = {
         0: "Vaisakha", 1: "Jyeshtha", 2: "Ashadha", 3: "Shravana",
@@ -684,13 +690,15 @@ async def get_panchang(
     }
     lunar_masa = RASHI_TO_LUNAR_MASA.get(amavasya_rashi_idx, "Ashvina")
 
-    # --- উৎসব ও ব্রত নির্ণয় ---
+    # --------------------------------------------------------------------------
+    # ৩. উৎসব ও পূজা তালিকা সংগ্রহ (সরাসরি festivals.py থেকে)
+    # --------------------------------------------------------------------------
     today_festivals = get_festivals_for_day(
         current_date=target_date,
-        lunar_month=lunar_masa,       # <--- অক্টোবরে এটি এখন সঠিক "Ashvina" হবে
+        lunar_month=lunar_masa,       # <--- সঠিক চান্দ্র মাস (যেমন: Ashvina, Kartika)
         paksha=paksha_val,            # <--- Shukla / Krishna
         tithi_num=tithi_num,          # <--- তিথি সংখ্যা (১ থেকে ১৫)
-        sankranti_name=None,          # <--- প্রতিদিন ভুল সংক্রান্তি বন্ধ
+        sankranti_name=None,          # <--- সাধারণ দিনে সংক্রান্তি ফলস রাখা হলো
         lang=lang if 'lang' in locals() else "en"
     )
     return {
@@ -720,6 +728,7 @@ async def get_panchang(
         "karana_end": f"{iso_date}T15:45:00",
         "karana_next_name": KARANAS[(karana_idx + 1) % 11],
         "karana_type": "Chara",
+        "paksha": paksha_val
         "pada_timeline": [
             {"nakshatra": NAKSHATRAS[nak_idx], "pada": pada, "end": f"{iso_date}T18:00:00"}
         ],
