@@ -867,26 +867,72 @@ def compute_full_drik_panchang(
     samvat_year = new_year_day.year + 57
     mantri_title = get_mantri_mandala_title(samvat_year, lang_key)
 
-    # --------------------------------------------------------------------------
-    # উৎসব ও চান্দ্র তারিখের অনলাইন গণনা (Existing Math 100% Intact)
-    # --------------------------------------------------------------------------
-    tithi_num = (t_idx % 15) + 1
-    paksha_val = "Shukla" if t_idx < 15 else "Krishna"
+        # ==========================================================================
+    # সুইস এফিমেরিস অ্যাস্ট্রোনমিক্যাল নিউ-মুন রুট ফাইন্ডিং (১০০ বছরের জন্য নিখুঁত)
+    # ==========================================================================
+    diff_tithi = (moon_lon - sun_lon) % 360.0
+    tithi_idx = int(diff_tithi / 12.0) % 30
+    tithi_num = (tithi_idx % 15) + 1
+    paksha_val = "Shukla" if tithi_idx < 15 else "Krishna"
     paksha_display = "শুক্ল পক্ষ" if paksha_val == "Shukla" else "কৃষ্ণ পক্ষ"
 
-    # সুইস এফিমেরিস চান্দ্র মাস
-    diff_tithi = (moon_lon - sun_lon) % 360.0
-    days_since_amavasya = (diff_tithi / 360.0) * 29.530588853
-    jd_amavasya = jd_sunrise - days_since_amavasya
-    sun_amavasya_res, _ = swe.calc_ut(jd_amavasya, swe.SUN, swe.FLG_SWIEPH | swe.FLG_SIDEREAL)
-    amavasya_rashi_idx = int(sun_amavasya_res[0] / 30.0) % 12
+    # ১. পূর্ববর্তী অমাবস্যার সঠিক সময় নির্ণয় (সুইস এফিমেরিস প্রিসিশন সার্চ)
+    approx_days_back = diff_tithi / 12.190749
+    jd_approx = jd_sunrise - approx_days_back
 
-    LUNAR_MASA_LIST = [
+    lo_scan = jd_approx - 1.5
+    hi_scan = jd_approx + 1.5
+    bracket_lo, bracket_hi = lo_scan, hi_scan
+    
+    # ৬ ঘণ্টার ব্যবধানে অমাবস্যার ০° ক্রসিং ব্র্যাকেট নির্ধারণ
+    step = 0.25
+    cur = lo_scan
+    while cur <= hi_scan:
+        s1 = swe.calc_ut(cur, swe.SUN, swe.FLG_SWIEPH | swe.FLG_SIDEREAL)[0][0] % 360.0
+        m1 = swe.calc_ut(cur, swe.MOON, swe.FLG_SWIEPH | swe.FLG_SIDEREAL)[0][0] % 360.0
+        d1 = (m1 - s1) % 360.0
+
+        s2 = swe.calc_ut(cur + step, swe.SUN, swe.FLG_SWIEPH | swe.FLG_SIDEREAL)[0][0] % 360.0
+        m2 = swe.calc_ut(cur + step, swe.MOON, swe.FLG_SWIEPH | swe.FLG_SIDEREAL)[0][0] % 360.0
+        d2 = (m2 - s2) % 360.0
+
+        if d1 > 300.0 and d2 < 60.0:
+            bracket_lo, bracket_hi = cur, cur + step
+            break
+        cur += step
+
+    # বাইনারি সার্চ দ্বারা অমাবস্যার নির্ভুল সেকেন্ড পর্যন্ত সময় বের করা
+    for _ in range(30):
+        mid = (bracket_lo + bracket_hi) / 2.0
+        sm = swe.calc_ut(mid, swe.SUN, swe.FLG_SWIEPH | swe.FLG_SIDEREAL)[0][0] % 360.0
+        mm = swe.calc_ut(mid, swe.MOON, swe.FLG_SWIEPH | swe.FLG_SIDEREAL)[0][0] % 360.0
+        dm = (mm - sm) % 360.0
+        if dm > 180.0:
+            bracket_lo = mid
+        else:
+            bracket_hi = mid
+
+    jd_exact_amavasya = bracket_hi
+
+    # ২. অমাবস্যার সময়ে সূর্যের স্পষ্ট রাশি স্ফুট
+    sun_amav_res = swe.calc_ut(jd_exact_amavasya, swe.SUN, swe.FLG_SWIEPH | swe.FLG_SIDEREAL)
+    amav_sun_rashi_idx = int(sun_amav_res[0][0] / 30.0) % 12
+
+    # ১২টি চান্দ্র মাসের শাস্ত্রীয় তালিকা (0=মেষ->বৈশাখ ... 11=মীন->চৈত্র)
+    LUNAR_MASA_ORDER = [
         "Vaisakha", "Jyeshtha", "Ashadha", "Shravana",
         "Bhadrapada", "Ashvina", "Kartika", "Margashirsha",
         "Pausha", "Magha", "Phalguna", "Chaitra"
     ]
-    lunar_masa = LUNAR_MASA_LIST[amavasya_rashi_idx]
+    amanta_masa = LUNAR_MASA_ORDER[amav_sun_rashi_idx]
+
+    # ৩. হিন্দি পূর্ণিমান্ত নিয়ম (কৃষ্ণ পক্ষে মাস ১ ধাপ এগিয়ে থাকে):
+    if paksha_val == "Krishna":
+        purnimanta_masa_idx = (amav_sun_rashi_idx + 1) % 12
+        lunar_masa = LUNAR_MASA_ORDER[purnimanta_masa_idx]
+    else:
+        lunar_masa = amanta_masa
+
 
     # festivals.py থেকে উৎসব লোড
     today_festivals = get_festivals_for_day(
