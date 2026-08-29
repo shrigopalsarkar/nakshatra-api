@@ -926,12 +926,8 @@ def compute_full_drik_panchang(
     ]
     amanta_masa = LUNAR_MASA_ORDER[amav_sun_rashi_idx]
 
-    # ৩. হিন্দি পূর্ণিমান্ত নিয়ম (কৃষ্ণ পক্ষে মাস ১ ধাপ এগিয়ে থাকে):
-    if paksha_val == "Krishna":
-        purnimanta_masa_idx = (amav_sun_rashi_idx + 1) % 12
-        lunar_masa = LUNAR_MASA_ORDER[purnimanta_masa_idx]
-    else:
-        lunar_masa = amanta_masa
+    # ৩. সর্বজনীন আমান্ত নিয়ম (অমাবস্যা থেকে অমাবস্যা)
+    lunar_masa = amanta_masa
 
 
     # festivals.py থেকে উৎসব লোড
