@@ -954,18 +954,45 @@ def compute_full_drik_panchang(
     else:
         lunar_masa = amanta_masa
 
-    # ৫. স্ক্রিনশট ফরম্যাট অনুযায়ী হেডার নম্বর (যেমন: 01, 04)
-    lunar_day_formatted = f"{tithi_num:02d}"
+    # ==========================================================================
+    # ক্ষয় তিথি ডিটেকশন ও মাল্টি-ডেট স্ট্রিং ফরম্যাটার (যেমন: "8, 9", "1, 2")
+    # ==========================================================================
+    # ১. বর্তমান দিনের সূর্যোদয় ও পরবর্তী সূর্যোদয়ের তিথি ইনডেক্স
+    sun_lon_rise, moon_lon_rise = sidereal_longitudes(jd_sunrise)
+    t_idx = int(((moon_lon_rise - sun_lon_rise) % 360.0) / 12.0) % 30
+    
+    sun_lon_next, moon_lon_next = sidereal_longitudes(jd_next_sunrise)
+    t_idx_next = int(((moon_lon_next - sun_lon_next) % 360.0) / 12.0) % 30
+    
+    paksha_val = "Shukla" if t_idx < 15 else "Krishna"
+    t_num_cur = (t_idx % 15) + 1
 
-    # festivals.py থেকে উৎসব লোড
-    today_festivals = get_festivals_for_day(
-        current_date=local_date,
-        lunar_month=lunar_masa,
-        paksha=paksha_val,
-        tithi_num=tithi_num,
-        sankranti_name=None,
-        lang=lang
-    )
+    # ২. দিনের মধ্যে তিথি ক্ষয় হয়েছে কি না পরীক্ষা (তিথি ১-এর বেশি লাফিয়েছে কি না)
+    tithi_step = (t_idx_next - t_idx) % 30
+    
+    active_tithi_nums = [t_num_cur]
+    if tithi_step > 1 and tithi_step < 5:
+        for skipped in range(1, tithi_step):
+            skipped_idx = (t_idx + skipped) % 30
+            active_tithi_nums.append((skipped_idx % 15) + 1)
+            
+    # ৩. হেডার টেক্সট তৈরি (যেমন: "8, 9", "1, 2", অথবা সাধারণ "8")
+    lunar_day_formatted = ", ".join(str(n) for n in active_tithi_nums)
+
+    # ৪. উৎসব লোড (উভয় তিথির উৎসব থাকলে তা সংগ্রহ করা)
+    today_festivals = []
+    for t_num in active_tithi_nums:
+        fests = get_festivals_for_day(
+            current_date=local_date,
+            lunar_month=lunar_masa,
+            paksha=paksha_val,
+            tithi_num=t_num,
+            sankranti_name=None,
+            lang=lang
+        )
+        for f in fests:
+            if not any(x.get("name") == f.get("name") for x in today_festivals):
+                today_festivals.append(f)
     # --------------------------------------------------------------------------
     # সুইস এফিমেরিস থেকে ডায়নামিক মুহূর্তের সময়সূচি গণনা (12hr / 24hr / 24+hr Support)
     # --------------------------------------------------------------------------
@@ -1067,6 +1094,7 @@ def compute_full_drik_panchang(
         "gregorian_month_year": local_date.strftime("%B %Y"),
         "weekday": local_date.strftime("%A"),
         "lunar_day": tithi_num,
+        "lunar_day": t_num_cur,
         "lunar_day_str": lunar_day_formatted,
         "lunar_month": lunar_masa,
         "masa": lunar_masa,
