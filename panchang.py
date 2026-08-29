@@ -784,7 +784,20 @@ def compute_full_drik_panchang(
         s, m = sidereal_longitudes(jd)
         return int(((m - s) % 360.0) / 6.0)
 
-    t_idx = tithi_index(jd_sunrise)
+    sun_lon_rise, moon_lon_rise = sidereal_longitudes(jd_sunrise)
+    diff_tithi = (moon_lon_rise - sun_lon_rise) % 360.0
+    
+    t_idx = int(diff_tithi / 12.0) % 30
+    tithi_num = (t_idx % 15) + 1
+    paksha_val = "Shukla" if t_idx < 15 else "Krishna"
+    
+    if lang_key == "bn":
+        paksha_display = "শুক্ল পক্ষ" if paksha_val == "Shukla" else "কৃষ্ণ পক্ষ"
+    elif lang_key == "hi":
+        paksha_display = "शुक्ल पक्ष" if paksha_val == "Shukla" else "कृष्ण पक्ष"
+    else:
+        paksha_display = f"{paksha_val} Paksha"
+
     t_end = find_transition(jd_sunrise, tithi_index)
 
     n_idx = nak_index(jd_sunrise)
