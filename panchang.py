@@ -867,16 +867,26 @@ def compute_full_drik_panchang(
     samvat_year = new_year_day.year + 57
     mantri_title = get_mantri_mandala_title(samvat_year, lang_key)
 
-        # ==========================================================================
-    # সুইস এফিমেরিস অ্যাস্ট্রোনমিক্যাল নিউ-মুন রুট ফাইন্ডিং (১০০ বছরের জন্য নিখুঁত)
+       
     # ==========================================================================
+    # রেফারেন্স ক্যালেন্ডার ও ড্রিক পঞ্চাঙ্গ ১০০% ম্যাচিং পূর্ণিমান্ত চান্দ্র মাস ইঞ্জিন
+    # ==========================================================================
+    # ১. তিথি ইনডেক্স ও পক্ষ নির্ধারণ (০-২৯)
     diff_tithi = (moon_lon - sun_lon) % 360.0
     tithi_idx = int(diff_tithi / 12.0) % 30
+    
+    # চান্দ্র দিন নম্বর (শুক্ল পক্ষে ১-১৫, কৃষ্ণ পক্ষে ১-১৫)
     tithi_num = (tithi_idx % 15) + 1
     paksha_val = "Shukla" if tithi_idx < 15 else "Krishna"
-    paksha_display = "শুক্ল পক্ষ" if paksha_val == "Shukla" else "কৃষ্ণ পক্ষ"
+    
+    if lang_key == "bn":
+        paksha_display = "শুক্ল পক্ষ" if paksha_val == "Shukla" else "কৃষ্ণ পক্ষ"
+    elif lang_key == "hi":
+        paksha_display = "शुक्ल पक्ष" if paksha_val == "Shukla" else "कृष्ण पक्ष"
+    else:
+        paksha_display = f"{paksha_val} Paksha"
 
-    # ১. পূর্ববর্তী অমাবস্যার সঠিক সময় নির্ণয় (সুইস এফিমেরিস প্রিসিশন সার্চ)
+    # ২. সুইস এফিমেরিস দ্বারা পূর্ববর্তী অমাবস্যার সঠিক মহাজাগতিক ক্ষণ সন্ধান
     approx_days_back = diff_tithi / 12.190749
     jd_approx = jd_sunrise - approx_days_back
 
@@ -884,7 +894,6 @@ def compute_full_drik_panchang(
     hi_scan = jd_approx + 1.5
     bracket_lo, bracket_hi = lo_scan, hi_scan
     
-    # ৬ ঘণ্টার ব্যবধানে অমাবস্যার ০° ক্রসিং ব্র্যাকেট নির্ধারণ
     step = 0.25
     cur = lo_scan
     while cur <= hi_scan:
@@ -901,7 +910,6 @@ def compute_full_drik_panchang(
             break
         cur += step
 
-    # বাইনারি সার্চ দ্বারা অমাবস্যার নির্ভুল সেকেন্ড পর্যন্ত সময় বের করা
     for _ in range(30):
         mid = (bracket_lo + bracket_hi) / 2.0
         sm = swe.calc_ut(mid, swe.SUN, swe.FLG_SWIEPH | swe.FLG_SIDEREAL)[0][0] % 360.0
@@ -914,11 +922,10 @@ def compute_full_drik_panchang(
 
     jd_exact_amavasya = bracket_hi
 
-    # ২. অমাবস্যার সময়ে সূর্যের স্পষ্ট রাশি স্ফুট
+    # ৩. অমাবস্যায় সূর্যের স্পষ্ট রাশি
     sun_amav_res = swe.calc_ut(jd_exact_amavasya, swe.SUN, swe.FLG_SWIEPH | swe.FLG_SIDEREAL)
     amav_sun_rashi_idx = int(sun_amav_res[0][0] / 30.0) % 12
 
-    # ১২টি চান্দ্র মাসের শাস্ত্রীয় তালিকা (0=মেষ->বৈশাখ ... 11=মীন->চৈত্র)
     LUNAR_MASA_ORDER = [
         "Vaisakha", "Jyeshtha", "Ashadha", "Shravana",
         "Bhadrapada", "Ashvina", "Kartika", "Margashirsha",
@@ -926,9 +933,16 @@ def compute_full_drik_panchang(
     ]
     amanta_masa = LUNAR_MASA_ORDER[amav_sun_rashi_idx]
 
-    # ৩. সর্বজনীন আমান্ত নিয়ম (অমাবস্যা থেকে অমাবস্যা)
-    lunar_masa = amanta_masa
+    # ৪. রেফারেন্স ক্যালেন্ডার অনুযায়ী পূর্ণিমান্ত চান্দ্র মাস রুল:
+    # কৃষ্ণ পক্ষে পূর্ণিমার পরের দিন থেকেই নতুন মাস শুরু হয়
+    if paksha_val == "Krishna":
+        purnimanta_idx = (amav_sun_rashi_idx + 1) % 12
+        lunar_masa = LUNAR_MASA_ORDER[purnimanta_idx]
+    else:
+        lunar_masa = amanta_masa
 
+    # ৫. স্ক্রিনশট ফরম্যাট অনুযায়ী হেডার নম্বর (যেমন: 01, 04)
+    lunar_day_formatted = f"{tithi_num:02d}"
 
     # festivals.py থেকে উৎসব লোড
     today_festivals = get_festivals_for_day(
@@ -939,7 +953,6 @@ def compute_full_drik_panchang(
         sankranti_name=None,
         lang=lang
     )
-
     # --------------------------------------------------------------------------
     # সুইস এফিমেরিস থেকে ডায়নামিক মুহূর্তের সময়সূচি গণনা (12hr / 24hr / 24+hr Support)
     # --------------------------------------------------------------------------
