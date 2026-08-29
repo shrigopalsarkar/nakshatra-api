@@ -21,6 +21,12 @@ from zoneinfo import ZoneInfo
 from dataclasses import dataclass
 from typing import List, Dict, Any, Optional
 from festivals import get_festivals_for_day
+from panchang_meta import (
+    TITHI_METADATA,
+    NAKSHATRA_METADATA,
+    YOGA_METADATA,
+    KARANA_METADATA
+)
 
 try:
     import swisseph as swe
@@ -1087,9 +1093,21 @@ def compute_full_drik_panchang(
         else:
             fest["muhurta"] = f"{lbl} ({pradosh_timing})"
 
+    # লাইভ ট্রানজিট আইডির সাথে মেটাডেটা ম্যাচিং
+    tithi_num_key = (t_idx % 15) + 1
+    tithi_detail_info = TITHI_METADATA.get(tithi_num_key, {})
+    nakshatra_detail_info = NAKSHATRA_METADATA.get(n_idx + 1, {})
+    yoga_detail_info = YOGA_METADATA.get(y_idx + 1, {})
+    karana_detail_info = KARANA_METADATA.get(karana_name, {})
+
     return {
         # মূল পঞ্চাঙ্গ ও রেট্রোফিট ডিটিও
         # ডানপাশের ইংরেজি ও বামপাশের হিন্দু ক্যালেন্ডার ফিল্ড:
+        # পপআপ উইন্ডোর জন্য বিস্তারিত শাস্ত্রীয় মেটাডেটা
+        "tithi_detail": tithi_detail_info,
+        "nakshatra_detail": nakshatra_detail_info,
+        "yoga_detail": yoga_detail_info,
+        "karana_detail": karana_detail_info,
         "gregorian_day": local_date.day,
         "gregorian_month_year": local_date.strftime("%B %Y"),
         "weekday": local_date.strftime("%A"),
