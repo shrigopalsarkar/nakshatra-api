@@ -1054,6 +1054,7 @@ def compute_full_drik_panchang(
         "gregorian_month_year": local_date.strftime("%B %Y"),
         "weekday": local_date.strftime("%A"),
         "lunar_day": tithi_num,
+        "lunar_day_str": lunar_day_formatted,
         "lunar_month": lunar_masa,
         "masa": lunar_masa,
         "paksha": paksha_val,
