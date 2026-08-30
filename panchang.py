@@ -1069,31 +1069,29 @@ def compute_full_drik_panchang(
     else:
         sandhi_timing = f"{fmt_m(dt_set - timedelta(minutes=24))} - {fmt_m(dt_set + timedelta(minutes=24))}"
 
-    # উৎসবের কার্ডে সঠিক শহর, দিন ও নির্বাচিত ফরম্যাটের মুহূর্ত ইনজেক্ট করা
+        from festivals import compute_dynamic_festival_muhurta
+
+    # সূর্যোদয় ও সূর্যাস্তের মিনিট রূপান্তর
+    rise_total_min = dt_rise.hour * 60 + dt_rise.minute
+    set_total_min = dt_set.hour * 60 + dt_set.minute
+
+    # প্রতিটি উৎসবের জন্য সুইস এফিমেরিস ডায়নামিক মুহূর্ত তৈরি
     for fest in today_festivals:
-        m_type = fest.get("muhurta_type", "pradosh")
-        lbl = fest.get("muhurta_label", "")
-        
-        if m_type == "pradosh":
-            fest["muhurta"] = f"{lbl} ({pradosh_timing})"
-        elif m_type == "nishita":
-            fest["muhurta"] = f"{lbl} ({nishita_timing})"
-        elif m_type == "madhyahna":
-            fest["muhurta"] = f"{lbl} ({madhyahna_timing})"
-        elif m_type == "purvahna":
-            fest["muhurta"] = f"{lbl} ({purvahna_timing})"
-        elif m_type == "sayankal":
-            fest["muhurta"] = f"{lbl} ({sayankal_timing})"
-        elif m_type == "sunrise_snan":
-            fest["muhurta"] = f"{lbl} ({sunrise_snan_timing})"
-        elif m_type == "aparahna":
-            fest["muhurta"] = f"{lbl} ({aparahna_timing})"
-        elif m_type == "sandhi":
-            fest["muhurta"] = f"{lbl} ({sandhi_timing})"
-        elif m_type == "brahma":
-            fest["muhurta"] = f"{lbl} ({brahma_timing})"
-        else:
-            fest["muhurta"] = f"{lbl} ({pradosh_timing})"
+        # যদি পূর্বে কোনো হার্ডকোডেড মুহূর্ত না থাকে
+        if not fest.get("muhurta"):
+            m_res = compute_dynamic_festival_muhurta(
+                festival_name=fest.get("name", ""),
+                festival_type=fest.get("category", "hindu"),
+                sunrise_min=rise_total_min,
+                sunset_min=set_total_min,
+                lang=lang_key
+            )
+            fest["muhurta_label"] = m_res["label"]
+            fest["muhurta_type"] = m_res["muhurta_type"]
+            fest["muhurta"] = m_res["formatted_display"]
+            fest["muhurta_start"] = m_res["start_time"]
+            fest["muhurta_end"] = m_res["end_time"]
+
 
     # লাইভ ট্রানজিট আইডির সাথে মেটাডেটা ম্যাচিং
     tithi_num_key = (t_idx % 15) + 1
