@@ -815,6 +815,12 @@ async def root():
 async def health():
     return {"status": "healthy", "timestamp": datetime.datetime.utcnow().isoformat()}
 
+from panchang import get_monthly_calendar_grid
+
+@app.get("/monthly-calendar")
+def get_monthly_cal(year: int, month: int, cal_type: str = "bengali", lat: float = 22.5726, lon: float = 88.3639, lang: str = "bn"):
+    return get_monthly_calendar_grid(year, month, cal_type=cal_type, lat=lat, lon=lon, lang=lang)
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
