@@ -601,21 +601,27 @@ def compute_moon_events(dt: datetime.datetime, lat: float, lon: float):
     return "16:30:00", "03:45:00"
 
 
+from functools import lru_cache
+
+@lru_cache(maxsize=256)
+def get_cached_panchang(iso_date: str, lat: float, lon: float, lang: str, time_format: str):
+    import datetime
+    from panchang import compute_full_drik_panchang
+    date_obj = datetime.date.fromisoformat(iso_date)
+    return compute_full_drik_panchang(date_obj, lat=lat, lon=lon, lang=lang, time_format=time_format)
+
 @app.get("/panchang")
 async def get_panchang(
     iso_date: str = Query(..., description="Date in YYYY-MM-DD format"),
     lat: float = Query(22.5726, description="Latitude (Default Kolkata: 22.5726)"),
     lon: float = Query(88.3639, description="Longitude (Default Kolkata: 88.3639)"),
     lang: str = Query("en", description="Language: 'en', 'hi', or 'bn'"),
-    time_format: str = Query("12hr", description="Time format: '12hr', '24hr', or '24+hr'") # <--- যুক্ত করুন
+    time_format: str = Query("12hr", description="Time format: '12hr', '24hr', or '24+hr'")
 ):
     try:
-        date_obj = datetime.date.fromisoformat(iso_date)
+        return get_cached_panchang(iso_date, lat, lon, lang, time_format)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid iso_date format.")
-
-    data = compute_full_drik_panchang(date_obj, lat=lat, lon=lon, lang=lang, time_format=time_format)
-    return data
 
     sunrise_str, sunset_str, rise_min, set_min = compute_sunrise_sunset(date_obj, lat, lon)
     
