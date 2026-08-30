@@ -1200,10 +1200,13 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
         dt = date(year, month, d)
         day_panchang = compute_full_drik_panchang(dt, lat=lat, lon=lon, lang=lang, time_format="12hr")
         
-        # ১. বাংলা সৌর তারিখ
-        sun_long = day_panchang.get("sun_longitude", 0.0)
-        solar_month_idx = int(sun_long / 30.0)
-        bengali_solar_day = int(sun_long % 30.0) + 1
+        # ১. বাংলা সৌর তারিখ (সূর্যোদয়ের স্পষ্ট দ্রাঘিমাংশ সমন্বয়)
+        jd_day_sun = to_jd_ut(datetime(year, month, d, 6, 0, tzinfo=IST))
+        s_lon, _ = sidereal_longitudes(jd_day_sun)
+        bengali_solar_day = int(s_lon % 30.0)
+        if bengali_solar_day == 0:
+            bengali_solar_day = 1
+
         
         # ২. সংবৎ চান্দ্র তিথি তারিখ (১ থেকে ১৫ / শুক্ল-কৃষ্ণ পক্ষ)
         t_num = day_panchang.get("lunar_day", 1)
