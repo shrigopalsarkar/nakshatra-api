@@ -1176,3 +1176,54 @@ def compute_full_drik_panchang(
         "chandra_tarabalam": chandra_tarabalam,
         "epochs_and_calendars": epochs
     }
+
+    # ==============================================================================
+# বৈদিক সংবৎ এবং বাংলা সৌর পঞ্জিকা (বঙ্গাব্দ) মাসিক ক্যালেন্ডার জেনারেটর
+# ==============================================================================
+
+BENGALI_SOLAR_MONTHS = ["বৈশাখ", "জ্যৈষ্ঠ", "আষাঢ়", "শ্রাবণ", "ভাদ্র", "আশ্বিন", "কার্তিক", "অগ্রহায়ণ", "পৌষ", "মাঘ", "ফাল্গুন", "চৈত্র"]
+BENGALI_DIGITS = str.maketrans("0123456789", "০১২৩৪৫৬৭৮৯")
+
+def to_bengali_num(n: int | str) -> str:
+    return str(n).translate(BENGALI_DIGITS)
+
+def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", lat: float = 22.5726, lon: float = 88.3639, lang: str = "bn"):
+    """
+    cal_type: 'bengali' | 'vikram' | 'shaka' | 'gujarati'
+    প্রতিটি দিনের রিয়েল তিথি, নক্ষত্র, সৌর তারিখ ও উৎসব সহ সম্পূর্ণ মাসের গ্রিড তৈরি করে
+    """
+    import calendar
+    num_days = calendar.monthrange(year, month)[1]
+    days_data = []
+
+    for d in range(1, num_days + 1):
+        dt = date(year, month, d)
+        day_panchang = compute_full_drik_panchang(dt, lat=lat, lon=lon, lang=lang, time_format="12hr")
+        
+        # সৌর বঙ্গাব্দ গণনা (সূর্যের রাশি প্রবেশ / সংক্রান্তি হিসাব)
+        sun_long = day_panchang.get("sun_longitude", 0.0)
+        solar_month_idx = int(sun_long / 30.0)
+        solar_day = int(sun_long % 30.0) + 1
+        bengali_year = year - 593 if month > 4 or (month == 4 and d >= 14) else year - 594
+
+        days_data.append({
+            "gregorian_date": dt.isoformat(),
+            "day_of_month": d,
+            "weekday_index": dt.weekday(), # 0 = Monday, 6 = Sunday
+            "tithi_name": day_panchang.get("tithi_display", ""),
+            "tithi_end": day_panchang.get("tithi_end", ""),
+            "nakshatra_name": day_panchang.get("nakshatra_name", ""),
+            "solar_date": solar_day,
+            "solar_date_bn": to_bengali_num(solar_day),
+            "solar_month_name": BENGALI_SOLAR_MONTHS[solar_month_idx],
+            "bengali_year": to_bengali_num(bengali_year),
+            "festivals": day_panchang.get("festivals", []),
+            "lunar_day_str": day_panchang.get("lunar_day_str", "")
+        })
+
+    return {
+        "year": year,
+        "month": month,
+        "cal_type": cal_type,
+        "month_days": days_data
+    }
