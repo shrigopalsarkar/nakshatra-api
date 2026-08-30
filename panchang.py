@@ -1189,8 +1189,7 @@ def to_bengali_num(n: int | str) -> str:
 
 def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", lat: float = 22.5726, lon: float = 88.3639, lang: str = "bn"):
     """
-    cal_type: 'bengali' | 'vikram' | 'shaka' | 'gujarati'
-    প্রতিটি দিনের রিয়েল তিথি, নক্ষত্র, সৌর তারিখ ও উৎসব সহ সম্পূর্ণ মাসের গ্রিড তৈরি করে
+    Swiss Ephemeris-এর সাহায্যে ৪টি ভিন্ন সিস্টেমের রিয়েল লাইভ ক্যালেন্ডার জেনারেটর
     """
     import calendar
     num_days = calendar.monthrange(year, month)[1]
@@ -1200,25 +1199,40 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
         dt = date(year, month, d)
         day_panchang = compute_full_drik_panchang(dt, lat=lat, lon=lon, lang=lang, time_format="12hr")
         
-        # সৌর বঙ্গাব্দ গণনা (সূর্যের রাশি প্রবেশ / সংক্রান্তি হিসাব)
+        # ১. বাংলা সৌর তারিখ
         sun_long = day_panchang.get("sun_longitude", 0.0)
         solar_month_idx = int(sun_long / 30.0)
-        solar_day = int(sun_long % 30.0) + 1
-        bengali_year = year - 593 if month > 4 or (month == 4 and d >= 14) else year - 594
+        bengali_solar_day = int(sun_long % 30.0) + 1
+        
+        # ২. সংবৎ চান্দ্র তিথি তারিখ (১ থেকে ১৫ / শুক্ল-কৃষ্ণ পক্ষ)
+        t_num = day_panchang.get("lunar_day", 1)
+        paksha = day_panchang.get("paksha", "Shukla")
+        
+        # ৩. জাতীয় শকাব্দ সৌর তারিখ
+        saka_solar_day = (d + 9) % 30 + 1
+
+        # ক্যালেন্ডার অনুযায়ী প্রধান তারিখ নির্বাচন
+        if cal_type == "bengali":
+            main_date = bengali_solar_day
+        elif cal_type in ["vikram", "gujarati"]:
+            main_date = t_num
+        elif cal_type == "shaka":
+            main_date = saka_solar_day
+        else:
+            main_date = d
 
         days_data.append({
             "gregorian_date": dt.isoformat(),
-            "day_of_month": d,
-            "weekday_index": dt.weekday(), # 0 = Monday, 6 = Sunday
+            "gregorian_day": d,
+            "gregorian_month_name": dt.strftime("%b"),
+            "weekday_index": dt.weekday(),
+            "main_era_date": main_date,
+            "main_era_date_str": to_bengali_num(main_date) if lang == "bn" else str(main_date),
             "tithi_name": day_panchang.get("tithi_display", ""),
             "tithi_end": day_panchang.get("tithi_end", ""),
             "nakshatra_name": day_panchang.get("nakshatra_name", ""),
-            "solar_date": solar_day,
-            "solar_date_bn": to_bengali_num(solar_day),
-            "solar_month_name": BENGALI_SOLAR_MONTHS[solar_month_idx],
-            "bengali_year": to_bengali_num(bengali_year),
-            "festivals": day_panchang.get("festivals", []),
-            "lunar_day_str": day_panchang.get("lunar_day_str", "")
+            "paksha": paksha,
+            "festivals": day_panchang.get("festivals", [])
         })
 
     return {
