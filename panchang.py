@@ -187,7 +187,7 @@ def get_vedic_weekday_from_dt(dt_local: datetime, lat: float, lon: float) -> str
     eff_date = d - timedelta(days=1) if dt_local < sunrise_dt else d
     return WEEKDAY_LORDS[(eff_date.weekday() + 1) % 7]
 
-def find_transition(jd_start: float, target_fn, step_hours=0.25, max_hours=48.0):
+def find_transition(jd_start: float, target_fn, step_hours=0.5, max_hours=36.0):
     start_index = target_fn(jd_start)
     jd = jd_start
     step = step_hours / 24.0
@@ -198,10 +198,12 @@ def find_transition(jd_start: float, target_fn, step_hours=0.25, max_hours=48.0)
         hours_scanned += step_hours
         if target_fn(jd) != start_index:
             lo, hi = prev_jd, jd
-            for _ in range(35):
+            for _ in range(20):  # ৩৫ এর বদলে ২০ ইটারেশন যথেষ্ট নিখুঁত এবং সুপার ফাস্ট
                 mid = (lo + hi) / 2.0
-                if target_fn(mid) == start_index: lo = mid
-                else: hi = mid
+                if target_fn(mid) == start_index:
+                    lo = mid
+                else:
+                    hi = mid
             return hi
         prev_jd = jd
     return None
