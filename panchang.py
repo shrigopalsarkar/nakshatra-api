@@ -1071,27 +1071,28 @@ def compute_full_drik_panchang(
 
         from festivals import compute_dynamic_festival_muhurta
 
-    # সূর্যোদয় ও সূর্যাস্তের মিনিট রূপান্তর
-    rise_total_min = dt_rise.hour * 60 + dt_rise.minute
-    set_total_min = dt_set.hour * 60 + dt_set.minute
+    # সূর্যোদয় ও সূর্যাস্তের মোট মিনিট
+    rise_total_min = int(dt_rise.hour * 60 + dt_rise.minute)
+    set_total_min = int(dt_set.hour * 60 + dt_set.minute)
 
-    # প্রতিটি উৎসবের জন্য সুইস এফিমেরিস ডায়নামিক মুহূর্ত তৈরি
+    # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি
     for fest in today_festivals:
-        # যদি পূর্বে কোনো হার্ডকোডেড মুহূর্ত না থাকে
-        if not fest.get("muhurta"):
+        try:
             m_res = compute_dynamic_festival_muhurta(
-                festival_name=fest.get("name", ""),
-                festival_type=fest.get("category", "hindu"),
+                festival_name=str(fest.get("name", "")),
+                festival_type=str(fest.get("category", "hindu")),
                 sunrise_min=rise_total_min,
                 sunset_min=set_total_min,
                 lang=lang_key
             )
-            fest["muhurta_label"] = m_res["label"]
-            fest["muhurta_type"] = m_res["muhurta_type"]
-            fest["muhurta"] = m_res["formatted_display"]
-            fest["muhurta_start"] = m_res["start_time"]
-            fest["muhurta_end"] = m_res["end_time"]
-
+            fest["muhurta_label"] = m_res.get("label", "শুভ মুহূর্ত:")
+            fest["muhurta_type"] = m_res.get("muhurta_type", "")
+            fest["muhurta"] = m_res.get("formatted_display", "")
+            fest["muhurta_start"] = m_res.get("start_time", "")
+            fest["muhurta_end"] = m_res.get("end_time", "")
+        except Exception as err:
+            fest["muhurta_label"] = "শুভ মুহূর্ত:"
+            fest["muhurta"] = f"প্রদোষ কাল ({pradosh_timing})"
 
     # লাইভ ট্রানজিট আইডির সাথে মেটাডেটা ম্যাচিং
     tithi_num_key = (t_idx % 15) + 1
