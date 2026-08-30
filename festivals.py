@@ -1647,3 +1647,105 @@ def get_festivals_for_day(
         )
 
     return festivals
+
+    # festivals.py ফাইলের একদম শেষে এই ফাংশনটি যুক্ত করুন:
+
+def compute_dynamic_festival_muhurta(festival_name: str, festival_type: str, sunrise_min: int, sunset_min: int, lang: str = "bn") -> dict:
+    dina_mana = sunset_min - sunrise_min
+    if dina_mana <= 0:
+        dina_mana += 1440
+    ratri_mana = 1440 - dina_mana
+
+    def min_to_12hr(m: int) -> str:
+        m = int(m % 1440)
+        hh = m // 60
+        mm = m % 60
+        period = "AM" if hh < 12 else "PM"
+        hh_12 = hh % 12
+        if hh_12 == 0:
+            hh_12 = 12
+        time_str = f"{hh_12:02d}:{mm:02d} {period}"
+        if lang == "bn":
+            bangla_digits = str.maketrans("0123456789", "০১২৩৪৫৬৭৮৯")
+            return time_str.translate(bangla_digits)
+        elif lang == "hi":
+            hindi_digits = str.maketrans("0123456789", "०१२३४५६७८९")
+            return time_str.translate(hindi_digits)
+        return time_str
+
+    fn_lower = festival_name.lower()
+    
+    # বিনায়ক চতুর্থী (দুপুরবেলা / মধ্যাহ্ন কাল)
+    if "vinayaka" in fn_lower or "ganesh" in fn_lower or "চতুর্থী" in fn_lower or "चतुर्थी" in fn_lower:
+        start_min = sunrise_min + (dina_mana * 2 / 5.0)
+        end_min = sunrise_min + (dina_mana * 3 / 5.0)
+        type_labels = {
+            "bn": "মধ্যাহ্ন গণেশ পূজা মুহূর্ত (দুপুরবেলা)",
+            "hi": "मध्याह्न गणेश पूजा मुहूर्त (दोपहर)",
+            "en": "Madhyahna Ganesha Puja Muhurta (Afternoon)"
+        }
+        label_text = {"bn": "শুভ মুহূর্ত:", "hi": "शुभ मुहूर्त:", "en": "Auspicious Timing:"}
+        return {
+            "label": label_text.get(lang, "Auspicious Timing:"),
+            "muhurta_type": type_labels.get(lang, type_labels["en"]),
+            "start_time": min_to_12hr(start_min),
+            "end_time": min_to_12hr(end_min),
+            "formatted_display": f"{type_labels.get(lang, type_labels['en'])} ({min_to_12hr(start_min)} - {min_to_12hr(end_min)})"
+        }
+
+    # শিবরাত্রি / মাসিক শিবরাত্রি (নিশীথ কাল / মধ্যরাত্রি)
+    elif "shivratri" in fn_lower or "শিবরাত্রি" in fn_lower or "शिवरात्रि" in fn_lower:
+        solar_midnight = sunset_min + (ratri_mana / 2.0)
+        start_min = solar_midnight - 24
+        end_min = solar_midnight + 24
+        type_labels = {
+            "bn": "নিশীথ কাল পূজা মুহূর্ত (রাত্রিবেলা)",
+            "hi": "निशीथ काल पूजा मुहूर्त (रात्रि)",
+            "en": "Nishita Kala Shiva Puja Muhurta (Night)"
+        }
+        label_text = {"bn": "পূজার শুভ মুহূর্ত:", "hi": "पूजा का शुभ मुहूर्त:", "en": "Puja Muhurta:"}
+        return {
+            "label": label_text.get(lang, "Puja Muhurta:"),
+            "muhurta_type": type_labels.get(lang, type_labels["en"]),
+            "start_time": min_to_12hr(start_min),
+            "end_time": min_to_12hr(end_min),
+            "formatted_display": f"{type_labels.get(lang, type_labels['en'])} ({min_to_12hr(start_min)} - {min_to_12hr(end_min)})"
+        }
+
+    # প্রদোষ ব্রত / সত্যনারায়ণ পূজা / সন্ধ্যা পূজা
+    elif "pradosh" in fn_lower or "প্রদোষ" in fn_lower or "satyanarayan" in fn_lower or "সত্যনারায়ণ" in fn_lower:
+        start_min = sunset_min
+        end_min = sunset_min + 144
+        type_labels = {
+            "bn": "প্রদোষ কাল (সন্ধ্যাবেলা)",
+            "hi": "प्रदोष काल (संध्या)",
+            "en": "Pradosh Kala Muhurta (Evening)"
+        }
+        label_text = {"bn": "পূজার শুভ মুহূর্ত:", "hi": "पूजा का शुभ मुहूर्त:", "en": "Puja Muhurta:"}
+        return {
+            "label": label_text.get(lang, "Puja Muhurta:"),
+            "muhurta_type": type_labels.get(lang, type_labels["en"]),
+            "start_time": min_to_12hr(start_min),
+            "end_time": min_to_12hr(end_min),
+            "formatted_display": f"{type_labels.get(lang, type_labels['en'])} ({min_to_12hr(start_min)} - {min_to_12hr(end_min)})"
+        }
+
+    # সাধারণ শুভ মুহূর্ত (অভিজিৎ / দিবস মুহূর্ত)
+    else:
+        one_muhurta = dina_mana / 15.0
+        start_min = sunrise_min + (7 * one_muhurta)
+        end_min = sunrise_min + (8 * one_muhurta)
+        type_labels = {
+            "bn": "অভিজিৎ শুভ মুহূর্ত (দুপুরবেলা)",
+            "hi": "अभिजित शुभ मुहूर्त (दोपहर)",
+            "en": "Abhijit Auspicious Muhurta"
+        }
+        label_text = {"bn": "শুভ মুহূর্ত:", "hi": "शुभ मुहूर्त:", "en": "Auspicious Timing:"}
+        return {
+            "label": label_text.get(lang, "Auspicious Timing:"),
+            "muhurta_type": type_labels.get(lang, type_labels["en"]),
+            "start_time": min_to_12hr(start_min),
+            "end_time": min_to_12hr(end_min),
+            "formatted_display": f"{type_labels.get(lang, type_labels['en'])} ({min_to_12hr(start_min)} - {min_to_12hr(end_min)})"
+        }
+
