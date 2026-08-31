@@ -1781,6 +1781,35 @@ HINDU_FESTIVAL_DATABASE = {
         "muhurta_type": "purvahna",
         "muhurta_label": {"en": "Pratah Smaran & Puja", "hi": "प्रातः वंदन व पूजा", "bn": "প্রাতঃকালীন স্মরণ ও পূজার্চনা"}
     },
+    # --- মাঘ মাস (Magha) ---
+    ("Magha", "Shukla", 1): {
+        "en": "Magha Gupt Navratri Begins / Ishti Havan",
+        "hi": "माघ गुप्त नवरात्रि प्रारंभ / घटस्थापना / इष्टि",
+        "bn": "মাঘ গুপ্ত নবরাত্রি আরম্ভ / ঘটস্থাপন / বৈদিক ইষ্টি যজ্ঞ",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "साधना पर्व", "bn": "মহাপর্ব"},
+        "icon": "🔱", "deity": {"en": "Das Mahavidya & Maa Durga", "hi": "दस महाविद्या व माँ दुर्गा", "bn": "দশমহাবিদ্যা ও মা দুর্গা"},
+        "description": {
+            "en": "Auspicious commencement of winter Gupt Navratri with Ghatasthapana and sacred Vedic Ishti oblations.",
+            "hi": "शिशिर ऋतु में आत्मिक शक्ति हेतु गुप्त नवरात्रि घटस्थापना एवं वैदिक इष्टि यज्ञानुष्ठान।",
+            "bn": "শীতকালীন গুপ্ত নবরাত্রির পুণ্য ঘটস্থাপন এবং সর্বকল্যাণ কামনায় বৈদিক ইষ্টি হোম।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Ghatasthapana & Ishti Muhurta", "hi": "घटस्थापना व इष्टि मुहूर्त", "bn": "ঘটস্থাপন ও ইষ্টি যজ্ঞ মুহূর্ত"}
+    },
+    ("Magha", "Shukla", 2): {
+        "en": "Chandra Darshana (Magha Shukla)",
+        "hi": "माघ चन्द्र दर्शन",
+        "bn": "মাঘ শুক্ল দ্বিতীয়া চন্দ্র দর্শন",
+        "category": "hindu", "type": {"en": "Observance", "hi": "धार्मिक दर्शन", "bn": "চন্দ্র দর্শন"},
+        "icon": "🌙", "deity": {"en": "Chandra Deva", "hi": "चन्द्र देव", "bn": "চন্দ্র দেব"},
+        "description": {
+            "en": "Sighting of the auspicious new crescent moon after sunset for peace, mental clarity, and fortune.",
+            "hi": "मानसिक शांति व सौभाग्य वृद्धि हेतु सायंकाल नवचंद्र (द्वितीया चंद्र) दर्शन व अर्घ्य।",
+            "bn": "মানসিক শান্তি ও সৌভাগ্য বৃদ্ধির কামনায় সায়ংকালে অমাবস্যা-পরবর্তী দ্বিতীয়ার শুভ চন্দ্র দর্শন।"
+        },
+        "muhurta_type": "sayankal",
+        "muhurta_label": {"en": "Sayankal Chandra Darshan", "hi": "सायंकाल चंद्र दर्शन", "bn": "সায়ংকালীন চন্দ্র দর্শন লগ্ন"}
+    },
 
 # ==============================================================================
 # ২. ভারতীয় জাতীয় ছুটির দিন ও স্মরণীয় দিবস
@@ -1868,6 +1897,32 @@ INDIAN_NATIONAL_HOLIDAYS = {
 # ৩. খ্রিস্টান ও আন্তর্জাতিক ফিক্সড দিবস
 # ==============================================================================
 FIXED_WORLD_CHRISTIAN_DAYS = {
+    (2, 4): {
+        "en": "World Cancer Day",
+        "hi": "विश्व कैंसर दिवस",
+        "bn": "বিশ্ব ক্যান্সার দিবস",
+        "category": "world", "icon": "🎗️", "type": {"en": "Observance", "hi": "अंतर्राष्ट्रीय दिवस", "bn": "আন্তর্জাতিক দিবস"},
+        "deity": {"en": "Universal", "hi": "सर्वव्यापी", "bn": "সার্বজনীন"},
+        "description": {
+            "en": "Global awareness initiative encouraging cancer prevention, early detection, and treatment.",
+            "hi": "कैंसर के प्रति वैश्विक जागरूकता, रोकथाम एवं उपचार को बढ़ावा देने का दिवस।",
+            "bn": "ক্যান্সার প্রতিরোধ, সচেতনতা বৃদ্ধি এবং রোগীদের প্রতি সংহতি প্রকাশের আন্তর্জাতিক দিবস।"
+        },
+        "muhurta": {"en": "All Day Observance", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}
+    },
+    (2, 14): {
+        "en": "Valentine's Day",
+        "hi": "वैलेंटाइन डे (प्रेम दिवस)",
+        "bn": "ভ্যালেন্টাইনস ডে (বিশ্ব ভালোবাসা দিবস)",
+        "category": "world", "icon": "💖", "type": {"en": "Global Celebration", "hi": "अंतर्राष्ट्रीय पर्व", "bn": "আন্তর্জাতিক উৎসব"},
+        "deity": {"en": "Universal", "hi": "सर्वव्यापी", "bn": "সার্বজনীন"},
+        "description": {
+            "en": "Celebration of affection, love, and goodwill among partners and companions worldwide.",
+            "hi": "स्नेह, प्रेम ও आत्मीयता की अभिव्यक्ति का वैश्विक उत्सव दिवस।",
+            "bn": "ভালোবাসা, সম্প্রীতি ও পারস্পরিক শ্রদ্ধাবোধ প্রকাশের সার্বজনীন উৎসব।"
+        },
+        "muhurta": {"en": "All Day Celebration", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}
+    },
     (1, 1): {
         "en": "New Year's Day", "hi": "नव वर्ष", "bn": "ইংরেজি নববর্ষ",
         "category": "world", "icon": "🌍", "type": {"en": "Global Celebration", "hi": "अंतर्राष्ट्रीय पर्व", "bn": "আন্তর্জাতিক উৎসব"},
@@ -2092,6 +2147,20 @@ def get_festivals_for_day(
                 "muhurta": ""  # panchang.py রিয়েল-টাইমে সুইস এফিমেরিস থেকে হিসাব করে বসাবে
             }
         )
+    # কুম্ভ সংক্রান্তি (Kumbha Sankranti)
+    elif m_d == (2, 13) or ("kumbha" in s_name or "aquarius" in s_name):
+        kumbha_names = {"en": "Kumbha Sankranti / Phalguna Sankranti", "hi": "कुम्भ संक्रांति", "bn": "কুম্ভ সংক্রান্তি / ফাল্গুন সংক্রান্তি মহাতীর্থ স্নান"}
+        kumbha_deity = {"en": "Surya Deva & Lord Shiva", "hi": "भगवान सूर्य व शिव जी", "bn": "ভগবান সূর্য দেব ও মহাদেব"}
+        kumbha_desc = {
+            "en": "Sun enters Aquarius (Kumbha Rashi), highly auspicious for sacred snan and charity.",
+            "hi": "सूर्य का कुम्भ राशि में प्रवेश, पवित्र तीर्थ स्नान एवं अन्न-वस्त्र दान का पावन दिन।",
+            "bn": "সূর্যের কুম্ভ রাশিতে শুভ প্রবেশ, গঙ্গা ও পুণ্যতীর্থ স্নান এবং দানকার্যের শ্রেষ্ঠ লগ্ন।"
+        }
+        append_festival_once(festivals, {
+            "name": kumbha_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "☀️", "deity": kumbha_deity[l_key], "description": kumbha_desc[l_key],
+            "muhurta_type": "sunrise_snan", "muhurta_label": {"en": "Kumbha Sankranti Punya Kaal", "hi": "कुम्भ संक्रांति पुण्य काल", "bn": "কুম্ভ সংক্রান্তি পুণ্যকাল স্নান ও দান"}[l_key], "muhurta": ""
+        })    
 
     # ২. সর্বভারতীয় একাদশী ব্রত (Ekadashi Vrata)
     if tithi_num == 11:
