@@ -1434,7 +1434,7 @@ HINDU_FESTIVAL_DATABASE = {
     },
 
     # --------------------------------------------------------------------------
-    # কার্তিক মাস (Kartika)
+    # কার্তিক মাস (Kartika) - সম্পূর্ণ ও নিখুঁত তিথি ম্যাপিং
     # --------------------------------------------------------------------------
     ("Kartika", "Krishna", 4): {
         "en": "Karwa Chauth / Vakratunda Sankashti Chaturthi",
@@ -1468,7 +1468,7 @@ HINDU_FESTIVAL_DATABASE = {
         "en": "Ahoi Ashtami Vrat / Radha Kund Snan",
         "hi": "अहोई अष्टमी व्रत / राधा कुंड स्नान",
         "bn": "অহোই অষ্টমী ব্রত / শ্রী রাধাকুণ্ড স্নান",
-        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "category": "hindu", "type": {"en": "Vrata", "hi": "উপবাস ব্রত", "bn": "উপবাস ব্রত"},
         "icon": "🪔", "deity": {"en": "Maa Ahoi", "hi": "माँ अहोई", "bn": "মা অহোই দেবী"},
         "description": {
             "en": "Mothers fast for the well-being and long life of their children, breaking the fast after star sighting.",
@@ -1510,7 +1510,7 @@ HINDU_FESTIVAL_DATABASE = {
         "en": "Dhanteras / Dhanvantari Jayanti / Kuber Puja",
         "hi": "धनतेरस / धन्वंतरि जयंती / कुबेर पूजा",
         "bn": "শ্রী শ্রী ধনতেরাস / ধন্বন্তরি জয়ন্তী / কুবের পূজা",
-        "category": "hindu", "type": {"en": "Major Festival", "hi": "মহাপর্ব", "bn": "মহাপর্ব"},
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
         "icon": "🪙", "deity": {"en": "Lord Dhanvantari & Kuber", "hi": "भगवान धन्वंतरि व कुबेर देव", "bn": "ভগবান ধন্বন্তরি ও কুবের দেব"},
         "description": {
             "en": "Worship of Dhanvantari for health and Lord Kuber for wealth, with evening Yama Deepam.",
@@ -1521,29 +1521,29 @@ HINDU_FESTIVAL_DATABASE = {
         "muhurta_label": {"en": "Pradosh Kaal & Vrishabha Lagna", "hi": "प्रदोष काल व वृषभ लग्न", "bn": "প্রদোষ কাল ও বৃষ লগ্ন"}
     },
     ("Kartika", "Krishna", 14): {
-        "en": "Bhoot Chaturdashi / Naraka Chaturdashi / 14 Pradeep Dan",
-        "hi": "नरक चतुर्दशी / छोटी दिवाली / रूप चौदस",
-        "bn": "ভূত চতুর্দশী (১৪ প্রদীপ ও ১৪ শাক দান) / নরক চতুর্দশী",
-        "category": "hindu", "type": {"en": "Major Festival", "hi": "মহাপর্ব", "bn": "মহাপর্ব"},
-        "icon": "🪔", "deity": {"en": "Yamaraja & Ancestors", "hi": "यमराज व पितृ गण", "bn": "যমরাজ ও চোদ্দ পুরুষ"},
+        "en": "Kali Chaudas / Bhoot Chaturdashi / Naraka Chaturdashi / 14 Pradeep Dan",
+        "hi": "काली चौदस / नरक चतुर्दशी / छोटी दिवाली",
+        "bn": "কালী চৌদাস / ভূত চতুর্দশী / নরক চতুর্দশী (১৪ প্রদীপ দান)",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🪔", "deity": {"en": "Yamaraja & Maa Kali", "hi": "यमराज व महाकाली", "bn": "যমরাজ ও মা কালী"},
         "description": {
-            "en": "Lighting 14 lamps to dispel dark energies and honour the 14 ancestors prior to Kali Puja.",
-            "hi": "चौदह यमदीप प्रज्वलित कर नकारात्मकता दूर करना एवं रूप निखार हेतु अभ्यंग स्नान।",
-            "bn": "চোদ্দ প্রদীপ প্রজ্বলন ও চোদ্দ শাক গ্রহণের মাধ্যমে অশুভ শক্তি দূরীকরণ ও চোদ্দ পুরুষের স্মরণ।"
+            "en": "Lighting 14 lamps and invoking Mahakali/Yamaraja to dispel dark and negative energies.",
+            "hi": "चौदह यमदीप प्रज्वलित कर नकारात्मकता दूर करना एवं अभ्यंग स्नान।",
+            "bn": "চোদ্দ প্রদীপ প্রজ্বলন ও চোদ্দ পুরুষের স্মরণে ভূত চতুর্দশী ও নরক চতুর্দশী ব্রত।"
         },
         "muhurta_type": "sayankal",
         "muhurta_label": {"en": "Sayankal 14 Deepam & Abhyanga Snan", "hi": "सायंकाल यम दीपदान व अभ्यंग स्नान", "bn": "সায়ংকালে ১৪ প্রদীপ দান ও তৈলাভ্যঙ্গ স্নান"}
     },
     ("Kartika", "Krishna", 15): {
-        "en": "Shyama Puja (Kali Puja) / Diwali / Lakshmi Puja",
-        "hi": "दीपावली / महालक्ष्मी पूजा / माँ काली पूजा",
-        "bn": "শ্রী শ্রী শ্যামাপূজা (কালীপূজা) / দীপাবলি মহোৎসব ও মহালক্ষ্মী পূজা",
-        "category": "hindu", "type": {"en": "Major Festival", "hi": "মহাপর্ব", "bn": "মহাপর্ব"},
+        "en": "Diwali / Lakshmi Puja / Shyama Puja / Darsha Amavasya",
+        "hi": "दीपावली / महालक्ष्मी पूजा / श्यामप पूजा / दर्श अमावस्या",
+        "bn": "শ্রী শ্রী শ্যামাপূজা (কালীপূজা) / দীপাবলি ও দর্শ অমাবস্যা",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
         "icon": "🪔", "deity": {"en": "Maa Kali & Maa Mahalakshmi", "hi": "माँ काली व माँ महालक्ष्मी", "bn": "মা শ্যামা কালী ও মা মহালক্ষ্মী"},
         "description": {
-            "en": "Victory of light over darkness with earthen lamps and midnight worship of Maa Kali.",
-            "hi": "अंधकार पर प्रकाश की विजय का दीपोत्सव एवं मध्यरात्रि में माँ काली की तांत्रिक व वैदिक पूजा।",
-            "bn": "অন্ধকার দূর করে আলোর দীপাবলি উৎসব এবং অমাবস্যার নিশীথ রাতে মা শ্যামা কালীর আরাধনা।"
+            "en": "Victory of light over darkness with earthen lamps, midnight worship of Maa Kali, and Darsha Amavasya.",
+            "hi": "अंधकार पर प्रकाश की विजय का दीपोत्सव, मध्यरात्रि माँ काली पूजा व दर्श अमावस्या।",
+            "bn": "অন্ধকার দূর করে আলোর দীপাবলি, অমাবস্যার নিশীথ রাতে মা শ্যামা কালীর আরাধনা ও দর্শ অমাবস্যা।"
         },
         "muhurta_type": "nishita",
         "muhurta_label": {"en": "Nishita Kaal (Kali Puja) & Pradosh", "hi": "निशीथ काल (काली पूजा) व प्रदोष", "bn": "নিশীথ কাল (কালীপূজা) ও প্রদোষ লগ্ন"}
@@ -1557,7 +1557,7 @@ HINDU_FESTIVAL_DATABASE = {
         "description": {
             "en": "Worship of Govardhan Hill with 56 delicacies, traditional Dyuta Krida, and Gujarati New Year.",
             "hi": "५६ भोग अन्नकूट समर्पण, सुख-समृद्धि हेतु पारंपरिक द्यूत क्रीड़ा एवं नूतन वर्षारंभ।",
-            "bn": "ছাপ্পান্ন ভোগসহ গোবর্ধন পর্বত পূজা, শিব-পার্বতীর পাশাখেলা স্মরণে দ্যূত ক্রীড়া ও গুজরাটি নববর্ষ।"
+            "bn": "ছাপ্পান্ন ভোগসহ গোবর্ধন পর্বত পূজা, শিব-পার্বতের পাশাখেলা স্মরণে দ্যূত ক্রীড়া ও গুজরাটি নববর্ষ।"
         },
         "muhurta_type": "purvahna",
         "muhurta_label": {"en": "Pratah & Sayankal Annakut", "hi": "प्रातः व सायंकाल पूजा", "bn": "প্রাতঃ ও সায়ংকালীন অন্নকূট লগ্ন"}
@@ -1701,7 +1701,7 @@ HINDU_FESTIVAL_DATABASE = {
         },
         "muhurta_type": "pradosh",
         "muhurta_label": {"en": "Pradosh Kaal & Full Moon Night", "hi": "प्रदोष काल व दीपदान मुहूर्त", "bn": "প্রদোষ কাল ও দেব দীপাবলি লগ্ন"}
-    },
+    }
 
     # --------------------------------------------------------------------------
     # মার্গশীর্ষ মাস (Margashirsha)
