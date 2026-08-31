@@ -2124,8 +2124,6 @@ INDIAN_NATIONAL_HOLIDAYS = {
 # ==============================================================================
 # FIXED_SOLAR_FESTIVALS / FIXED_WORLD_CHRISTIAN_DAYS এ যুক্ত করার মিসিং দিবসসমূহ:
 # ==============================================================================
-
-MISSING_SOLAR_AND_NATIONAL_DAYS = {
     (1, 13): {
         "en": "Lohri Festival",
         "hi": "लोहड़ी पर्व",
@@ -2164,11 +2162,21 @@ MISSING_SOLAR_AND_NATIONAL_DAYS = {
             "bn": "মানুষ গড়ার কারিগর শিক্ষক মহাশয়দের প্রতি শ্রদ্ধা নিবেদন ও প্রাক্তন রাষ্ট্রপতির জন্মতিথি।"
         },
         "muhurta": {"en": "All Day School Observance", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন শিক্ষাপ্রতিষ্ঠানভিত্তিক উদযাপন"}
+    },
+    (3, 23): {
+        "en": "Shaheed Diwas (Bhagat Singh, Sukhdev & Rajguru Martyrdom Day)",
+        "hi": "शहीद दिवस (भगत सिंह, सुखदेव व राजगुरु बलिदान दिवस)",
+        "bn": "শহীদ দিবস (বীর ভগৎ সিং, সুখদেব ও রাজগুরুর আত্মোৎসর্গ দিবস)",
+        "category": "national", "icon": "🇮🇳", "type": {"en": "Martyrdom Day", "hi": "बलिदान दिवस", "bn": "জাতীয় শ্রদ্ধা দিবস"},
+        "deity": {"en": "Bhagat Singh, Sukhdev & Rajguru", "hi": "अमर शहीद भगत सिंह, सुखदेव व राजगुरु", "bn": "অমর বিপ্লবী ভগৎ সিং, সুখদেব ও রাজগুরু"},
+        "description": {
+            "en": "Tribute to the supreme sacrifice of Shaheed Bhagat Singh, Sukhdev, and Rajguru for Indian Independence.",
+            "hi": "भारत माता की स्वाधीनता हेतु हँसते-हँसते फाँसी के फंदे चूमने वाले अमर क्रांतिकारियों को नमन।",
+            "bn": "ভারতের স্বাধীনতা সংগ্রামে আত্মাহুতি দানকারী অমর বিপ্লবী ভগৎ সিং, সুখদেব ও রাজগুরুর অমর স্মৃতির প্রতি শ্রদ্ধাঞ্জলি।"
+        },
+        "muhurta": {"en": "All Day Observance", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}
     }
 }
-
-# মূল ডিকশনারিতে মার্জ করার জন্য:
-INDIAN_NATIONAL_HOLIDAYS.update(MISSING_SOLAR_AND_NATIONAL_DAYS)
 
 # ==============================================================================
 # ৩. খ্রিস্টান ও আন্তর্জাতিক ফিক্সড দিবস
@@ -2283,6 +2291,18 @@ FIXED_WORLD_CHRISTIAN_DAYS = {
         },
         "muhurta": {"en": "All Day Observance", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}
     },     
+    (3, 21): {
+        "en": "Vernal Equinox (Spring Equinox)",
+        "hi": "वसंत विषुव (दिन-रात बराबर)",
+        "bn": "মহাবিষুব (বসন্ত বিষুব / দিন ও রাত্রি সমান)",
+        "category": "world", "icon": "☀️", "type": {"en": "Astronomical Event", "hi": "खगोलीय घटना", "bn": "জ্যোতির্বৈজ্ঞানিক ঘটনা"},
+        "deity": {"en": "Surya Deva & Mother Nature", "hi": "भगवान सूर्य व प्रकृति", "bn": "ভগবান সূর্য দেব ও প্রকৃতি"},
+        "description": {
+            "en": "Astronomical day where the plane of Earth's equator passes through the geometric center of the Sun's disk.",
+            "hi": "खगोलीय दिवस जब सूर्य विषुवत रेखा पर सीधा चमकता है और दिन-रात की अवधि पूर्णतः बराबर होती है।",
+            "bn": "যে জ্যোতির্বৈজ্ঞানিক দিনে সূর্য বিষুবরেখায় অবস্থান করে এবং পৃথিবীর সর্বত্র দিন ও রাত্রির দৈর্ঘ্য সমান হয়।"
+        },
+        "muhurta": {"en": "All Day Observance", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}
     }
 }
 
