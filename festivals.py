@@ -1189,8 +1189,6 @@ HINDU_FESTIVAL_DATABASE = {
     # ==============================================================================
 # HINDU_FESTIVAL_DATABASE এ যুক্ত করার জন্য মিসিং আইটেমসমূহ:
 # ==============================================================================
-
-MISSING_HINDU_FESTIVALS = {
     # ---------------- Chaitra ----------------
     ("Chaitra", "Krishna", 8): {
         "en": "Sheetala Ashtami / Basoda",
@@ -1267,8 +1265,7 @@ MISSING_HINDU_FESTIVALS = {
         },
         "muhurta_type": "purvahna",
         "muhurta_label": {"en": "Purvahna Puja & Paran", "hi": "पूर्वाह्न पूजन व पारण", "bn": "পূর্বাহ্ন বিহিত পূজা ও পারণ"}
-    }
-}
+    },
 
     # ==========================================================================
     # DRIK PANCHANG COMPREHENSIVE ADDITIONS (দশমহাবিদ্যা, দশাবতার, দিওয়ালি, ওনাম ও ব্রত)
