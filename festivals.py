@@ -1701,7 +1701,7 @@ HINDU_FESTIVAL_DATABASE = {
         },
         "muhurta_type": "pradosh",
         "muhurta_label": {"en": "Pradosh Kaal & Full Moon Night", "hi": "प्रदोष काल व दीपदान मुहूर्त", "bn": "প্রদোষ কাল ও দেব দীপাবলি লগ্ন"}
-    }
+    },
 
     # --------------------------------------------------------------------------
     # মার্গশীর্ষ মাস (Margashirsha)
