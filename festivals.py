@@ -2329,6 +2329,20 @@ FIXED_WORLD_CHRISTIAN_DAYS = {
         },
         "muhurta": {"en": "All Day Observance", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}
     },
+    # বিশ্ব তামাকমুক্ত দিবস (World No Tobacco Day - ৩১ মে)
+    (5, 31): {
+        "en": "World No Tobacco Day",
+        "hi": "विश्व तंबाकू निषेध दिवस",
+        "bn": "বিশ্ব তামাকমুক্ত দিবস",
+        "category": "world", "icon": "🚭", "type": {"en": "Observance", "hi": "अंतर्राष्ट्रीय दिवस", "bn": "আন্তর্জাতিক দিবস"},
+        "deity": {"en": "World Health Organization", "hi": "विश्व स्वास्थ्य संगठन", "bn": "বিশ্ব স্বাস্থ্য সংস্থা"},
+        "description": {
+            "en": "Global awareness campaign highlighting health risks associated with tobacco consumption.",
+            "hi": "तंबाकू व धूम्रपान के दुष्प्रभावों के प्रति जन-जागरूकता एवं स्वास्थ्य रक्षा का वैश्विक दिवस।",
+            "bn": "তামাক সেবনের মারাত্মক স্বাস্থ্যঝুঁকি সম্পর্কে জনসচেতনতা সৃষ্টির লক্ষ্যে আন্তর্জাতিক দিবস।"
+        },
+        "muhurta": {"en": "All Day Observance", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}
+    },
     (2, 14): {
         "en": "Valentine's Day",
         "hi": "वैलेंटाइन डे (प्रेम दिवस)",
@@ -2727,7 +2741,67 @@ def get_festivals_for_day(
                 "bn": "পিতৃপুরুষের আত্মার তৃপ্তির উদ্দেশ্যে পবিত্র তর্পণ, দান ও মহাদেবের অর্চনা।"
             }[l_key],
             "muhurta_type": "aparahna", "muhurta_label": {"en": "Aparahna (Tarpan)", "hi": "अपराह्न तर्पण काल", "bn": "অপরাহ্ন তর্পণ লগ্ন"}[l_key], "muhurta": ""
-        })    
+        })
+
+    # মিথুন সংক্রান্তি (Mithuna Sankranti - ১৫ জুন)
+    elif m_d == (6, 15) or ("mithuna" in s_name or "gemini" in s_name):
+        mithuna_names = {"en": "Mithuna Sankranti / Raja Parba", "hi": "मिथुन संक्रांति / राजा पर्ब", "bn": "মিথুন সংক্রান্তি / রাজা পর্ব (ভূদেবী পূজা)"}
+        mithuna_deity = {"en": "Surya Deva & Mother Earth", "hi": "भगवान सूर्य व भूदेवी", "bn": "ভগবান সূর্য দেব ও ধরিত্রী মাতা"}
+        mithuna_desc = {
+            "en": "Sun enters Gemini (Mithuna Rashi), celebrated as agricultural festivity honoring Mother Earth.",
+            "hi": "सूर्य का मिथुन राशि में प्रवेश, धरती माता के सत्कार एवं नवीन कृषि उत्सव (राजा पर्ब) का पावन दिन।",
+            "bn": "সূর্যের মিথুন রাশিতে শুভ সংক্রমণ এবং ধরিত্রী মাতার উর্বরতা কামনায় ঐতিহ্যবাহী ভূদেবী পূজা।"
+        }
+        append_festival_once(festivals, {
+            "name": mithuna_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "☀️", "deity": mithuna_deity[l_key], "description": mithuna_desc[l_key],
+            "muhurta_type": "sunrise_snan", "muhurta_label": {"en": "Mithuna Sankranti Punya Kaal", "hi": "मिथुन संक्रांति पुण्य काल", "bn": "মিথুন সংক্রান্তি পুণ্যকাল স্নান ও দান"}[l_key], "muhurta": ""
+        })
+
+    # কর্কট সংক্রান্তি / দক্ষিণায়ন আরম্ভ (Karka Sankranti - ১৬/১৭ জুলাই)
+    elif m_d == (7, 16) or m_d == (7, 17) or ("karka" in s_name or "cancer" in s_name):
+        karka_names = {"en": "Karka Sankranti / Dakshinayana Begins", "hi": "कर्क संक्रांति / दक्षिणायन प्रारंभ", "bn": "কর্কট সংক্রান্তি (সূর্যের দক্ষিণায়ন গমন)"}
+        karka_deity = {"en": "Surya Deva & Lord Vishnu", "hi": "भगवान सूर्य व श्री हरि", "bn": "ভগবান সূর্য দেব ও শ্রীহরি নারায়ণ"}
+        karka_desc = {
+            "en": "Sun transits into Cancer (Karka Rashi) marking the start of Dakshinayana, dedicated to Pitru tarpan.",
+            "hi": "सूर्य का कर्क राशि में प्रवेश, देवताओं की रात्रि (दक्षिणायन) का आरंभ एवं पवित्र स्नान-दान दिवस।",
+            "bn": "সূর্যের কর্কট রাশিতে প্রবেশ ও ৬ মাসব্যাপী দক্ষিণায়নের সূচনা; পিতৃপুরুষের তর্পণে পুণ্যফলদায়ী লগ্ন।"
+        }
+        append_festival_once(festivals, {
+            "name": karka_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "☀️", "deity": karka_deity[l_key], "description": karka_desc[l_key],
+            "muhurta_type": "sunrise_snan", "muhurta_label": {"en": "Karka Sankranti Punya Kaal", "hi": "कर्क संक्रांति पुण्य काल", "bn": "কর্কট সংক্রান্তি পুণ্যকাল স্নান ও দান"}[l_key], "muhurta": ""
+        })
+
+    # ডায়নামিক আন্তর্জাতিক রবিবার ভিত্তিক দিবস (Mother's Day, Father's Day, Friendship Day)
+    if current_date.weekday() == 6:  # রবিবার
+        # মে মাসের ২য় রবিবার: Mother's Day
+        if current_date.month == 5 and 8 <= current_date.day <= 14:
+            append_festival_once(festivals, {
+                "name": {"en": "Mother's Day", "hi": "मातृ दिवस (मदर्स डे)", "bn": "বিশ্ব মা দিবস (মাদার্স ডে)"}[l_key],
+                "category": "world", "type": {"en": "Observance", "hi": "अंतर्राष्ट्रीय दिवस", "bn": "আন্তর্জাতিক দিবস"}[l_key],
+                "icon": "👩‍👧‍👦", "deity": {"en": "Motherhood", "hi": "मातृ शक्ति", "bn": "মাতৃশক্তি"}[l_key],
+                "description": {"en": "Honouring motherhood and maternal bonds.", "hi": "मातृ प्रेम व समर्पण के सम्मान का दिन।", "bn": "মায়েদের নিঃস্বার্থ স্নেহ, মমতা ও ভালোবাসার প্রতি শ্রদ্ধার্ঘ্য।"}[l_key],
+                "muhurta": {"en": "All Day Celebration", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}[l_key]
+            })
+        # জুনের ৩য় রবিবার: Father's Day
+        elif current_date.month == 6 and 15 <= current_date.day <= 21:
+            append_festival_once(festivals, {
+                "name": {"en": "Father's Day", "hi": "पितृ दिवस (फादर्स डे)", "bn": "বিশ্ব বাবা দিবস (ফাদার্স ডে)"}[l_key],
+                "category": "world", "type": {"en": "Observance", "hi": "अंतर्राष्ट्रीय दिवस", "bn": "আন্তর্জাতিক দিবস"}[l_key],
+                "icon": "👨‍👧‍👦", "deity": {"en": "Fatherhood", "hi": "पितृ शक्ति", "bn": "পিতৃশক্তি"}[l_key],
+                "description": {"en": "Honouring fatherhood and paternal contributions.", "hi": "पिता के त्याग व मार्गदर्शन के प्रति सम्मान का दिन।", "bn": "বাবার ত্যাগ, নিষ্ঠা ও ভালোবাসার প্রতি গভীর শ্রদ্ধা নিবেদনের দিন।"}[l_key],
+                "muhurta": {"en": "All Day Celebration", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}[l_key]
+            })
+        # আগস্টের ১ম রবিবার: Friendship Day
+        elif current_date.month == 8 and current_date.day <= 7:
+            append_festival_once(festivals, {
+                "name": {"en": "International Friendship Day", "hi": "अंतर्राष्ट्रीय मित्रता दिवस (फ्रेंडशिप डे)", "bn": "আন্তর্জাতিক বন্ধু দিবস (ফ্রেন্ডশিপ ডে)"}[l_key],
+                "category": "world", "type": {"en": "Global Celebration", "hi": "अंतर्राष्ट्रीय पर्व", "bn": "আন্তর্জাতিক উৎসব"}[l_key],
+                "icon": "🤝", "deity": {"en": "Companionship", "hi": "मित्रता", "bn": "বন্ধুত্ব"}[l_key],
+                "description": {"en": "Celebrating the enduring spirit of friendship and mutual support.", "hi": "सच्ची मित्रता एवं सद्भाव को समर्पित पावन दिवस।", "bn": "সত্যিকারের বন্ধুত্ব ও ভ্রাতৃত্বের মেলবন্ধন উদযাপনের বিশেষ দিন।"}[l_key],
+                "muhurta": {"en": "All Day Celebration", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}[l_key]
+            })
 
     # ৩. প্রদোষ ব্রত (Pradosh Vrata)
     elif tithi_num == 13:
