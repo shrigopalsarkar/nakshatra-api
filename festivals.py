@@ -2639,3 +2639,581 @@ def get_language_key(lang: str = "en") -> str:
     elif value.startswith("hi") or "hindi" in value:
         return "hi"
     return "en"
+    
+def normalize_sankranti_name(sankranti_name: Optional[str]) -> str:
+    return str(sankranti_name or "").strip().lower()
+
+def append_festival_once(festivals: List[Dict[str, Any]], festival: Dict[str, Any]) -> None:
+    festival_name = festival.get("name", "")
+    for existing in festivals:
+        if existing.get("name") == festival_name:
+            return
+    festivals.append(festival)
+
+def resolve_field(obj: Any, l_key: str) -> str:
+    if isinstance(obj, dict):
+        return obj.get(l_key, obj.get("en", ""))
+    return str(obj or "")
+
+def get_festivals_for_day(
+    current_date: date,
+    lunar_month: str = "",
+    paksha: str = "",
+    tithi_num: int = 1,
+    sankranti_name: Optional[str] = None,
+    lang: str = "en"
+) -> List[Dict[str, Any]]:
+    
+    festivals: List[Dict[str, Any]] = []
+    l_key = get_language_key(lang)
+    lunar_month = str(lunar_month or "").strip()
+    paksha = str(paksha or "").strip()
+    m_d = (current_date.month, current_date.day)
+    s_name = normalize_sankranti_name(sankranti_name)
+
+    try:
+        tithi_num = int(tithi_num)
+    except (TypeError, ValueError):
+        tithi_num = 0
+
+    # ১. তিথিভিত্তিক সনাতন উৎসব
+    h_key = (lunar_month, paksha, tithi_num)
+    if h_key in HINDU_FESTIVAL_DATABASE:
+        item = HINDU_FESTIVAL_DATABASE[h_key]
+        append_festival_once(
+            festivals,
+            {
+                "name": item.get(l_key, item.get("en", "")),
+                "category": item.get("category", "hindu"),
+                "type": resolve_field(item.get("type"), l_key),
+                "icon": item.get("icon", "🕉️"),
+                "deity": resolve_field(item.get("deity"), l_key),
+                "description": resolve_field(item.get("description"), l_key),
+                "muhurta_type": item.get("muhurta_type", "pradosh"),
+                "muhurta_label": resolve_field(item.get("muhurta_label"), l_key),
+                "muhurta": ""
+            }
+        )
+
+    # ২. সর্বভারতীয় একাদশী ব্রত
+    if tithi_num == 11:
+        ekadashi_name = {"en": "Ekadashi Vrata / Fast", "hi": "एकादशी व्रत", "bn": "একাদশী ব্রত ও উপবাস"}
+        ekadashi_deity = {"en": "Lord Sri Hari Vishnu", "hi": "भगवान श्री हरि विष्णु", "bn": "ভগবান শ্রীহরি বিষ্ণু"}
+        ekadashi_desc = {
+            "en": "Sacred fasting day dedicated to Lord Vishnu to cleanse sins and attain spiritual devotion.",
+            "hi": "समस्त पापों के नाश एवं भगवान विष्णु की कृपा प्राप्ति हेतु पावन निर्जला/फलाहार व्रत।",
+            "bn": "ভগবান শ্রীহরি বিষ্ণুর প্রীত্যর্থে পাপক্ষয় ও আধ্যাত্মিক কল্যাণ কামনায় পরম পবিত্র উপবাস ব্রত।"
+        }
+        append_festival_once(
+            festivals,
+            {
+                "name": ekadashi_name[l_key],
+                "category": "hindu",
+                "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"}[l_key],
+                "icon": "🕉️",
+                "deity": ekadashi_deity[l_key],
+                "description": ekadashi_desc[l_key],
+                "muhurta_type": "brahma",
+                "muhurta_label": {"en": "Brahma Muhurta (Fast Sankalp)", "hi": "ब्रह्म मुहूर्त (व्रत संकल्प)", "bn": "ব্রাহ্ম মুহূর্ত (ব্রত সঙ্কল্প)"}[l_key],
+                "muhurta": ""
+            }
+        )
+
+    # ৩. মাসিক সংকষ্টী চতুর্থী
+    if tithi_num == 4 and paksha == "Krishna":
+        sankashti_name = {"en": "Sankashti Chaturthi Vrat", "hi": "संकष्टी चतुर्थी व्रत", "bn": "সংকষ্টী চতুর্থী ব্রত (চন্দ্রোদয় পূজা)"}
+        append_festival_once(festivals, {
+            "name": sankashti_name[l_key], "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"}[l_key],
+            "icon": "🐘", "deity": {"en": "Lord Ganesha & Chandra Deva", "hi": "भगवान श्री गणेश व चन्द्र देव", "bn": "শ্রী গণেশ ও চন্দ্র দেব"}[l_key],
+            "description": {
+                "en": "Fasting dedicated to Lord Ganesha to remove obstacles, broken after moonrise sighting.",
+                "hi": "विघ्नहर्ता भगवान गणेश का व्रत, जो रात्रि में चंद्र दर्शन व अर्घ्य के बाद खोला जाता है।",
+                "bn": "বিঘ্নবিনাশক শ্রী গণেশের উদ্দেশ্যে উপবাস এবং রাতে চন্দ্র দর্শন ও অর্ঘ্যদানের মাধ্যমে পারণ।"
+            }[l_key],
+            "muhurta_type": "sayankal", "muhurta_label": {"en": "Moonrise & Puja Time", "hi": "चन्द्रोदय व गणेश पूजन", "bn": "চন্দ্রোদয় ও গণেশ পূজা লগ্ন"}[l_key], "muhurta": ""
+        })
+
+    # ৪. মাসিক বিনায়ক চতুর্থী
+    elif tithi_num == 4 and paksha == "Shukla":
+        vinayaka_name = {"en": "Vinayaka Chaturthi Vrat", "hi": "विनायक चतुर्थी व्रत", "bn": "বিনায়ক চতুর্থী ব্রত (মধ্যাহ্ন পূজা)"}
+        append_festival_once(festivals, {
+            "name": vinayaka_name[l_key], "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"}[l_key],
+            "icon": "🐘", "deity": {"en": "Lord Ganesha (Vinayaka)", "hi": "भगवान श्री गणेश", "bn": "ভগবান শ্রী গণেশ"}[l_key],
+            "description": {
+                "en": "Monthly Shukla Chaturthi fast observing Madhyahna Ganesha Puja for wisdom and success.",
+                "hi": "बुद्धि व सिद्धि की प्राप्ति हेतु शुक्ल पक्ष की चतुर्थी पर मध्याह्न गणेश पूजन।",
+                "bn": "জ্ঞান, বুদ্ধি ও সর্বসিদ্ধির কামনায় শুক্লপক্ষের চতুর্থীতে মধ্যাহ্নকালে শ্রী গণেশ পূজা।"
+            }[l_key],
+            "muhurta_type": "madhyahna", "muhurta_label": {"en": "Madhyahna Puja Muhurta", "hi": "मध्याह्न गणेश पूजा", "bn": "মধ্যাহ্ন গণেশ পূজা মুহূর্ত"}[l_key], "muhurta": ""
+        })
+
+    # ৫. মাসিক কালাষ্টমী / ভৈরব অষ্টমী
+    elif tithi_num == 8 and paksha == "Krishna":
+        kalashtami_name = {"en": "Kalashtami / Bhairava Ashtami Vrat", "hi": "कालाष्टमी / भैरव अष्टमी व्रत", "bn": "কালাষ্টমী ব্রত (কালভৈরব পূজা)"}
+        append_festival_once(festivals, {
+            "name": kalashtami_name[l_key], "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"}[l_key],
+            "icon": "🔱", "deity": {"en": "Lord Kalabhairava & Shiva", "hi": "भगवान कालभैरव", "bn": "ভগবান কালভৈরব ও শিব"}[l_key],
+            "description": {
+                "en": "Monthly fasting dedicated to Lord Bhairava to eliminate fears, afflictions, and negativities.",
+                "hi": "समस्त भय, बाधा व संकटों के निवारण हेतु भगवान कालभैरव की विशेष रात्रि पूजा।",
+                "bn": "সর্বপ্রকার ভয় ও বিঘ্ন বিনাশের জন্য ভগবান কালভৈরবের বিশেষ পূজা ও উপবাস।"
+            }[l_key],
+            "muhurta_type": "nishita", "muhurta_label": {"en": "Nishita Kaal Puja", "hi": "निशीथ काल पूजा", "bn": "নিশীথ কাল ভৈরব পূজা"}[l_key], "muhurta": ""
+        })
+
+    # ৬. মাসিক দুর্গাশ্টমী
+    elif tithi_num == 8 and paksha == "Shukla":
+        durga_ashtami_name = {"en": "Masik Durgashtami Vrat", "hi": "मासिक दुर्गाष्टमी व्रत", "bn": "মাসিক দুর্গাশ্টমী ব্রত (দেবী দুর্গা পূজা)"}
+        append_festival_once(festivals, {
+            "name": durga_ashtami_name[l_key], "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"}[l_key],
+            "icon": "🔱", "deity": {"en": "Maa Durga", "hi": "माँ दुर्गा", "bn": "মা দুর্গা দেবী"}[l_key],
+            "description": {
+                "en": "Monthly fasting dedicated to Goddess Durga invoking strength, prosperity, and protection.",
+                "hi": "शक्ति, सामर्थ्य एवं परिवार की रक्षा हेतु शुक्ल पक्ष की अष्टमी पर माँ दुर्गा की विशेष पूजा।",
+                "bn": "পারিবারিক সমৃদ্ধি ও সুরক্ষার কামনায় প্রতি মাসের শুক্ল অষ্টমী তিথিতে মা দুর্গার বিশেষ পূজা।"
+            }[l_key],
+            "muhurta_type": "sandhi", "muhurta_label": {"en": "Sandhya / Pradosh Puja", "hi": "संध्या व प्रदोष काल", "bn": "সন্ধ্যা ও প্রদোষ লগ্ন"}[l_key], "muhurta": ""
+        })
+
+    # ৭. মাসিক স্কন্দ ষষ্ঠী ব্রত
+    elif tithi_num == 6 and paksha == "Shukla":
+        skanda_name = {"en": "Masik Skanda Sasthi Vrat", "hi": "मासिक स्कंद षष्ठी व्रत", "bn": "মাসিক স্কন্দ ষষ্ঠী ব্রত (কার্তিক পূজা)"}
+        append_festival_once(festivals, {
+            "name": skanda_name[l_key], "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"}[l_key],
+            "icon": "🦚", "deity": {"en": "Lord Kartikeya (Murugan)", "hi": "भगवान कार्तिकेय (मुरुगन)", "bn": "ভগবান কার্তিকেয় (মুরুগান)"}[l_key],
+            "description": {
+                "en": "Fast observed for health, courage, and offspring dedicated to Lord Skanda.",
+                "hi": "संतान सुख व आरोग्यता की प्राप्ति हेतु भगवान कार्तिकेय (स्कंद) का पावन षष्ठी व्रत।",
+                "bn": "সুস্বাস্থ্য, সাহস ও সন্তান কামনায় দেব সেনাপতি ভগবান কার্তিকেয়ের ষষ্ঠী ব্রত।"
+            }[l_key],
+            "muhurta_type": "purvahna", "muhurta_label": {"en": "Purvahna Puja", "hi": "पूर्वाह्न काल", "bn": "পূর্বাহ্ন কাল পূজা"}[l_key], "muhurta": ""
+        })
+
+    # ৮. মাসিক শিবরাত্রি
+    elif tithi_num == 14 and paksha == "Krishna":
+        shivratri_name = {"en": "Masik Shivratri Vrat", "hi": "मासिक शिवरात्रि व्रत", "bn": "মাসিক শিবরাত্রি ব্রত (নিশীথ পূজা)"}
+        append_festival_once(festivals, {
+            "name": shivratri_name[l_key], "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"}[l_key],
+            "icon": "🔱", "deity": {"en": "Lord Shiva", "hi": "भगवान शिव", "bn": "দেবাদিদেব মহাদেব"}[l_key],
+            "description": {
+                "en": "Monthly Shivratri fasting observed with midnight Shiva Lingam worship for liberation.",
+                "hi": "मनोकामना पूर्ति एवं कष्ट निवारण हेतु मध्यरात्रि में भगवान शिव का जलाभिषेक व व्रत।",
+                "bn": "মনোবাঞ্ছা পূরণ ও সর্বক্লেশ মুক্তির উদ্দেশ্যে নিশীথ কালে শিবলিঙ্গে জলাভিষেক ও উপবাস।"
+            }[l_key],
+            "muhurta_type": "nishita", "muhurta_label": {"en": "Nishita Midnight Puja", "hi": "निशीथ काल मुहूर्त", "bn": "নিশীথ काल পূজা মুহূর্ত"}[l_key], "muhurta": ""
+        })
+
+    # ৯. দর্শ অমাবস্যা ও পিতৃ তর্পণ
+    elif (tithi_num == 15 and paksha == "Krishna") or tithi_num == 30:
+        amavasya_name = {"en": "Darsha Amavasya / Pitru Tarpan", "hi": "दर्श अमावस्या / पितृ तर्पण", "bn": "দর্শ অমাবস্যা / পিতৃপুরুষের তর্পণ ও দান"}
+        append_festival_once(festivals, {
+            "name": amavasya_name[l_key], "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ও তর্পণ"}[l_key],
+            "icon": "🌑", "deity": {"en": "Pitru Devas & Lord Shiva", "hi": "पितृ देव व भगवान शिव", "bn": "পিতৃপুরুষ ও মহাদেব"}[l_key],
+            "description": {
+                "en": "Monthly Amavasya day for offering sacred water oblation (tarpan) and charity for ancestors' peace.",
+                "hi": "पूर्वजों की शांति व तृप्ति हेतु पवित्र जल तर्पण, अन्नदान एवं पुण्य स्नान का दिन।",
+                "bn": "পিতৃপুরুষের আত্মার তৃপ্তির উদ্দেশ্যে পবিত্র তর্পণ, দান ও মহাদেবের অর্চনা।"
+            }[l_key],
+            "muhurta_type": "aparahna", "muhurta_label": {"en": "Aparahna (Tarpan)", "hi": "अपराह्न तर्पण काल", "bn": "অপরাহ্ন তর্পণ লগ্ন"}[l_key], "muhurta": ""
+        })
+
+    # ১০. প্রদোষ ব্রত
+    elif tithi_num == 13:
+        pradosh_name = {"en": "Pradosh Vrata", "hi": "प्रदोष व्रत", "bn": "প্রদোষ ব্রত"}
+        pradosh_deity = {"en": "Lord Shiva", "hi": "भगवान शिव", "bn": "ভগবান দেবাদিদেব মহাদেব"}
+        pradosh_desc = {
+            "en": "Twilight worship of Lord Shiva to attain peace, health, and freedom from distress.",
+            "hi": "संध्याकाल (प्रदोष काल) में भगवान शिव की आराधना से सुख, आरोग्य एवं संकट मुक्ति।",
+            "bn": "সন্ধ্যাবেলায় দেবাদিদেব মহাদেবের আরাধনা করে সর্বসংকট মুক্তি ও মানসিক শান্তি লাভের ব্রত।"
+        }
+        append_festival_once(
+            festivals,
+            {
+                "name": pradosh_name[l_key],
+                "category": "hindu",
+                "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"}[l_key],
+                "icon": "🔱",
+                "deity": pradosh_deity[l_key],
+                "description": pradosh_desc[l_key],
+                "muhurta_type": "pradosh",
+                "muhurta_label": {"en": "Pradosh Kaal Muhurta", "hi": "प्रदोष काल मुहूर्त", "bn": "প্রদোষ কাল মুহূর্ত (সন্ধ্যাবেলা)"}[l_key],
+                "muhurta": ""
+            }
+        )
+
+    # ১১. সত্যনারায়ণ পূজা
+    elif tithi_num == 15 and paksha == "Shukla":
+        purnima_name = {"en": "Purnima Vrata / Sri Satyanarayan Puja", "hi": "पूर्णिमा व्रत / श्री सत्यनारायण पूजा", "bn": "পূর্ণিমা ব্রত / শ্রী সত্যনারায়ণ পূজা"}
+        purnima_deity = {"en": "Lord Sri Satyanarayan (Vishnu)", "hi": "भगवान श्री सत्यनारायण", "bn": "শ্রী সত্যনারায়ণ নারায়ণ"}
+        purnima_desc = {
+            "en": "Offering Panchamrit, Shinni bhog, and Katha to Lord Satyanarayan on full moon.",
+            "hi": "श्री सत्यनारायण भगवान का पंचामृत भोग, कथा श्रवण एवं पूर्णिमा चंद्र दर्शन।",
+            "bn": "শ্রীশ্রী সত্যনারায়ণ দেবের পঞ্চামৃত সিন্নি ভোগ, মাহাত্ম্য কথা শ্রবণ ও পূর্ণিমা উপবাস।"
+        }
+        append_festival_once(
+            festivals,
+            {
+                "name": purnima_name[l_key],
+                "category": "hindu",
+                "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"}[l_key],
+                "icon": "🌕",
+                "deity": purnima_deity[l_key],
+                "description": purnima_desc[l_key],
+                "muhurta_type": "pradosh",
+                "muhurta_label": {"en": "Pradosh Kaal (Katha & Puja)", "hi": "प्रदोष काल (कथा व पूजन)", "bn": "প্রদোষ কাল (সন্ধ্যায় সিন্নি ভোগ ও কথা)"}[l_key],
+                "muhurta": ""
+            }
+        )
+
+    # ১২. সৌর সংক্রান্তি
+    if m_d == (1, 14) or ("makar" in s_name or "capricorn" in s_name):
+        makar_names = {"en": "Makar Sankranti / Pongal / Poush Parbon", "hi": "मकर संक्रांति / पोंगल", "bn": "মকর সংক্রান্তি / পৌষ সংক্রান্তি / পৌষ পার্বণ ও গঙ্গাসাগর স্নান"}
+        makar_deity = {"en": "Surya Deva", "hi": "भगवान सूर्य देव", "bn": "ভগবান সূর্য দেব"}
+        makar_desc = {
+            "en": "Sun transits into Capricorn (Makara) marking the auspicious Uttarayana, observed with Gangasagar snan and sesame charity.",
+            "hi": "सूर्य का मकर राशि में प्रवेश, उत्तरायण आरंभ एवं गंगासागर महास्नान व तिल-गुड़ दान का महापर्व।",
+            "bn": "সূর্যের মকর রাশিতে উত্তরায়ণ গমন, গঙ্গাসাগর তীর্থে পুণ্যস্নান ও নতুন শস্যের পিঠেপুলির পৌষ পার্বণ।"
+        }
+        append_festival_once(festivals, {
+            "name": makar_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "☀️", "deity": makar_deity[l_key], "description": makar_desc[l_key],
+            "muhurta_type": "sunrise_snan", "muhurta_label": {"en": "Makara Sankranti Punya Kaal", "hi": "मकर संक्रांति पुण्य काल", "bn": "মকর সংক্রান্তি পুণ্যকাল স্নান ও দান"}[l_key], "muhurta": ""
+        })
+
+    elif m_d == (2, 13) or ("kumbha" in s_name or "aquarius" in s_name):
+        kumbha_names = {"en": "Kumbha Sankranti / Phalguna Sankranti", "hi": "कुम्भ संक्रांति", "bn": "কুম্ভ সংক্রান্তি / ফাল্গুন সংক্রান্তি মহাতীর্থ স্নান"}
+        kumbha_deity = {"en": "Surya Deva & Lord Shiva", "hi": "भगवान सूर्य व शिव जी", "bn": "ভগবান সূর্য দেব ও মহাদেব"}
+        kumbha_desc = {
+            "en": "Sun enters Aquarius (Kumbha Rashi), highly auspicious for sacred snan and charity.",
+            "hi": "सूर्य का कुम्भ राशि में प्रवेश, पवित्र तीर्थ स्नान एवं अन्न-वस्त्र दान का पावन दिन।",
+            "bn": "সূর্যের কুম্ভ রাশিতে শুভ প্রবেশ, গঙ্গা ও পুণ্যতীর্থ স্নান এবং দানকার্যের শ্রেষ্ঠ লগ্ন।"
+        }
+        append_festival_once(festivals, {
+            "name": kumbha_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "☀️", "deity": kumbha_deity[l_key], "description": kumbha_desc[l_key],
+            "muhurta_type": "sunrise_snan", "muhurta_label": {"en": "Kumbha Sankranti Punya Kaal", "hi": "कुम्भ संक्रांति पुण्य काल", "bn": "কুম্ভ সংক্রান্তি পুণ্যকাল স্নান ও দান"}[l_key], "muhurta": ""
+        })
+
+    elif m_d == (3, 15) or ("meena" in s_name or "pisces" in s_name):
+        meena_names = {"en": "Meena Sankranti", "hi": "मीन संक्रांति", "bn": "মীন সংক্রান্তি পুণ্যস্নান ও দান"}
+        meena_deity = {"en": "Surya Deva", "hi": "भगवान सूर्य देव", "bn": "ভগবান সূর্য দেব"}
+        meena_desc = {
+            "en": "Sun transits into Pisces (Meena Rashi), highly auspicious for holy dip and charity.",
+            "hi": "सूर्य का मीन राशि में प्रवेश, पवित्र नदियों में स्नान एवं पुण्य दान का विशेष दिन।",
+            "bn": "সূর্যের মীন রাশিতে শুভ সংক্রমণ, পবিত্র গঙ্গাস্নান ও পুণ্য অর্জনের লগ্ন।"
+        }
+        append_festival_once(festivals, {
+            "name": meena_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "☀️", "deity": meena_deity[l_key], "description": meena_desc[l_key],
+            "muhurta_type": "sunrise_snan", "muhurta_label": {"en": "Meena Sankranti Punya Kaal", "hi": "मीन संक्रांति पुण्य काल", "bn": "মীন সংক্রান্তি পুণ্যকাল স্নান ও দান"}[l_key], "muhurta": ""
+        })
+
+    elif m_d == (4, 14):
+        nil_names = {"en": "Nil Puja / Charak Puja (Chaitra Sankranti)", "hi": "नील पूजा / चरक पूजा (चैत्र संक्रांति)", "bn": "শ্রী শ্রী নীল পূজা / চড়ক পূজা (চৈত্র সংক্রান্তি)"}
+        nil_deity = {"en": "Lord Shiva & Maa Nilavati", "hi": "भगवान शिव व माँ लीलावती", "bn": "দেবাদিদেব শিব ও নীলবতী মাতা"}
+        nil_desc = {
+            "en": "Worship of Lord Shiva and Maa Nilavati on the last day of the Bengali solar year.",
+            "hi": "वर्ष के अंतिम दिन संक्रांति पर भगवान शिव एवं माँ नीलावती की कठिन तपस्या व चरक पूजन।",
+            "bn": "চৈত্র সংক্রান্তিতে সন্তানের মঙ্গল কামনায় নীলবতী দেবী ও শিবের উপবাস এবং চড়কের বহ্নিপূজা।"
+        }
+        append_festival_once(festivals, {
+            "name": nil_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "🔱", "deity": nil_deity[l_key], "description": nil_desc[l_key],
+            "muhurta_type": "pradosh", "muhurta_label": {"en": "Pradosh Kaal", "hi": "प्रदोष काल", "bn": "প্রদোষ কাল"}[l_key], "muhurta": ""
+        })
+
+    elif m_d == (4, 15) or ("mesha" in s_name or "aries" in s_name):
+        mesha_names = {"en": "Mesha Sankranti / Poila Boishakh", "hi": "मेष संक्रांति / पोइला बैशाख", "bn": "পয়লা বৈশাখ / মেষ সংক্রান্তি (শুভ নববর্ষ)"}
+        mesha_deity = {"en": "Surya Deva & Ganesha", "hi": "सूर्य देव व गणेश जी", "bn": "ভগবান সূর্য দেব ও শ্রী গণেশ"}
+        mesha_desc = {
+            "en": "Solar New Year marking Sun's entry into Aries, opening new business ledgers (Hal Khata).",
+            "hi": "सूर्य का मेष राशि में प्रवेश, सौर नववर्षारंभ एवं नए व्यापारिक बहीखातों का पूजन।",
+            "bn": "মেষ রাশিতে সূর্যের শুভ প্রবেশ, বাংলা সৌর নববর্ষ উদযাপন ও ব্যবসায়িক শুভ হালখাতা পূজা।"
+        }
+        append_festival_once(festivals, {
+            "name": mesha_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "🌾", "deity": mesha_deity[l_key], "description": mesha_desc[l_key],
+            "muhurta_type": "purvahna", "muhurta_label": {"en": "Purvahna Kaal (Morning Puja)", "hi": "पूर्वाह्न काल (प्रातः पूजा)", "bn": "পূর্বাহ্ন কাল (সকালবেলা পূজা)"}[l_key], "muhurta": ""
+        })
+
+    elif m_d == (5, 15) or ("vrishabha" in s_name or "taurus" in s_name):
+        vrish_names = {"en": "Vrishabha Sankranti", "hi": "वृषभ संक्रांति", "bn": "বৃষ সংক্রান্তি মহাতীর্থ স্নান ও দান"}
+        vrish_deity = {"en": "Surya Deva", "hi": "भगवान सूर्य देव", "bn": "ভগবান সূর্য দেব"}
+        vrish_desc = {
+            "en": "Sun transits into Taurus (Vrishabha Rashi), highly sacred for holy water oblations.",
+            "hi": "सूर्य का वृषभ राशि में प्रवेश, पवित्र तीर्थ स्नान एवं गौ-दान का विशेष पावन दिन।",
+            "bn": "সূর্যের বৃষ রাশিতে শুভ সংক্রমণ, পুণ্যতীর্থ স্নান ও গো-দানের শ্রেষ্ঠ দিন।"
+        }
+        append_festival_once(festivals, {
+            "name": vrish_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "☀️", "deity": vrish_deity[l_key], "description": vrish_desc[l_key],
+            "muhurta_type": "sunrise_snan", "muhurta_label": {"en": "Vrishabha Sankranti Punya Kaal", "hi": "वृषभ संक्रांति पुण्य काल", "bn": "বৃষ সংক্রান্তি পুণ্যকাল স্নান"}[l_key], "muhurta": ""
+        })
+
+    elif m_d == (6, 15) or ("mithuna" in s_name or "gemini" in s_name):
+        mithuna_names = {"en": "Mithuna Sankranti / Raja Parba", "hi": "मिथुन संक्रांति / राजा पर्ब", "bn": "মিথুন সংক্রান্তি / রাজা পর্ব (ভূদেবী পূজা)"}
+        mithuna_deity = {"en": "Surya Deva & Mother Earth", "hi": "भगवान सूर्य व भूदेवी", "bn": "ভগবান সূর্য দেব ও ধরিত্রী মাতা"}
+        mithuna_desc = {
+            "en": "Sun enters Gemini (Mithuna Rashi), celebrated as agricultural festivity honoring Mother Earth.",
+            "hi": "सूर्य का मिथुन राशि में प्रवेश, धरती माता के सत्कार एवं नवीन कृषि उत्सव (राजा पर्ब) का पावन दिन।",
+            "bn": "সূর্যের মিথুন রাশিতে শুভ সংক্রমণ এবং ধরিত্রী মাতার উর্বরতা কামনায় ঐতিহ্যবাহী ভূদেবী পূজা।"
+        }
+        append_festival_once(festivals, {
+            "name": mithuna_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "☀️", "deity": mithuna_deity[l_key], "description": mithuna_desc[l_key],
+            "muhurta_type": "sunrise_snan", "muhurta_label": {"en": "Mithuna Sankranti Punya Kaal", "hi": "मिथुन संक्रांति पुण्य काल", "bn": "মিথুন সংক্রান্তি পুণ্যকাল স্নান ও দান"}[l_key], "muhurta": ""
+        })
+
+    elif m_d == (7, 16) or m_d == (7, 17) or ("karka" in s_name or "cancer" in s_name):
+        karka_names = {"en": "Karka Sankranti / Dakshinayana Begins", "hi": "कर्क संक्रांति / दक्षिणायन प्रारंभ", "bn": "কর্কট সংক্রান্তি (সূর্যের দক্ষিণায়ন গমন)"}
+        karka_deity = {"en": "Surya Deva & Lord Vishnu", "hi": "भगवान सूर्य व श्री हरि", "bn": "ভগবান সূর্য দেব ও শ্রীহরি নারায়ণ"}
+        karka_desc = {
+            "en": "Sun transits into Cancer (Karka Rashi) marking the start of Dakshinayana, dedicated to Pitru tarpan.",
+            "hi": "सूर्य का कर्क राशि में प्रवेश, देवताओं की रात्रि (दक्षिणायन) का आरंभ एवं पवित्र स्नान-दान दिवस।",
+            "bn": "সূর্যের কর্কট রাশিতে প্রবেশ ও ৬ মাসব্যাপী দক্ষিণায়নের সূচনা; পিতৃপুরুষের তর্পণে পুণ্যফলদায়ী লগ্ন।"
+        }
+        append_festival_once(festivals, {
+            "name": karka_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "☀️", "deity": karka_deity[l_key], "description": karka_desc[l_key],
+            "muhurta_type": "sunrise_snan", "muhurta_label": {"en": "Karka Sankranti Punya Kaal", "hi": "कर्क संक्रांति पुण्य काल", "bn": "কর্কট সংক্রান্তি পুণ্যকাল স্নান ও দান"}[l_key], "muhurta": ""
+        })
+
+    elif m_d == (8, 17) or ("simha" in s_name or "leo" in s_name):
+        simha_names = {"en": "Simha Sankranti / Main Manasa Puja", "hi": "सिंह संक्रांति / मुख्य मनसा पूजा", "bn": "সিংহ সংক্রান্তি / প্রধান শ্রী শ্রী মনসা পূজা"}
+        simha_deity = {"en": "Surya Deva & Maa Manasa", "hi": "भगवान सूर्य व माँ मनसा", "bn": "ভগবান সূর্য দেব ও মা মনসা দেবী"}
+        simha_desc = {
+            "en": "Sun transits into Leo (Simha Rashi) and annual worship of Goddess Manasa in Bengal and Assam.",
+            "hi": "सूर्य का सिंह राशि में प्रवेश एवं बंगाल व असम में माँ मनसा की प्रधान वार्षिक महापूजा।",
+            "bn": "সূর্যের সিংহ রাশিতে সংক্রমণ এবং সর্পভয়নাশিনী মা মনসার বার্ষিক মহোৎসব ও পূজা সমাপন।"
+        }
+        append_festival_once(festivals, {
+            "name": simha_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "🐍", "deity": simha_deity[l_key], "description": simha_desc[l_key],
+            "muhurta_type": "purvahna", "muhurta_label": {"en": "Simha Sankranti Punya Kaal", "hi": "सिंह संक्रांति पुण्य काल", "bn": "সিংহ সংক্রান্তি পুণ্যকাল"}[l_key], "muhurta": ""
+        })
+
+    elif m_d == (9, 17) or ("kanya" in s_name or "virgo" in s_name):
+        kanya_names = {"en": "Kanya Sankranti / Vishwakarma Puja", "hi": "कन्या संक्रांति / विश्वकर्मा पूजा", "bn": "কন্যা সংক্রান্তি / শ্রী শ্রী বিশ্বকর্মা পূজা"}
+        kanya_deity = {"en": "Lord Vishwakarma", "hi": "भगवान विश्वकर्मा", "bn": "দেবশিল্পী শ্রী শ্রী বিশ্বকর্মা"}
+        kanya_desc = {
+            "en": "Worship of the divine celestial architect and craftsman, Lord Vishwakarma, in factories and workshops.",
+            "hi": "दिव्य वास्तुकार भगवान विश्वकर्मा का यंत्रों, कारखानों व शिल्प संस्थानों में विधिपूर्वक पूजन।",
+            "bn": "দেবশিল্পী বিশ্বকর্মার চরণে শিল্প, কলকারখানা ও যন্ত্রপাতির সমৃদ্ধির কামনায় বিশেষ অর্ঘ্য নিবেদন।"
+        }
+        append_festival_once(festivals, {
+            "name": kanya_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "⚙️", "deity": kanya_deity[l_key], "description": kanya_desc[l_key],
+            "muhurta_type": "purvahna", "muhurta_label": {"en": "Purvahna & Abhijit Muhurta", "hi": "पूर्वाह्न व अभिजित मुहूर्त", "bn": "পূর্বাহ্ন ও অভিজিৎ মুহূর্ত"}[l_key], "muhurta": ""
+        })
+
+    elif m_d == (10, 17) or ("tula" in s_name or "libra" in s_name):
+        tula_names = {"en": "Tula Sankranti / Garbhana Sankranti", "hi": "तुला संक्रांति / गर्भाना संक्रांति", "bn": "তুলা সংক্রান্তি / গর্ভণা সংক্রান্তি ও ডাক সংক্রান্তি"}
+        tula_deity = {"en": "Surya Deva & Maa Lakshmi", "hi": "भगवान सूर्य व माँ लक्ष्मी", "bn": "ভগবান সূর্য দেব ও মা লক্ষ্মী"}
+        tula_desc = {
+            "en": "Sun transits into Libra (Tula Rashi), celebrated with holy river baths and harvest prayers.",
+            "hi": "सूर्य का तुला राशि में संक्रमण, कावेरी तीर्थ स्नान एवं नवीन धान्य समृद्धि का पावन दिन।",
+            "bn": "সূর্যের তুলা রাশিতে শুভ সংক্রমণ, তীর্থস্নান এবং ধানের শীষে সমৃদ্ধি কামনায় বিশেষ অর্চনা।"
+        }
+        append_festival_once(festivals, {
+            "name": tula_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "☀️", "deity": tula_deity[l_key], "description": tula_desc[l_key],
+            "muhurta_type": "purvahna", "muhurta_label": {"en": "Tula Sankranti Punya Kaal", "hi": "तुला संक्रांति पुण्य काल", "bn": "তুলা সংক্রান্তি পুণ্যকাল"}[l_key], "muhurta": ""
+        })
+
+    # ১৩. ডায়নামিক আন্তর্জাতিক রবিবার ভিত্তিক দিবস
+    if current_date.weekday() == 6:
+        if current_date.month == 5 and 8 <= current_date.day <= 14:
+            append_festival_once(festivals, {
+                "name": {"en": "Mother's Day", "hi": "मातृ दिवस (मदर्स डे)", "bn": "বিশ্ব মা দিবস (মাদার্স ডে)"}[l_key],
+                "category": "world", "type": {"en": "Observance", "hi": "अंतर्राष्ट्रीय दिवस", "bn": "আন্তর্জাতিক দিবস"}[l_key],
+                "icon": "👩‍👧‍👦", "deity": {"en": "Motherhood", "hi": "मातृ शक्ति", "bn": "মাতৃশক্তি"}[l_key],
+                "description": {"en": "Honouring motherhood and maternal bonds.", "hi": "मातृ प्रेम व समर्पण के सम्मान का दिन।", "bn": "মায়েদের নিঃস্বার্থ স্নেহ, মমতা ও ভালোবাসার প্রতি শ্রদ্ধার্ঘ্য।"}[l_key],
+                "muhurta": {"en": "All Day Celebration", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}[l_key]
+            })
+        elif current_date.month == 6 and 15 <= current_date.day <= 21:
+            append_festival_once(festivals, {
+                "name": {"en": "Father's Day", "hi": "पितृ दिवस (फादर्स डे)", "bn": "বিশ্ব বাবা দিবস (ফাদার্স ডে)"}[l_key],
+                "category": "world", "type": {"en": "Observance", "hi": "अंतर्राष्ट्रीय दिवस", "bn": "আন্তর্জাতিক দিবস"}[l_key],
+                "icon": "👨‍👧‍👦", "deity": {"en": "Fatherhood", "hi": "पितृ शक्ति", "bn": "পিতৃশক্তি"}[l_key],
+                "description": {"en": "Honouring fatherhood and paternal contributions.", "hi": "पिता के त्याग व मार्गदर्शन के प्रति सम्मान का दिन।", "bn": "বাবার ত্যাগ, নিষ্ঠা ও ভালোবাসার প্রতি গভীর শ্রদ্ধা নিবেদনের দিন।"}[l_key],
+                "muhurta": {"en": "All Day Celebration", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}[l_key]
+            })
+        elif current_date.month == 8 and current_date.day <= 7:
+            append_festival_once(festivals, {
+                "name": {"en": "International Friendship Day", "hi": "अंतर्राष्ट्रीय मित्रता दिवस (फ्रेंडशिप डे)", "bn": "আন্তর্জাতিক বন্ধু দিবস (ফ্রেন্ডশিপ ডে)"}[l_key],
+                "category": "world", "type": {"en": "Global Celebration", "hi": "अंतर्राष्ट्रीय पर्व", "bn": "আন্তর্জাতিক উৎসব"}[l_key],
+                "icon": "🤝", "deity": {"en": "Companionship", "hi": "मित्रता", "bn": "বন্ধুত্ব"}[l_key],
+                "description": {"en": "Celebrating the enduring spirit of friendship and mutual support.", "hi": "सच्ची मित्रता एवं सद्भाव को समर्पित पावन दिवस।", "bn": "সত্যিকারের বন্ধুত্ব ও ভ্রাতৃত্বের মেলবন্ধন উদযাপনের বিশেষ দিন।"}[l_key],
+                "muhurta": {"en": "All Day Celebration", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}[l_key]
+            })
+
+    # ১৪. ভারতীয় জাতীয় দিবস
+    if m_d in INDIAN_NATIONAL_HOLIDAYS:
+        nat = INDIAN_NATIONAL_HOLIDAYS[m_d]
+        append_festival_once(
+            festivals,
+            {
+                "name": nat[l_key],
+                "category": nat.get("category", "national"),
+                "type": resolve_field(nat.get("type"), l_key),
+                "icon": nat.get("icon", "🇮🇳"),
+                "deity": resolve_field(nat.get("deity"), l_key),
+                "description": resolve_field(nat.get("description"), l_key),
+                "muhurta": resolve_field(nat.get("muhurta"), l_key)
+            }
+        )
+
+    # ১৫. আন্তর্জাতিক দিবস
+    if m_d in FIXED_WORLD_CHRISTIAN_DAYS:
+        world_day = FIXED_WORLD_CHRISTIAN_DAYS[m_d]
+        append_festival_once(
+            festivals,
+            {
+                "name": world_day[l_key],
+                "category": world_day.get("category", "world"),
+                "type": resolve_field(world_day.get("type"), l_key),
+                "icon": world_day.get("icon", "🌍"),
+                "deity": resolve_field(world_day.get("deity"), l_key),
+                "description": resolve_field(world_day.get("description"), l_key),
+                "muhurta": resolve_field(world_day.get("muhurta"), l_key)
+            }
+        )
+
+    # ১৬. পরিবর্তনশীল দিবস
+    full_date_key = (current_date.year, current_date.month, current_date.day)
+    if full_date_key in VARIABLE_RELIGIOUS_DAYS:
+        rel = VARIABLE_RELIGIOUS_DAYS[full_date_key]
+        append_festival_once(
+            festivals,
+            {
+                "name": rel[l_key],
+                "category": rel.get("category", "hindu" if "hindu" in rel.get("category", "") else "religious"),
+                "type": resolve_field(rel.get("type"), l_key),
+                "icon": rel.get("icon", "🕉️"),
+                "deity": resolve_field(rel.get("deity"), l_key),
+                "description": resolve_field(rel.get("description"), l_key),
+                "muhurta": resolve_field(rel.get("muhurta"), l_key)
+            }
+        )
+
+    return festivals
+
+# ==============================================================================
+# ডায়নামিক মুহূর্ত গণক
+# ==============================================================================
+def compute_dynamic_festival_muhurta(festival_name: str, festival_type: str, sunrise_min: int, sunset_min: int, lang: str = "bn") -> dict:
+    dina_mana = sunset_min - sunrise_min
+    if dina_mana <= 0:
+        dina_mana += 1440
+    ratri_mana = 1440 - dina_mana
+
+    def min_to_12hr(m: int) -> str:
+        m = int(m % 1440)
+        hh = m // 60
+        mm = m % 60
+        period = "AM" if hh < 12 else "PM"
+        hh_12 = hh % 12
+        if hh_12 == 0:
+            hh_12 = 12
+        time_str = f"{hh_12:02d}:{mm:02d} {period}"
+        if lang == "bn":
+            bangla_digits = str.maketrans("0123456789", "০১২৩৪৫৬৭৮৯")
+            return time_str.translate(bangla_digits)
+        elif lang == "hi":
+            hindi_digits = str.maketrans("0123456789", "०१२३४५६७८९")
+            return time_str.translate(hindi_digits)
+        return time_str
+
+    fn_lower = festival_name.lower()
+    
+    # বিনায়ক চতুর্থী (দুপুরবেলা / মধ্যাহ্ন কাল)
+    if "vinayaka" in fn_lower or "ganesh" in fn_lower or "চতুর্থী" in fn_lower or "चतुर्थी" in fn_lower:
+        start_min = sunrise_min + (dina_mana * 2 / 5.0)
+        end_min = sunrise_min + (dina_mana * 3 / 5.0)
+        type_labels = {
+            "bn": "মধ্যাহ্ন গণেশ পূজা মুহূর্ত (দুপুরবেলা)",
+            "hi": "मध्याह्न गणेश पूजा मुहूर्त (दोपहर)",
+            "en": "Madhyahna Ganesha Puja Muhurta (Afternoon)"
+        }
+        label_text = {"bn": "শুভ মুহূর্ত:", "hi": "शुभ मुहूर्त:", "en": "Auspicious Timing:"}
+        return {
+            "label": label_text.get(lang, "Auspicious Timing:"),
+            "muhurta_type": type_labels.get(lang, type_labels["en"]),
+            "start_time": min_to_12hr(start_min),
+            "end_time": min_to_12hr(end_min),
+            "formatted_display": f"{type_labels.get(lang, type_labels['en'])} ({min_to_12hr(start_min)} - {min_to_12hr(end_min)})"
+        }
+        
+    # লোহড়ী বহ্নিপূজা ও প্রদোষ মুহূর্ত
+    elif "lohri" in fn_lower or "লোহড়ী" in fn_lower or "लोहड़ी" in fn_lower:
+        start_min = sunset_min
+        end_min = sunset_min + 144
+        type_labels = {
+            "bn": "লোহড়ী বহ্নি প্রজ্বলন ও প্রদোষ লগ্ন",
+            "hi": "लोहड़ी अग्नि पूजन व प्रदोष काल",
+            "en": "Lohri Bonfire & Pradosha Muhurta"
+        }
+        label_text = {"bn": "শুভ মুহূর্ত:", "hi": "शुभ मुहूर्त:", "en": "Auspicious Timing:"}
+        return {
+            "label": label_text.get(lang, "Auspicious Timing:"),
+            "muhurta_type": type_labels.get(lang, type_labels["en"]),
+            "start_time": min_to_12hr(start_min),
+            "end_time": min_to_12hr(end_min),
+            "formatted_display": f"{type_labels.get(lang, type_labels['en'])} ({min_to_12hr(start_min)} - {min_to_12hr(end_min)})"
+        }    
+
+    # শিবরাত্রি / মাসিক শিবরাত্রি (নিশীথ কাল / মধ্যরাত্রি)
+    elif "shivratri" in fn_lower or "শিবরাত্রি" in fn_lower or "शिवरात्रि" in fn_lower:
+        solar_midnight = sunset_min + (ratri_mana / 2.0)
+        start_min = solar_midnight - 24
+        end_min = solar_midnight + 24
+        type_labels = {
+            "bn": "নিশীথ কাল পূজা মুহূর্ত (রাত্রিবেলা)",
+            "hi": "निशीथ काल पूजा मुहूर्त (रात्रि)",
+            "en": "Nishita Kala Shiva Puja Muhurta (Night)"
+        }
+        label_text = {"bn": "পূজার শুভ মুহূর্ত:", "hi": "पूजा का शुभ मुहूर्त:", "en": "Puja Muhurta:"}
+        return {
+            "label": label_text.get(lang, "Puja Muhurta:"),
+            "muhurta_type": type_labels.get(lang, type_labels["en"]),
+            "start_time": min_to_12hr(start_min),
+            "end_time": min_to_12hr(end_min),
+            "formatted_display": f"{type_labels.get(lang, type_labels['en'])} ({min_to_12hr(start_min)} - {min_to_12hr(end_min)})"
+        }
+
+    # প্রদোষ ব্রত / সত্যনারায়ণ পূজা / সন্ধ্যা পূজা
+    elif "pradosh" in fn_lower or "প্রদোষ" in fn_lower or "satyanarayan" in fn_lower or "সত্যনারায়ণ" in fn_lower:
+        start_min = sunset_min
+        end_min = sunset_min + 144
+        type_labels = {
+            "bn": "প্রদোষ কাল (সন্ধ্যাবেলা)",
+            "hi": "प्रदोष काल (संध्या)",
+            "en": "Pradosh Kala Muhurta (Evening)"
+        }
+        label_text = {"bn": "পূজার শুভ মুহূর্ত:", "hi": "पूजा का शुभ मुहूर्त:", "en": "Puja Muhurta:"}
+        return {
+            "label": label_text.get(lang, "Puja Muhurta:"),
+            "muhurta_type": type_labels.get(lang, type_labels["en"]),
+            "start_time": min_to_12hr(start_min),
+            "end_time": min_to_12hr(end_min),
+            "formatted_display": f"{type_labels.get(lang, type_labels['en'])} ({min_to_12hr(start_min)} - {min_to_12hr(end_min)})"
+        }
+
+    # সাধারণ শুভ মুহূর্ত
+    else:
+        one_muhurta = dina_mana / 15.0
+        start_min = sunrise_min + (7 * one_muhurta)
+        end_min = sunrise_min + (8 * one_muhurta)
+        type_labels = {
+            "bn": "অভিজিৎ শুভ মুহূর্ত (দুপুরবেলা)",
+            "hi": "अभिजित शुभ मुहूर्त (दोपहर)",
+            "en": "Abhijit Auspicious Muhurta"
+        }
+        label_text = {"bn": "শুভ মুহূর্ত:", "hi": "शुभ मुहूर्त:", "en": "Auspicious Timing:"}
+        return {
+            "label": label_text.get(lang, "Auspicious Timing:"),
+            "muhurta_type": type_labels.get(lang, type_labels["en"]),
+            "start_time": min_to_12hr(start_min),
+            "end_time": min_to_12hr(end_min),
+            "formatted_display": f"{type_labels.get(lang, type_labels['en'])} ({min_to_12hr(start_min)} - {min_to_12hr(end_min)})"
+        }
