@@ -3252,6 +3252,38 @@ def get_festivals_for_day(
             }
         )
 
+    # ভানু সপ্তমী (যেকোনো সপ্তমী তিথি যদি রবিবারে পড়ে)
+    if tithi_num == 7 and current_date.weekday() == 6:
+        bhanu_name = {"en": "Bhanu Saptami (Surya Saptami)", "hi": "भानु सप्तमी (सूर्य सप्तमी)", "bn": "পবিত্র ভানু সপ্তমী মহাতর্পণ"}
+        append_festival_once(festivals, {
+            "name": bhanu_name[l_key], "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"}[l_key],
+            "icon": "☀️", "deity": {"en": "Lord Surya Narayana", "hi": "भगवान सूर्य नारायण", "bn": "ভগবান সূর্য নারায়ণ"}[l_key],
+            "description": {
+                "en": "Sunday alignment with Saptami Tithi dedicated to Sun God.",
+                "hi": "रविवार युक्त सप्तमी पर भगवान सूर्य को अर्घ्य समर्पण।",
+                "bn": "রবিবার যুক্ত সপ্তমীতে সূর্যদেবের বিশেষ তর্পণ ও পূজা।"
+            }[l_key],
+            "muhurta_type": "sunrise_snan",
+            "muhurta_label": {"en": "Sunrise Arghya Muhurta", "hi": "सूर्योदय अर्घ्य मुहूर्त", "bn": "সূর্যোদয় অর্ঘ্যদান মুহূর্ত"}[l_key],
+            "muhurta": ""
+        })
+
+    # অন্বাধান (অমাবস্যা বা চতুর্দশী সংযোগে বৈদিক যজ্ঞ তিথি)
+    if (tithi_num == 15 and paksha == "Krishna") or (tithi_num == 14 and paksha == "Krishna"):
+        anvadhan_name = {"en": "Anvadhan (Vedic Ritual)", "hi": "अन्वाधान (वैदिक अनुष्ठान)", "bn": "বৈদিক অন্বাধান সংস্কার"}
+        append_festival_once(festivals, {
+            "name": anvadhan_name[l_key], "category": "hindu", "type": {"en": "Vedic Ritual", "hi": "वैदिक अनुष्ठान", "bn": "বৈদিক সংস্কার"}[l_key],
+            "icon": "🔥", "deity": {"en": "Agni Deva & Sri Vishnu", "hi": "अग्नि देव व श्री विष्णु", "bn": "অগ্নি দেব ও শ্রীহরি বিষ্ণু"}[l_key],
+            "description": {
+                "en": "Vedic rite performed prior to Ishti.",
+                "hi": "इष्टि अनुष्ठान से पूर्व अग्नि प्रज्वलन का पावन वैदिक संस्कार।",
+                "bn": "ইষ্টি যজ্ঞের পূর্বে যজ্ঞাগ্নি রক্ষা ও সংযমের বৈদিক অন্বাধান সংস্কার।"
+            }[l_key],
+            "muhurta_type": "purvahna",
+            "muhurta_label": {"en": "Purvahna Havan", "hi": "पूर्वाह्न हवन", "bn": "পূর্বাহ্ন সংস্কার লগ্ন"}[l_key],
+            "muhurta": ""
+        })
+
     return festivals
 
 # ==============================================================================
