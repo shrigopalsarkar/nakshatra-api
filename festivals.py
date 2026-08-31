@@ -1478,20 +1478,6 @@ HINDU_FESTIVAL_DATABASE = {
         "muhurta_type": "sayankal",
         "muhurta_label": {"en": "Sayankal Star Gazing & Pradosh", "hi": "सायंकाल तारा दर्शन व प्रदोष", "bn": "সায়ংকালে তারা দর্শন ও প্রদোষ"}
     },
-    ("Kartika", "Krishna", 11): {
-        "en": "Rama Ekadashi",
-        "hi": "रमा एकादशी",
-        "bn": "রমা একাদশী ব্রত",
-        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
-        "icon": "🪷", "deity": {"en": "Lord Vishnu & Maa Rama (Lakshmi)", "hi": "भगवान विष्णु व रमा (लक्ष्मी)", "bn": "শ্রীহরি বিষ্ণু ও দেবী রমা (লক্ষ্মী)"},
-        "description": {
-            "en": "Observed before Diwali to invite Goddess Lakshmi's enduring grace.",
-            "hi": "दीपावली से पूर्व माँ लक्ष्मी की कृपा व अखंड ऐश्वर्य प्राप्ति हेतु रमा एकादशी।",
-            "bn": "দীপাবলির পূর্বে দেবী লক্ষ্মীর চিরকৃপা ও সমৃদ্ধি লাভের জন্য রমা একাদশী ব্রত।"
-        },
-        "muhurta_type": "purvahna",
-        "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
-    },
     ("Kartika", "Krishna", 12): {
         "en": "Govatsa Dwadashi / Bachh Baras / Gau Puja",
         "hi": "गोवत्स द्वादशी (बछ बारस) / गौ माता पूजा",
