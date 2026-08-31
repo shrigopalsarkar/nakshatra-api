@@ -3598,6 +3598,34 @@ def get_festivals_for_day(
             "muhurta": ""
         })
 
+    elif m_d == (11, 16) or ("vrishchika" in s_name or "scorpio" in s_name):
+        vrishchika_names = {"en": "Vrishchika Sankranti", "hi": "वृश्चिक संक्रांति", "bn": "বৃশ্চিক সংক্রান্তি মহাতীর্থ স্নান ও দান"}
+        vrishchika_deity = {"en": "Surya Deva", "hi": "भगवान सूर्य देव", "bn": "ভগবান সূর্য দেব"}
+        vrishchika_desc = {
+            "en": "Sun transits into Scorpio (Vrishchika Rashi), highly auspicious for holy dip and charity.",
+            "hi": "सूर्य का वृश्चिक राशि में प्रवेश, पवित्र तीर्थ स्नान एवं पुण्य दान का विशेष दिन।",
+            "bn": "সূর্যের বৃশ্চিক রাশিতে শুভ সংক্রমণ, তীর্থস্নান ও অন্নদানের পবিত্র লগ্ন।"
+        }
+        append_festival_once(festivals, {
+            "name": vrishchika_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "☀️", "deity": vrishchika_deity[l_key], "description": vrishchika_desc[l_key],
+            "muhurta_type": "sunrise_snan", "muhurta_label": {"en": "Vrishchika Sankranti Punya Kaal", "hi": "वृश्चिक संक्रांति पुण्य काल", "bn": "বৃশ্চিক সংক্রান্তি পুণ্যকাল"}[l_key], "muhurta": ""
+        })
+
+    elif m_d == (12, 16) or ("dhanu" in s_name or "sagittarius" in s_name):
+        dhanu_names = {"en": "Dhanu Sankranti / Dhanurmas Begins", "hi": "धनु संक्रांति / धनुर्मास प्रारंभ", "bn": "ধনু সংক্রান্তি / ধনুর্মাস আরম্ভ"}
+        dhanu_deity = {"en": "Surya Deva & Lord Vishnu", "hi": "भगवान सूर्य व श्रीहरि", "bn": "ভগবান সূর্য দেব ও শ্রীহরি নারায়ণ"}
+        dhanu_desc = {
+            "en": "Sun enters Sagittarius (Dhanu Rashi), commencing the sacred month of Dhanurmas.",
+            "hi": "सूर्य का धनु राशि में संक्रमण एवं भगवान विष्णु की विशेष आराधना के धनुर्मास का शुभारंभ।",
+            "bn": "সূর্যের ধনু রাশিতে প্রবেশ ও শ্রীহরির বিশেষ আরাধনাময় ধনুর্মাসের শুভ সূচনা।"
+        }
+        append_festival_once(festivals, {
+            "name": dhanu_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "☀️", "deity": dhanu_deity[l_key], "description": dhanu_desc[l_key],
+            "muhurta_type": "sunrise_snan", "muhurta_label": {"en": "Dhanu Sankranti Punya Kaal", "hi": "धनु संक्रांति पुण्य काल", "bn": "ধনু সংক্রান্তি পুণ্যকাল"}[l_key], "muhurta": ""
+        })
+
     return festivals
 
 # ==============================================================================
