@@ -2433,6 +2433,277 @@ HINDU_FESTIVAL_DATABASE = {
         },
         "muhurta_type": "purvahna",
         "muhurta_label": {"en": "Purvahna Dolotsav & Pradosh Gaura Arati", "hi": "पूर्वाह्न डोल उत्सव व संध्याकाल", "bn": "পূর্বাহ্ন দোলোৎসব ও সায়ংকালীন আবির্ভাব আরতি"}
+    },
+    # ==========================================================================
+    # PDF 2026 ক্যালেন্ডার থেকে চিহ্নিত মিসিং সনাতন উৎসব ও ব্রতসমূহ
+    # ==========================================================================
+
+    # --- চৈত্র মাস (Chaitra) ---
+    ("Chaitra", "Krishna", 7): {
+        "en": "Sheetala Saptami",
+        "hi": "शीतला सप्तमी",
+        "bn": "শ্রী শ্রী শীতলা সপ্তমী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🌸", "deity": {"en": "Maa Sheetala", "hi": "माँ शीतला", "bn": "মা শীতলা দেবী"},
+        "description": {
+            "en": "Worship of Maa Sheetala one day prior to Basoda to seek protection from epidemics and heat-borne diseases.",
+            "hi": "शीतला अष्टमी से पूर्व आरोग्य ও शीतलता की प्राप्ति हेतु माँ शीतला का पावन पूजन।",
+            "bn": "বসন্ত ও সংক্রামক রোগব্যাধি থেকে সুরক্ষার কামনায় মা শীতলা দেবীর বিশেষ সপ্তমী পূজা।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Purvahna Sheetala Puja", "hi": "पूर्वाह्न शीतला पूजा", "bn": "পূর্বাহ্ন শীতলা পূজা লগ্ন"}
+    },
+
+    # --- বৈশাখ মাস (Vaishakha) ---
+    ("Vaishakha", "Krishna", 15): {
+        "en": "Vaishakha Amavasya / Darsha Amavasya / Anvadhan",
+        "hi": "वैशाख अमावस्या / दर्श अमावस्या / अन्वाधान",
+        "bn": "বৈশাখী অমাবস্যা / দর্শ অমাবস্যা ও অন্বাধান",
+        "category": "hindu", "type": {"en": "Vrata & Tarpan", "hi": "उपवास व तर्पण", "bn": "উপবাস ও তর্পণ"},
+        "icon": "🌑", "deity": {"en": "Pitru Devas & Lord Shiva", "hi": "पितृ देव व भगवान शिव", "bn": "পিতৃপুরুষ ও মহাদেব"},
+        "description": {
+            "en": "Auspicious Vaishakha new moon for holy river bath, pitru tarpan, and charity.",
+            "hi": "पितरों की शांति, पवित्र नदियों में स्नान एवं दान-पुण्य का पावन वैशाख अमावस्या पर्व।",
+            "bn": "পিতৃপুরুষের আত্মার তৃপ্তির জন্য গঙ্গা ও পবিত্র তীর্থে মহাস্নান, তর্পণ ও অন্নদান।"
+        },
+        "muhurta_type": "aparahna",
+        "muhurta_label": {"en": "Aparahna Tarpan & Snan", "hi": "अपराह्न तर्पण काल", "bn": "অপরাহ্ন তর্পণ ও স্নান লগ্ন"}
+    },
+
+    # --- আষাঢ় মাস (Ashadha) ---
+    ("Ashadha", "Krishna", 12): {
+        "en": "Gauna Yogini Ekadashi / Vaishnava Yogini Ekadashi",
+        "hi": "गौण योगिनी एकादशी / वैष्णव योगिनी एकादशी",
+        "bn": "গৌণ যোগিনী একাদশী / বৈষ্ণব যোগিনী একাদশী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Sri Hari Vishnu", "hi": "भगवान श्री हरि विष्णु", "bn": "ভগবান শ্রীহরি বিষ্ণু"},
+        "description": {
+            "en": "Special Vaishnava community observance of Yogini Ekadashi to eliminate bodily ailments.",
+            "hi": "वैष्णव संप्रदाय द्वारा आचरित रोगनाशक एवं पापमुक्ति प्रदाता योगिनी एकादशी व्रत।",
+            "bn": "বৈষ্ণব পরম্পরায় সর্বপ্রকার রোগব্যাধি ও পাপ মুক্তির কামনায় যোগিনী একাদশী ব্রত।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Morning Fast & Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+    ("Ashadha", "Krishna", 15): {
+        "en": "Ashadha Amavasya / Darsha Amavasya / Anvadhan",
+        "hi": "आषाढ़ अमावस्या / दर्श अमावस्या / अन्वाधान",
+        "bn": "আষাঢ়ী অমাবস্যা / দর্শ অমাবস্যা ও অন্বাধান",
+        "category": "hindu", "type": {"en": "Vrata & Tarpan", "hi": "उपवास व तर्पण", "bn": "উপবাস ও তর্পণ"},
+        "icon": "🌑", "deity": {"en": "Pitru Devas & Lord Shiva", "hi": "पितृ देव व भगवान शिव", "bn": "পিতৃপুরুষ ও মহাদেব"},
+        "description": {
+            "en": "New moon of Ashadha dedicated to ancestor oblations and sacred charity before Chaturmasya.",
+            "hi": "चातुर्मास से पूर्व पितरों के निमित्त तर्पण, पिंडदान एवं दीपदान का पावन दिवस।",
+            "bn": "চাতুর্মাস্য শুরুর প্রাক্কালে পিতৃপুরুষের তৃপ্তির জন্য পবিত্র তর্পণ ও জলদান।"
+        },
+        "muhurta_type": "aparahna",
+        "muhurta_label": {"en": "Aparahna Tarpan Kaal", "hi": "अपराह्न तर्पण काल", "bn": "অপরাহ্ন তর্পণ লগ্ন"}
+    },
+
+    # --- আশ্বিন মাস (Ashvina) ---
+    ("Ashvina", "Krishna", 1): {
+        "en": "Pitru Paksha Begins / Mahalaya Paksha Ishti",
+        "hi": "पितृपक्ष प्रारंभ / महालय पक्ष इष्टि",
+        "bn": "১৬ দিনের মহালয়া পিতৃপক্ষ আরম্ভ / বৈদিক ইষ্টি যজ্ঞ",
+        "category": "hindu", "type": {"en": "Vrata & Tarpan", "hi": "तर्पण पर्व", "bn": "তর্পণ ও পিতৃশ্রাদ্ধ"},
+        "icon": "🙏", "deity": {"en": "Pitru Devas & Lord Yama", "hi": "पितृ गण व यमराज", "bn": "পিতৃপুরুষগণ ও যমরাজ"},
+        "description": {
+            "en": "Sacred beginning of the 16-day fortnight for ancestor shraddha, tarpan, and remembrance.",
+            "hi": "पूर्वजों के प्रति कृतज्ञता समर्पण एवं १६ दिवसीय महालय श्राद्ध पक्ष का पावन शुभारंभ।",
+            "bn": "পরলোকগত পিতৃপুরুষের উদ্দেশ্যে জলদান, তর্পণ ও পার্বণ শ্রাদ্ধের ১৬ দিনব্যাপী পুণ্য পক্ষ আরম্ভ।"
+        },
+        "muhurta_type": "aparahna",
+        "muhurta_label": {"en": "Kutapa & Aparahna Tarpan", "hi": "कुतप व अपराह्न तर्पण", "bn": "কুতপ ও অপরাহ্ন তর্পণ সময়"}
+    },
+    ("Ashvina", "Shukla", 10): {
+        "en": "Vijaya Dashami / Dussehra / Madhvacharya Jayanti",
+        "hi": "विजयादशमी / दशहरा / मध्वाचार्य जयंती",
+        "bn": "শ্রী শ্রী বিজয়া দশমী / দশহরা / শ্রী মধ্বাচার্য জয়ন্তী",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🔱", "deity": {"en": "Maa Durga, Lord Rama & Sri Madhvacharya", "hi": "माँ दुर्गा, श्रीराम व मध्वाचार्य", "bn": "মা দুর্গা, শ্রীরাম ও শ্রী মধ্বাচার্য"},
+        "description": {
+            "en": "Triumph of good over evil, Durga Visarjan, and appearance day of Dvaita philosopher Sri Madhvacharya.",
+            "hi": "बुराई पर अच्छाई की विजय, रावण दहन एवं द्वैत वेदांत के प्रवर्तक मध्वाचार्य का पावन जन्मोत्सव।",
+            "bn": "অসুরের বিনাশে শুভর জয়, অপরাজিতা পূজা এবং দ্বৈত বেদান্তের প্রবক্তা শ্রীমধ্বাচার্যের আবির্ভাব তিথি।"
+        },
+        "muhurta_type": "aparahna",
+        "muhurta_label": {"en": "Aparajita & Vijaya Muhurta", "hi": "अपराजिता व विजय मुहूर्त", "bn": "অপরাজিতা পূজা ও বিজয় মুহূর্ত"}
+    },
+
+    # --- কার্তিক মাস (Kartika) ---
+    ("Kartika", "Shukla", 11): {
+        "en": "Devutthana Ekadashi / Tulsi Vivah / Kansa Vadh / Bhishma Panchak Begins",
+        "hi": "देवउठनी एकादशी / तुलसी विवाह / कंस वध / भीष्म पंचक प्रारंभ",
+        "bn": "দেবউত্থান একাদশী / তুলসী বিবাহ / কংস বধ মহোৎসব / ভীষ্ম পঞ্চক ব্রতারম্ভ",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🌿", "deity": {"en": "Lord Shaligram, Tulsi & Sri Krishna", "hi": "भगवान शालिग्राम, तुलसी व श्रीकृष्ण", "bn": "ভগবান শালগ্রাম, তুলসী ও শ্রীকৃষ্ণ"},
+        "description": {
+            "en": "Lord Vishnu awakens from cosmic slumber, inception of 5-day Bhishma Panchak and celebrating Kansa Vadh in Mathura.",
+            "hi": "चातुर्मास समाप्ति, भीष्म पंचक महाव्रत प्रारंभ, शालिग्राम-तुलसी विवाह एवं मथुरा में कंस वध लीला।",
+            "bn": "শ্রীহরির যোগনিদ্রা ভঙ্গ, ভীষ্ম পঞ্চক ব্রতারম্ভ এবং মথুরায় শ্রীকৃষ্ণ কর্তৃক কংস বধ মহোৎসব।"
+        },
+        "muhurta_type": "pradosh",
+        "muhurta_label": {"en": "Pradosh Kaal (Tulsi Vivah)", "hi": "प्रदोष काल (तुलसी विवाह)", "bn": "প্রদোষ কাল (তুলসী বিবাহ সময়)"}
+    },
+    ("Kartika", "Shukla", 13): {
+        "en": "Vishweshwara Vrat / Vaikuntha Trayodashi / Pradosh Vrat",
+        "hi": "विश्वेश्वर व्रत / वैकुंठ त्रयोदशी / प्रदोष व्रत",
+        "bn": "শ্রী শ্রী বিশ্বেশ্বর ব্রত / বৈকুণ্ঠ ত্রয়োদশী / প্রদোষ ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "উপবাস ব্রত", "bn": "উপবাস ব্রত"},
+        "icon": "🔱", "deity": {"en": "Lord Vishweshwara (Shiva) & Vishnu", "hi": "काशी विश्वनाथ व भगवान विष्णु", "bn": "কাশী বিশ্বনাথ ও ভগবান শ্রীহরি"},
+        "description": {
+            "en": "Sacred fasting in Varanasi dedicated to Kashi Vishwanath and Lord Vishnu before Dev Deepawali.",
+            "hi": "काशी में देव दीपावली से पूर्व भगवान विश्वेश्वर एवं श्रीहरि के मिलन का पावन व्रत।",
+            "bn": "কাশী বিশ্বনাথ ও শ্রীহরির প্রীত্যর্থে পরম পবিত্র বিশ্বেশ্বর ব্রত ও প্রদোষ শিবপূজা।"
+        },
+        "muhurta_type": "pradosh",
+        "muhurta_label": {"en": "Pradosh Kaal Puja", "hi": "प्रदोष काल", "bn": "প্রদোষ কাল পূজা লগ্ন"}
+    },
+    ("Kartika", "Shukla", 14): {
+        "en": "Vaikuntha Chaturdashi / Manikarnika Snan",
+        "hi": "वैकुंठ चतुर्दशी / मणिकर्णिका महास्नान",
+        "bn": "শ্রী বৈকুণ্ঠ চতুর্দশী / কাশীতে মণিকর্ণিকা ঘাট মহাস্নান",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "মহাপর্ব", "bn": "মহাপর্ব"},
+        "icon": "🕉️", "deity": {"en": "Lord Shiva & Lord Vishnu", "hi": "भगवान शिव व भगवान विष्णु", "bn": "দেবাদিদেব শিব ও শ্রীহরি বিষ্ণু"},
+        "description": {
+            "en": "Hari-Hara union and taking sacred bath in Manikarnika Kund in Varanasi at midnight.",
+            "hi": "भगवान शिव व विष्णु का पावन मिलन एवं काशी मणिकर्णिका तीर्थ में मध्यरात्रि मुक्ति स्नान।",
+            "bn": "ভগবান শিব ও শ্রীহরির মিলন তিথি এবং কাশীর পবিত্র মণিকর্ণিকা তীর্থে নিশীথ কাল মহাস্নান।"
+        },
+        "muhurta_type": "nishita",
+        "muhurta_label": {"en": "Nishita Kaal Muhurta (Midnight)", "hi": "निशीथ काल मुहूर्त (मध्यरात्रि)", "bn": "নিশীথ কাল মুহূর্ত (মধ্যরাত্রি)"}
+    },
+    ("Kartika", "Shukla", 15): {
+        "en": "Dev Diwali / Guru Nanak Jayanti (Prakash Utsav) / Kartika Purnima / Rash Yatra",
+        "hi": "देव दीपावली / गुरु नानक जयंती (प्रकाश पर्व) / कार्तिक पूर्णिमा / रास पूर्णिमा",
+        "bn": "দেব দীপাবলি / শ্রী গুরু নানক জন্মজয়ন্তী (প্রকাশ পর্ব) / কার্তিক পূর্ণিমা / শ্রী শ্রী রাসযাত্রা",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "মহাপর্ব", "bn": "মহাপর্ব"},
+        "icon": "🪔", "deity": {"en": "Lord Shiva, Guru Nanak Dev Ji & Radha Krishna", "hi": "भगवान शिव, गुरु नानक देव जी व राधा-कृष्ण", "bn": "দেবাদিদেব শিব, শ্রী গুরু নানক দেব ও রাধাকৃষ্ণ"},
+        "description": {
+            "en": "Varanasi Dev Deepawali with millions of earthen lamps, Guru Nanak Dev Ji's birth anniversary, and Vrindavan Raas Purnima.",
+            "hi": "काशी में दीपदान का महापर्व देव दीपावली, सिख धर्म के संस्थापक गुरु नानक देव जी का प्रकाश पर्व एवं महारास।",
+            "bn": "কাশীতে লক্ষ প্রদীপ প্রজ্বলনে দেব দীপাবলি, শিখ গুরু নানক দেবজীর শুভ জন্মজয়ন্তী ও রাসপূর্ণিমা।"
+        },
+        "muhurta_type": "pradosh",
+        "muhurta_label": {"en": "Pradosh Deepdan & Full Moon Night", "hi": "प्रदोष काल दीपदान", "bn": "প্রদোষ কাল ও দেব দীপাবলি লগ্ন"}
+    },
+
+    # --- মার্গশীর্ষ মাস (Margashirsha) ---
+    ("Margashirsha", "Krishna", 1): {
+        "en": "Margashirsha Krishna Pratipada / Ishti Havan",
+        "hi": "मार्गशीर्ष कृष्ण प्रतिपदा / इष्टि",
+        "bn": "মার্গশীর্ষ কৃষ্ণ প্রতিপদ / বৈদিক ইষ্টি যজ্ঞ",
+        "category": "hindu", "type": {"en": "Vedic Ritual", "hi": "वैदिक अनुष्ठान", "bn": "বৈদিক সংস্কার"},
+        "icon": "🔥", "deity": {"en": "Agni Deva & Sri Vishnu", "hi": "अग्नि देव व श्री विष्णु", "bn": "অগ্নি দেব ও শ্রীহরি বিষ্ণু"},
+        "description": {
+            "en": "Inception of Margashirsha Krishna Paksha observing sacred Ishti fire rituals.",
+            "hi": "मार्गशीर्ष कृष्ण पक्ष का प्रारंभ एवं सुख-शांति हेतु वैदिक इष्टि यज्ञानुष्ठान।",
+            "bn": "অগ্রহায়ণ কৃষ্ণপক্ষের শুভ সূচনা এবং শান্তি ও সমৃদ্ধি কামনায় বৈদিক ইষ্টি হোম।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Morning Ishti Havan", "hi": "प्रातः इष्टि मुहूर्त", "bn": "প্রাতঃকালীন ইষ্টি যজ্ঞ মুহূর্ত"}
+    },
+    ("Margashirsha", "Krishna", 15): {
+        "en": "Margashirsha Amavasya / Darsha Amavasya / Anvadhan",
+        "hi": "मार्गशीर्ष अमावस्या / दर्श अमावस्या / अन्वाधान",
+        "bn": "মার্গশীর্ষ অমাবস্যা / দর্শ অমাবস্যা ও অন্বাধান",
+        "category": "hindu", "type": {"en": "Vrata & Tarpan", "hi": "उपवास व तर्पण", "bn": "উপবাস ও তর্পণ"},
+        "icon": "🌑", "deity": {"en": "Pitru Devas & Lord Shiva", "hi": "पितृ देव व भगवान शिव", "bn": "পিতৃপুরুষ ও মহাদেব"},
+        "description": {
+            "en": "Sacred new moon of Margashirsha for ancestral peace, holy snan, and charity.",
+            "hi": "पितरों की तृप्ति, पवित्र तीर्थ स्नान एवं पुण्य फल हेतु मार्गशीर्ष अमावस्या व्रत।",
+            "bn": "পিতৃপুরুষের আত্মার তৃপ্তির জন্য পবিত্র স্নান, তর্পণ ও দানকার্যের অগ্রহায়ণ অমাবস্যা।"
+        },
+        "muhurta_type": "aparahna",
+        "muhurta_label": {"en": "Aparahna Tarpan Kaal", "hi": "अपराह्न तर्पण काल", "bn": "অপরাহ্ন তর্পণ লগ্ন"}
+    },
+    ("Margashirsha", "Shukla", 1): {
+        "en": "Margashirsha Shukla Pratipada / Ishti Havan",
+        "hi": "मार्गशीर्ष शुक्ल प्रतिपदा / इष्टि",
+        "bn": "মার্গশীর্ষ শুক্ল প্রতিপদ / বৈদিক ইষ্টি যজ্ঞ",
+        "category": "hindu", "type": {"en": "Vedic Ritual", "hi": "वैदिक अनुष्ठान", "bn": "বৈদিক সংস্কার"},
+        "icon": "🔥", "deity": {"en": "Agni Deva & Sri Vishnu", "hi": "अग्नि देव व श्री विष्णु", "bn": "অগ্নি দেব ও শ্রীহরি বিষ্ণু"},
+        "description": {
+            "en": "Commencement of Margashirsha Shukla Paksha observing auspicious Ishti.",
+            "hi": "मार्गशीर्ष शुक्ल पक्ष का प्रारंभ एवं सुख-शांति हेतु वैदिक इष्टि यज्ञानुष्ठान।",
+            "bn": "অগ্রহায়ণ শুক্লপক্ষের শুভ সূচনা এবং শান্তি কামনায় বৈদিক ইষ্টি হোম।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Morning Ishti Havan", "hi": "प्रातः इष्टि मुहूर्त", "bn": "প্রাতঃকালীন ইষ্টি যজ্ঞ মুহূর্ত"}
+    },
+    ("Margashirsha", "Shukla", 2): {
+        "en": "Chandra Darshana (Margashirsha Shukla)",
+        "hi": "मार्गशीर्ष चन्द्र दर्शन",
+        "bn": "মার্গশীর্ষ শুক্ল দ্বিতীয়া চন্দ্র দর্শন",
+        "category": "hindu", "type": {"en": "Observance", "hi": "धार्मिक दर्शन", "bn": "চন্দ্র দর্শন"},
+        "icon": "🌙", "deity": {"en": "Chandra Deva", "hi": "चन्द्र देव", "bn": "চন্দ্র দেব"},
+        "description": {
+            "en": "Auspicious sighting of the crescent moon after sunset for peace and mental clarity.",
+            "hi": "मानसिक शांति व सौभाग्य वृद्धि हेतु सायंकाल नवचंद्र दर्शन व अर्घ्य।",
+            "bn": "মানসিক শান্তি ও সৌভাগ্য বৃদ্ধির কামনায় সায়ংকালে নবচন্দ্রের শুভ দর্শন।"
+        },
+        "muhurta_type": "sayankal",
+        "muhurta_label": {"en": "Sayankal Chandra Darshan", "hi": "सायंकाल चंद्र दर्शन", "bn": "সায়ংকালীন চন্দ্র দর্শন লগ্ন"}
+    },
+
+    # --- পৌষ মাস (Pausha) ---
+    ("Pausha", "Krishna", 4): {
+        "en": "Akhuratha Sankashti Chaturthi",
+        "hi": "अखुरथ संकष्टी चतुर्थी",
+        "bn": "শ্রী আখুরথ সংকষ্টী চতুর্থী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🐘", "deity": {"en": "Lord Akhuratha Ganesha & Chandra", "hi": "भगवान अखुरथ गणेश व चन्द्र देव", "bn": "ভগবান আখুরথ শ্রী গণেশ ও চন্দ্র দেব"},
+        "description": {
+            "en": "Pausha Krishna Chaturthi fast dedicated to Lord Akhuratha Ganesha, concluded with moonrise arghya.",
+            "hi": "समस्त विघ्नों व संकटों के निवारण हेतु पौष मास की अखुरथ संकष्टी चतुर्थी का पावन व्रत।",
+            "bn": "সর্বসঙ্কট দূরীকরণে পৌষ কৃষ্ণ চতুর্থীতে শ্রী আখুরথ গণেশের উপবাস ব্রত এবং চন্দ্রোদয়ে ভক্তিপূর্ণ অর্ঘ্যদান।"
+        },
+        "muhurta_type": "sayankal",
+        "muhurta_label": {"en": "Moonrise & Puja Time", "hi": "चन्द्रोदय व पूजन", "bn": "চন্দ্রোদয় ও পূজা লগ্ন"}
+    },
+
+    # --- অতিরিক্ত মাস / অধিক মাস (Adhika Masa Festivals 2026) ---
+    ("Adhika_Jyeshtha", "Shukla", 11): {
+        "en": "Padmini Ekadashi (Kamala Ekadashi)",
+        "hi": "पद्मिनी एकादशी (कमला एकादशी / अधिक मास एकादशी)",
+        "bn": "পদ্মিনী একাদশী ব্রত (কমলা একাদশী / অধিক মাস)",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "महाव्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🪷", "deity": {"en": "Lord Purushottama (Vishnu)", "hi": "भगवान पुरुषोत्तम विष्णु", "bn": "ভগবান পুরুষোত্তম শ্রীহরি"},
+        "description": {
+            "en": "Rare Ekadashi falling in Adhika Masa (Purushottam Masa), granting Vaikuntha attainment and boundless merits.",
+            "hi": "अधिक मास (मलमास) के शुक्ल पक्ष की परम दुर्लभ पद्मिनी एकादशी, जो समस्त तीर्थों का पुण्य प्रदान करती है।",
+            "bn": "পুরুষোত্তম অধিক মাসের শুক্লপক্ষের পরম পুণ্যময়ী পদ্মিনী একাদশী ব্রত।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Morning Fast & Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+    ("Adhika_Jyeshtha", "Krishna", 4): {
+        "en": "Vibhuvana Sankashti Chaturthi (Adhika Masa)",
+        "hi": "विभुवन संकष्टी चतुर्थी (अधिक मास)",
+        "bn": "শ্রী বিভুবন সংকষ্টী চতুর্থী ব্রত (অধিক মাস)",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🐘", "deity": {"en": "Lord Ganesha & Chandra", "hi": "भगवान गणेश व चन्द्र देव", "bn": "ভগবান শ্রী গণেশ ও চন্দ্র দেব"},
+        "description": {
+            "en": "Rare Sankashti Chaturthi observed during Adhika Masa for removal of deep-rooted sorrows.",
+            "hi": "अधिक मास में समस्त मनोकामनाओं की पूर्ति हेतु विभुवन संकष्टी चतुर्थी का पावन व्रत।",
+            "bn": "অধিক মাসে সর্বকষ্ট ও বাধা নাশে বিভুবন সংকষ্টী চতুর্থীর বিশেষ উপবাস ও চন্দ্রোদয়ে পূজা।"
+        },
+        "muhurta_type": "sayankal",
+        "muhurta_label": {"en": "Moonrise & Puja Time", "hi": "चन्द्रोदय व पूजन", "bn": "চন্দ্রোদয় ও পূজা লগ্ন"}
+    },
+    ("Adhika_Jyeshtha", "Krishna", 11): {
+        "en": "Parama Ekadashi (Adhika Krishna Ekadashi)",
+        "hi": "परमा एकादशी (अधिक मास कृष्ण एकादशी)",
+        "bn": "পরমা একাদশী ব্রত (অধিক মাস কৃষ্ণ একাদশী)",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "महाव्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Purushottama (Vishnu)", "hi": "भगवान पुरुषोत्तम विष्णु", "bn": "ভগবান পুরুষোত্তম শ্রীহরি"},
+        "description": {
+            "en": "Observed in the dark fortnight of Adhika Masa to eradicate poverty and grant immense spiritual merit.",
+            "hi": "दरिद्रता का समूल नाश करने एवं अक्षय पुण्य प्रदान करने वाली अधिक मास की परमा एकादशी।",
+            "bn": "দারিদ্র্য দূরীকরণ ও মোক্ষলাভের কামনায় অধিক মাসের কৃষ্ণপক্ষের পরম পবিত্র পরমা একাদশী।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Morning Fast & Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
     }
 }
 
