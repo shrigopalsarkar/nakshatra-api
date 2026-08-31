@@ -1660,6 +1660,67 @@ HINDU_FESTIVAL_DATABASE = {
         "description": {"en": "Worshipping Amla tree alongside Shiva-Parvati's joyous arrival in Kashi.", "hi": "आँवला वृक्ष पूजन एवं काशी में माँ गौरा का प्रथम आगमन रंगोत्सव।", "bn": "আমলকী বৃক্ষ পূজা এবং কাশীতে মহাদেব ও মা পার্বতীর প্রথম গুলাল খেলার আনন্দোৎসব।"},
         "muhurta_type": "purvahna", "muhurta_label": {"en": "Purvahna Amla Puja", "hi": "पूर्वाह्न आमलकी पूजा", "bn": "পূর্বাহ্ন আমলকী পূজা লগ্ন"}
     },
+    # --- মার্গশীর্ষ মাস (Margashirsha) ---
+    ("Margashirsha", "Krishna", 8): {
+        "en": "Kalabhairav Jayanti / Mahakaal Ashtami",
+        "hi": "कालभैरव जयंती / महाकाल भैरवाष्टमी",
+        "bn": "শ্রী শ্রী কালভৈরব জয়ন্তী / মহাকাল ভৈরবাষ্টমী",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🔱", "deity": {"en": "Lord Kalabhairava & Shiva", "hi": "भगवान कालभैरव", "bn": "ভগবান কালভৈরব ও শিব"},
+        "description": {
+            "en": "Divine appearance day of Lord Kalabhairava, the fierce manifestation of Lord Shiva to protect Dharma.",
+            "hi": "धर्म रक्षा एवं भक्तों के भय निवारण हेतु भगवान शिव के उग्र रूप कालभैरव का प्राकट्योत्सव।",
+            "bn": "ভক্তদের সর্বভয় দূর করতে দেবাদিদেব শিবের রুদ্র রূপ শ্রী কালভৈরবের শুভ আবির্ভাব মহোৎসব।"
+        },
+        "muhurta_type": "nishita",
+        "muhurta_label": {"en": "Nishita Kaal Puja", "hi": "निशीथ काल पूजा", "bn": "নিশীথ কাল ভৈরব পূজা"}
+    },
+
+    # --- পৌষ মাস (Pausha) ---
+    ("Pausha", "Shukla", 7): {
+        "en": "Guru Gobind Singh Jayanti (Prakash Parv)",
+        "hi": "गुरु गोबिंद सिंह जयंती (प्रकाश पर्व)",
+        "bn": "দশম গুরু গোবিন্দ সিংহ জয়ন্তী (প্রকাশ পর্ব)",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "प्रकाश पर्व", "bn": "মহাপর্ব"},
+        "icon": "⚔️", "deity": {"en": "Guru Gobind Singh Ji", "hi": "गुरु गोबिंद सिंह जी", "bn": "শ্রী গুরু গোবিন্দ সিংহ জী"},
+        "description": {
+            "en": "Birth anniversary of the tenth Sikh Guru, warrior-poet and founder of the Khalsa Panth.",
+            "hi": "खालसा पंथ के संस्थापक एवं दशम सिख गुरु गोबिंद सिंह जी का पावन प्रकाश जन्मोत्सव।",
+            "bn": "খালসা পন্থের প্রতিষ্ঠাতা ও দশম শিখ গুরু গোবিন্দ সিংহজীর পরম পবিত্র প্রকাশ পর্ব ও জন্মজয়ন্তী।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Pratah Kaal Prakash Utsav", "hi": "प्रातः प्रकाश पर्व", "bn": "প্রাতঃকালীন প্রকাশ মহোৎসব"}
+    },
+    ("Pausha", "Shukla", 11): {
+        "en": "Pausha Putrada Ekadashi / Tailang Swami Jayanti",
+        "hi": "पौष पुत्रदा एकादशी / तैलंग स्वामी जयंती",
+        "bn": "পৌষ পুত্রদা একাদশী ব্রত / ত্রৈলঙ্গ স্বামী জয়ন্তী",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Vishnu & Trailanga Swami", "hi": "भगवान विष्णु व तैलंग स्वामी", "bn": "ভগবান শ্রীহরি বিষ্ণু ও ত্রৈলঙ্গ স্বামী"},
+        "description": {
+            "en": "Fasting for child welfare alongside the birth celebration of the Walking Shiva of Varanasi, Trailanga Swami.",
+            "hi": "संतान कल्याणकारी पुत्रदा एकादशी एवं काशी के सचल विश्वनाथ स्वामी तैलंग का पावन जन्मोत्सव।",
+            "bn": "সন্তানের কল্যাণদায়ী পুত্রদা একাদশী এবং কাশীর সচল শিব যোগীরাজ ত্রৈলঙ্গ স্বামীর আবির্ভাব তিথি।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Morning Fast & Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+
+    # --- মাঘ মাস (Magha) ---
+    ("Magha", "Krishna", 4): {
+        "en": "Sakat Chauth / Lambodara Sankashti Chaturthi / Tilkuta Chauth",
+        "hi": "सकट चौथ / लंबोदर संकष्टी चतुर्थी / तिलकुटा चौथ",
+        "bn": "সঙ্কট চৌথ / লম্বোদর সংকষ্টী চতুর্থী (তিলকুটা চতুর্থী ব্রত)",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🐘", "deity": {"en": "Lord Lambodara (Ganesha) & Chandra", "hi": "भगवान लंबोदर गणेश व चन्द्र देव", "bn": "ভগবান লম্বোদর গণেশ ও চন্দ্র দেব"},
+        "description": {
+            "en": "Mothers observe severe fast offering sesame laddus to Lord Lambodara for children's longevity, broken at moonrise.",
+            "hi": "संतानों के संकट निवारण ও दीर्घायु हेतु माताओं द्वारा तिल-गुड़ भोग युक्त निर्जला सकट चौथ व्रत।",
+            "bn": "সন্তানের দীর্ঘায়ু ও সর্বসংকট নাশে মায়েদের পরম নিষ্ঠাপূর্ণ তিলকুটা উপবাস ও চন্দ্রোদয়ে অর্ঘ্যদান।"
+        },
+        "muhurta_type": "sayankal",
+        "muhurta_label": {"en": "Moonrise & Puja Time", "hi": "चन्द्रोदय व पूजन", "bn": "চন্দ্রোদয় ও পূজা লগ্ন"}
+    },
 
 # ==============================================================================
 # ২. ভারতীয় জাতীয় ছুটির দিন ও স্মরণীয় দিবস
