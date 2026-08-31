@@ -1719,6 +1719,103 @@ def get_festivals_for_day(
                 "muhurta": ""
             }
         )
+    # ৬. মাসিক সংকষ্টী চতুর্থী (Krishna Paksha Chaturthi - চন্দ্রোদয় পর্যন্ত উপবাস)
+    if tithi_num == 4 and paksha == "Krishna":
+        sankashti_name = {"en": "Sankashti Chaturthi Vrat", "hi": "संकष्टी चतुर्थी व्रत", "bn": "সংকষ্টী চতুর্থী ব্রত (চন্দ্রোদয় পূজা)"}
+        append_festival_once(festivals, {
+            "name": sankashti_name[l_key], "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"}[l_key],
+            "icon": "🐘", "deity": {"en": "Lord Ganesha & Chandra Deva", "hi": "भगवान श्री गणेश व चन्द्र देव", "bn": "শ্রী গণেশ ও চন্দ্র দেব"}[l_key],
+            "description": {
+                "en": "Fasting dedicated to Lord Ganesha to remove obstacles, broken after moonrise sighting.",
+                "hi": "विघ्नहर्ता भगवान गणेश का व्रत, जो रात्रि में चंद्र दर्शन व अर्घ्य के बाद खोला जाता है।",
+                "bn": "বিঘ্নবিনাশক শ্রী গণেশের উদ্দেশ্যে উপবাস এবং রাতে চন্দ্র দর্শন ও অর্ঘ্যদানের মাধ্যমে পারণ।"
+            }[l_key],
+            "muhurta_type": "sayankal", "muhurta_label": {"en": "Moonrise & Puja Time", "hi": "चन्द्रोदय व गणेश पूजन", "bn": "চন্দ্রোদয় ও গণেশ পূজা লগ্ন"}[l_key], "muhurta": ""
+        })
+
+    # ৭. মাসিক বিনায়ক চতুর্থী (Shukla Paksha Chaturthi - দুপুরবেলা গণেশ পূজা)
+    elif tithi_num == 4 and paksha == "Shukla":
+        vinayaka_name = {"en": "Vinayaka Chaturthi Vrat", "hi": "विनायक चतुर्थी व्रत", "bn": "বিনায়ক চতুর্থী ব্রত (মধ্যাহ্ন পূজা)"}
+        append_festival_once(festivals, {
+            "name": vinayaka_name[l_key], "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"}[l_key],
+            "icon": "🐘", "deity": {"en": "Lord Ganesha (Vinayaka)", "hi": "भगवान श्री गणेश", "bn": "ভগবান শ্রী গণেশ"}[l_key],
+            "description": {
+                "en": "Monthly Shukla Chaturthi fast observing Madhyahna Ganesha Puja for wisdom and success.",
+                "hi": "बुद्धि व सिद्धि की प्राप्ति हेतु शुक्ल पक्ष की चतुर्थी पर मध्याह्न गणेश पूजन।",
+                "bn": "জ্ঞান, বুদ্ধি ও সর্বসিদ্ধির কামনায় শুক্লপক্ষের চতুর্থীতে মধ্যাহ্নকালে শ্রী গণেশ পূজা।"
+            }[l_key],
+            "muhurta_type": "madhyahna", "muhurta_label": {"en": "Madhyahna Puja Muhurta", "hi": "मध्याह्न गणेश पूजा", "bn": "মধ্যাহ্ন গণেশ পূজা মুহূর্ত"}[l_key], "muhurta": ""
+        })
+
+    # ৮. মাসিক কালাষ্টমী / ভৈরব অষ্টমী (Krishna Paksha Ashtami - নিশীথ কাল ভৈরব পূজা)
+    elif tithi_num == 8 and paksha == "Krishna":
+        kalashtami_name = {"en": "Kalashtami / Bhairava Ashtami Vrat", "hi": "कालाष्टमी / भैरव अष्टमी व्रत", "bn": "কালাষ্টমী ব্রত (কালভৈরব পূজা)"}
+        append_festival_once(festivals, {
+            "name": kalashtami_name[l_key], "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"}[l_key],
+            "icon": "🔱", "deity": {"en": "Lord Kalabhairava & Shiva", "hi": "भगवान कालभैरव", "bn": "ভগবান কালভৈরব ও শিব"}[l_key],
+            "description": {
+                "en": "Monthly fasting dedicated to Lord Bhairava to eliminate fears, afflictions, and negativities.",
+                "hi": "समस्त भय, बाधा ও संकटों के निवारण हेतु भगवान कालभैरव की विशेष रात्रि पूजा।",
+                "bn": "সর্বপ্রকার ভয় ও বিঘ্ন বিনাশের জন্য ভগবান কালভৈরবের বিশেষ পূজা ও উপবাস।"
+            }[l_key],
+            "muhurta_type": "nishita", "muhurta_label": {"en": "Nishita Kaal Puja", "hi": "निशीथ काल पूजा", "bn": "নিশীথ কাল ভৈরব পূজা"}[l_key], "muhurta": ""
+        })
+
+    # ৯. মাসিক দুর্গাশ্টমী / মাস দুর্গা পূজা (Shukla Paksha Ashtami)
+    elif tithi_num == 8 and paksha == "Shukla":
+        durga_ashtami_name = {"en": "Masik Durgashtami Vrat", "hi": "मासिक दुर्गाष्टमी व्रत", "bn": "মাসিক দুর্গাশ্টমী ব্রত (দেবী দুর্গা পূজা)"}
+        append_festival_once(festivals, {
+            "name": durga_ashtami_name[l_key], "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"}[l_key],
+            "icon": "🔱", "deity": {"en": "Maa Durga", "hi": "माँ दुर्गा", "bn": "মা দুর্গা দেবী"}[l_key],
+            "description": {
+                "en": "Monthly fasting dedicated to Goddess Durga invoking strength, prosperity, and protection.",
+                "hi": "शक्ति, सामर्थ्य एवं परिवार की रक्षा हेतु शुक्ल पक्ष की अष्टमी पर माँ दुर्गा की विशेष पूजा।",
+                "bn": "পারিবারিক সমৃদ্ধি ও সুরক্ষার কামনায় প্রতি মাসের শুক্ল অষ্টমী তিথিতে মা দুর্গার বিশেষ পূজা।"
+            }[l_key],
+            "muhurta_type": "sandhi", "muhurta_label": {"en": "Sandhya / Pradosh Puja", "hi": "संध्या व प्रदोष काल", "bn": "সন্ধ্যা ও প্রদোষ লগ্ন"}[l_key], "muhurta": ""
+        })
+
+    # ১০. মাসিক স্কন্দ ষষ্ঠী ব্রত (Shukla Paksha Shashthi - কার্তিক ভগবান)
+    elif tithi_num == 6 and paksha == "Shukla":
+        skanda_name = {"en": "Masik Skanda Sasthi Vrat", "hi": "मासिक स्कंद षष्ठी व्रत", "bn": "মাসিক স্কন্দ ষষ্ঠী ব্রত (কার্তিক পূজা)"}
+        append_festival_once(festivals, {
+            "name": skanda_name[l_key], "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"}[l_key],
+            "icon": "🦚", "deity": {"en": "Lord Kartikeya (Murugan)", "hi": "भगवान कार्तिकेय (मुरुगन)", "bn": "ভগবান কার্তিকেয় (মুরুগান)"}[l_key],
+            "description": {
+                "en": "Fast observed for health, courage, and offspring dedicated to Lord Skanda.",
+                "hi": "संतान सुख ও आरोग्यता की प्राप्ति हेतु भगवान कार्तिकेय (स्कंद) का पावन षष्ठी व्रत।",
+                "bn": "সুস্বাস্থ্য, সাহস ও সন্তান কামনায় দেব সেনাপতি ভগবান কার্তিকেয়ের ষষ্ঠী ব্রত।"
+            }[l_key],
+            "muhurta_type": "purvahna", "muhurta_label": {"en": "Purvahna Puja", "hi": "पूर्वाह्न काल", "bn": "পূর্বাহ্ন কাল পূজা"}[l_key], "muhurta": ""
+        })
+
+    # ১১. মাসিক শিবরাত্রি (Krishna Paksha Chaturdashi - প্রতি মাসের ১৪ তিথি)
+    elif tithi_num == 14 and paksha == "Krishna":
+        shivratri_name = {"en": "Masik Shivratri Vrat", "hi": "मासिक शिवरात्रि व्रत", "bn": "মাসিক শিবরাত্রি ব্রত (নিশীথ পূজা)"}
+        append_festival_once(festivals, {
+            "name": shivratri_name[l_key], "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"}[l_key],
+            "icon": "🔱", "deity": {"en": "Lord Shiva", "hi": "भगवान शिव", "bn": "দেবাদিদেব মহাদেব"}[l_key],
+            "description": {
+                "en": "Monthly Shivratri fasting observed with midnight Shiva Lingam worship for liberation.",
+                "hi": "मनोकामना पूर्ति एवं कष्ट निवारण हेतु मध्यरात्रि में भगवान शिव का जलाभिषेक व व्रत।",
+                "bn": "মনোবাঞ্ছা পূরণ ও সর্বক্লেশ মুক্তির উদ্দেশ্যে নিশীথ কালে শিবলিঙ্গে জলাভিষেক ও উপবাস।"
+            }[l_key],
+            "muhurta_type": "nishita", "muhurta_label": {"en": "Nishita Midnight Puja", "hi": "निशीथ काल मुहूर्त", "bn": "নিশীথ কাল পূজা মুহূর্ত"}[l_key], "muhurta": ""
+        })
+
+    # ১২. দর্শ অমাবস্যা ও পিতৃ তর্পণ (Krishna Paksha Amavasya - ৩০ বা ১৫ তিথি)
+    elif (tithi_num == 15 and paksha == "Krishna") or tithi_num == 30:
+        amavasya_name = {"en": "Darsha Amavasya / Pitru Tarpan", "hi": "दर्श अमावस्या / पितृ तर्पण", "bn": "দর্শ অমাবস্যা / পিতৃপুরুষের তর্পণ ও দান"}
+        append_festival_once(festivals, {
+            "name": amavasya_name[l_key], "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ও তর্পণ"}[l_key],
+            "icon": "🌑", "deity": {"en": "Pitru Devas & Lord Shiva", "hi": "पितृ देव व भगवान शिव", "bn": "পিতৃপুরুষ ও মহাদেব"}[l_key],
+            "description": {
+                "en": "Monthly Amavasya day for offering sacred water oblation (tarpan) and charity for ancestors' peace.",
+                "hi": "पूर्वजों की शांति व तृप्ति हेतु पवित्र जल तर्पण, अन्नदान एवं पुण्य स्नान का दिन।",
+                "bn": "পিতৃপুরুষের আত্মার তৃপ্তির উদ্দেশ্যে পবিত্র তর্পণ, দান ও মহাদেবের অর্চনা।"
+            }[l_key],
+            "muhurta_type": "aparahna", "muhurta_label": {"en": "Aparahna (Tarpan)", "hi": "अपराह्न तर्पण काल", "bn": "অপরাহ্ন তর্পণ লগ্ন"}[l_key], "muhurta": ""
+        })    
 
     # ৩. প্রদোষ ব্রত (Pradosh Vrata)
     elif tithi_num == 13:
