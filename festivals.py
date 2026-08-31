@@ -1722,6 +1722,66 @@ HINDU_FESTIVAL_DATABASE = {
         "muhurta_label": {"en": "Moonrise & Puja Time", "hi": "चन्द्रोदय व पूजन", "bn": "চন্দ্রোদয় ও পূজা লগ্ন"}
     },
 
+    # --- পৌষ মাস (Pausha) ---
+    ("Pausha", "Shukla", 1): {
+        "en": "Pausha Shukla Pratipada / Ishti Havan",
+        "hi": "पौष शुक्ल प्रतिपदा / इष्टि",
+        "bn": "পৌষ শুক্ল প্রতিপদ / বৈদিক ইষ্টি যজ্ঞ",
+        "category": "hindu", "type": {"en": "Vedic Ritual", "hi": "वैदिक अनुष्ठान", "bn": "বৈদিক সংস্কার"},
+        "icon": "🔥", "deity": {"en": "Agni Deva & Sri Vishnu", "hi": "अग्नि देव व श्री विष्णु", "bn": "অগ্নি দেব ও শ্রীহরি বিষ্ণু"},
+        "description": {
+            "en": "Auspicious commencement of Pausha Shukla Paksha observing sacred Vedic Ishti havan.",
+            "hi": "पौष शुक्ल पक्ष का पावन प्रारंभ एवं सुख-समृद्धि हेतु वैदिक इष्टि अनुष्ठान।",
+            "bn": "পৌষ শুক্লপক্ষের পুণ্য সূচনা এবং পরম কল্যাণ কামনায় বৈদিক ইষ্টি যজ্ঞ অনুষ্ঠান।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Morning Ishti Havan", "hi": "प्रातः इष्टि मुहूर्त", "bn": "প্রাতঃকালীন ইষ্টি যজ্ঞ মুহূর্ত"}
+    },
+    ("Pausha", "Shukla", 2): {
+        "en": "Chandra Darshana (Pausha Shukla)",
+        "hi": "पौष चन्द्र दर्शन",
+        "bn": "পৌষ শুক্ল দ্বিতীয়া চন্দ্র দর্শন",
+        "category": "hindu", "type": {"en": "Observance", "hi": "धार्मिक दर्शन", "bn": "চন্দ্র দর্শন"},
+        "icon": "🌙", "deity": {"en": "Chandra Deva", "hi": "चन्द्र देव", "bn": "চন্দ্র দেব"},
+        "description": {
+            "en": "Auspicious sighting of the crescent moon after sunset for peace, harmony, and mental clarity.",
+            "hi": "मानसिक शांति ও सौभाग्य वृद्धि हेतु सायंकाल नवचंद्र (द्वितीया चंद्र) दर्शन व अर्घ्य।",
+            "bn": "মানসিক প্রশান্তি ও সৌভাগ্য বৃদ্ধির কামনায় সায়ংকালে অমাবস্যা-পরবর্তী নবচন্দ্র দর্শন।"
+        },
+        "muhurta_type": "sayankal",
+        "muhurta_label": {"en": "Sayankal Chandra Darshan", "hi": "सायंकाल चंद्र दर्शन", "bn": "সায়ংকালীন চন্দ্র দর্শন লগ্ন"}
+    },
+
+    # --- মাঘ মাস (Magha) ---
+    ("Magha", "Krishna", 1): {
+        "en": "Magha Krishna Pratipada / Ishti Havan",
+        "hi": "माघ कृष्ण प्रतिपदा / इष्टि",
+        "bn": "মাঘ কৃষ্ণ প্রতিপদ / বৈদিক ইষ্টি যজ্ঞ",
+        "category": "hindu", "type": {"en": "Vedic Ritual", "hi": "वैदिक अनुष्ठान", "bn": "বৈদিক সংস্কার"},
+        "icon": "🔥", "deity": {"en": "Agni Deva & Pitru Devas", "hi": "अग्नि देव व पितृ गण", "bn": "অগ্নি দেব ও পিতৃপুরুষগণ"},
+        "description": {
+            "en": "Beginning of Magha Krishna Paksha observing traditional Ishti fire oblations.",
+            "hi": "माघ कृष्ण पक्ष का प्रारंभ एवं पितृ-देव तृप्ति हेतु वैदिक इष्टि यज्ञानुष्ठान।",
+            "bn": "মাঘ কৃষ্ণপক্ষের শুভ সূচনা এবং শান্তি ও সমৃদ্ধি কামনায় বৈদিক ইষ্টি হোম।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Morning Ishti Havan", "hi": "प्रातः इष्टि मुहूर्त", "bn": "প্রাতঃকালীন ইষ্টি যজ্ঞ লগ্ন"}
+    },
+    ("Magha", "Krishna", 7): {
+        "en": "Swami Vivekananda Jayanti (Tithi-based / Samvat)",
+        "hi": "स्वामी विवेकानंद जयंती (संवत / तिथि आधारित)",
+        "bn": "যুগনায়ক স্বামী বিবেকানন্দ জন্মতিথি (তিথিভিত্তিক / পৌষী কৃষ্ণা সপ্তমী)",
+        "category": "hindu", "type": {"en": "Jayanti", "hi": "पावन जयंती", "bn": "আবির্ভাব জয়ন্তী"},
+        "icon": "🕉️", "deity": {"en": "Swami Vivekananda & Sri Ramakrishna", "hi": "स्वामी विवेकानंद व रामकृष्ण परमहंस", "bn": "স্বামী বিবেকানন্দ ও শ্রীরামকৃষ্ণ"},
+        "description": {
+            "en": "Traditional Hindu lunar tithi celebration of the advent of Swami Vivekananda on Magha/Pausha Krishna Saptami.",
+            "hi": "पौष/माघ कृष्ण सप्तमी पर सनातन धर्म के पुनर्जागरणकर्ता स्वामी विवेकानंद का पावन जन्मतिथी उत्सव।",
+            "bn": "সনাতন ধর্মের বিশ্বদূত যুগনায়ক স্বামী বিবেকানন্দের শাস্ত্রীয় তিথিভিত্তিক জন্মজয়ন্তী মহোৎসব।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Pratah Smaran & Puja", "hi": "प्रातः वंदन व पूजा", "bn": "প্রাতঃকালীন স্মরণ ও পূজার্চনা"}
+    },
+
 # ==============================================================================
 # ২. ভারতীয় জাতীয় ছুটির দিন ও স্মরণীয় দিবস
 # ==============================================================================
