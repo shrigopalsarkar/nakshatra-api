@@ -1896,7 +1896,71 @@ HINDU_FESTIVAL_DATABASE.update(MISSING_HINDU_FESTIVALS)
         "muhurta_type": "sayankal",
         "muhurta_label": {"en": "Sayankal Chandra Darshan", "hi": "सायंकाल चंद्र दर्शन", "bn": "সায়ংকালীন চন্দ্র দর্শন লগ্ন"}
     },
+# ==============================================================================
+# ১. HINDU_FESTIVAL_DATABASE-এ যুক্ত করার জন্য মিসিং আইটেমসমূহ
+# ==============================================================================
+SCREENSHOT_MISSING_FESTIVALS = {
+    # ---------------- Phalguna (ফাল্গুন মাস) ----------------
+    ("Phalguna", "Krishna", 10): {
+        "en": "Maharishi Dayanand Saraswati Jayanti",
+        "hi": "महर्षि दयानंद सरस्वती जयंती",
+        "bn": "মহর্ষি দয়ানন্দ সরস্বতী জয়ন্তী",
+        "category": "hindu", "type": {"en": "Jayanti", "hi": "जयंती पर्व", "bn": "মহাপর্ব"},
+        "icon": "🕉️", "deity": {"en": "Maharishi Dayanand Saraswati", "hi": "महर्षि दयानंद सरस्वती", "bn": "মহর্ষি দয়ানন্দ সরস্বতী"},
+        "description": {
+            "en": "Birth anniversary of Swami Dayanand Saraswati, the founder of Arya Samaj and Vedic revivalist.",
+            "hi": "आर्य समाज के संस्थापक एवं वेदों के प्रचारक महर्षि दयानंद सरस्वती का पावन जन्मोत्सव।",
+            "bn": "আর্য সমাজের প্রতিষ্ঠাতা ও বৈদিক দর্শনের পুনরুজ্জীবক মহর্ষি দয়ানন্দ সরস্বতীর শুভ আবির্ভাব তিথি।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Morning Prayer & Havan", "hi": "प्रातः वंदन व हवन", "bn": "প্রাতঃকালীন স্মরণ ও বৈদিক যজ্ঞ"}
+    },
+    ("Phalguna", "Krishna", 15): {
+        "en": "Phalguna Amavasya / Darsha Amavasya / Anvadhan",
+        "hi": "फाल्गुन अमावस्या / दर्श अमावस्या / अन्वाधान",
+        "bn": "ফাল্গুনী অমাবস্যা / দর্শ অমাবস্যা ও অন্বাধান",
+        "category": "hindu", "type": {"en": "Vrata & Tarpan", "hi": "उपवास व तर्पण", "bn": "উপবাস ও তর্পণ"},
+        "icon": "🌑", "deity": {"en": "Pitru Devas & Lord Shiva", "hi": "पितृ देव व भगवान शिव", "bn": "পিতৃপুরুষ ও মহাদেব"},
+        "description": {
+            "en": "Auspicious new moon day of Phalguna for sacred holy dip, ancestor charity, and Vedic Anvadhan rituals.",
+            "hi": "पितरों की शांति, पवित्र तीर्थ स्नान एवं इष्टि पूर्व अन्वाधान अनुष्ठान का पावन दिन।",
+            "bn": "পিতৃপুরুষের আত্মার তৃপ্তির জন্য পবিত্র স্নান, তর্পণ, দান এবং বৈদিক অন্বাধান সংস্কার পালন।"
+        },
+        "muhurta_type": "aparahna",
+        "muhurta_label": {"en": "Aparahna Tarpan & Snan", "hi": "अपराह्न तर्पण काल", "bn": "অপরাহ্ন তর্পণ ও স্নান লগ্ন"}
+    },
+    ("Phalguna", "Shukla", 1): {
+        "en": "Phalguna Shukla Pratipada / Ishti Havan",
+        "hi": "फाल्गुन शुक्ल प्रतिपदा / इष्टि",
+        "bn": "ফাল্গুন শুক্ল প্রতিপদ / বৈদিক ইষ্টি যজ্ঞ",
+        "category": "hindu", "type": {"en": "Vedic Ritual", "hi": "वैदिक अनुष्ठान", "bn": "বৈদিক সংস্কার"},
+        "icon": "🔥", "deity": {"en": "Agni Deva & Lord Vishnu", "hi": "अग्नि देव व श्री विष्णु", "bn": "অগ্নি দেব ও শ্রীহরি বিষ্ণু"},
+        "description": {
+            "en": "Commencement of Phalguna Shukla Paksha observing sacred Vedic Ishti fire rituals for auspiciousness.",
+            "hi": "फाल्गुन शुक्ल पक्ष का प्रारंभ एवं सुख-शांति हेतु वैदिक इष्टि यज्ञानुष्ठान।",
+            "bn": "ফাল্গুন শুক্লপক্ষের শুভ সূচনা এবং শান্তি ও সমৃদ্ধি কামনায় বৈদিক ইষ্টি হোম।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Morning Ishti Havan", "hi": "प्रातः इष्टि मुहूर्त", "bn": "প্রাতঃকালীন ইষ্টি যজ্ঞ মুহূর্ত"}
+    },
+    ("Phalguna", "Shukla", 2): {
+        "en": "Phulera Dooj / Ramakrishna Paramahamsa Jayanti / Chandra Darshana",
+        "hi": "फुलेरा दूज / रामकृष्ण परमहंस जयंती / चन्द्र दर्शन",
+        "bn": "শ্রী শ্রী ফুলেরা দুজ / যুগাবতার শ্রীরামকৃষ্ণ জন্মজয়ন্তী / চন্দ্র দর্শন",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🌸", "deity": {"en": "Sri Radha Krishna & Sri Ramakrishna", "hi": "श्रीराधा-कृष्ण व रामकृष्ण परमहंस", "bn": "শ্রীশ্রী রাধাকৃষ্ণ ও যুগাবতার শ্রীরামকৃষ্ণ"},
+        "description": {
+            "en": "Joyous flower festival (Phulera Dooj) of Radha-Krishna in Braj and the divine advent of Sri Ramakrishna Paramahamsa.",
+            "hi": "ब्रज में फूलों की होली (फुलेरा दूज) एवं युगपुरुष श्री रामकृष्ण परमहंस का पावन प्राकट्य दिवस।",
+            "bn": "ব্রজমণ্ডলে ফুল দিয়ে হোলি খেলার পুণ্য ফুলেরা দুজ এবং যুগাবতার ভগবান শ্রী শ্রী রামকৃষ্ণ পরমহংসদেবের শুভ আবির্ভাব তিথি।"
+        },
+        "muhurta_type": "sayankal",
+        "muhurta_label": {"en": "Sayankal Chandra Darshan & Puja", "hi": "सायंकाल चंद्र दर्शन व पूजा", "bn": "সায়ংকালীন চন্দ্র দর্শন ও আরতি লগ্ন"}
+    }
+}
 
+# মূল ডাটাবেসে আপডেট করার জন্য:
+HINDU_FESTIVAL_DATABASE.update(SCREENSHOT_MISSING_FESTIVALS)
 # ==============================================================================
 # ২. ভারতীয় জাতীয় ছুটির দিন ও স্মরণীয় দিবস
 # ==============================================================================
@@ -1978,6 +2042,55 @@ INDIAN_NATIONAL_HOLIDAYS = {
         },
         "muhurta": {"en": "All Day Observance", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}
     },
+
+# ==============================================================================
+# FIXED_SOLAR_FESTIVALS / FIXED_WORLD_CHRISTIAN_DAYS এ যুক্ত করার মিসিং দিবসসমূহ:
+# ==============================================================================
+
+MISSING_SOLAR_AND_NATIONAL_DAYS = {
+    (1, 13): {
+        "en": "Lohri Festival",
+        "hi": "लोहड़ी पर्व",
+        "bn": "লোহড়ী মহোৎসব (বহ্নি উৎসব)",
+        "category": "hindu", "icon": "🔥", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"},
+        "deity": {"en": "Agni Deva & Surya Deva", "hi": "अग्नि देव व सूर्य देव", "bn": "অগ্নি দেব ও সূর্য দেব"},
+        "description": {
+            "en": "Harvest bonfire festival marking the culmination of winter and welcoming longer days.",
+            "hi": "अग्नि पूजन, तिल-गुड़ भोग एवं रबी फसल के आगमन का उल्लासमय पर्व।",
+            "bn": "নতুন ফসল আহরণ ও শীতের অবসানে পবিত্র অগ্নি প্রজ্বলন ও তিল-গুড় নিবেদনের উৎসব।"
+        },
+        "muhurta": {"en": "Evening Bonfire (06:00 - 08:30 PM)", "hi": "सायंकाल अग्नि पूजन (०६:०० - ०८:३০)", "bn": "সায়ংকালে বহ্নি প্রজ্বলন (সন্ধ্যা ০৬:০০ - ০৮:৩০)"}
+    },
+    (5, 7): {
+        "en": "Rabindra Jayanti (Pachishe Boishakh)",
+        "hi": "रवीन्द्रनाथ टैगोर जयंती",
+        "bn": "রবীন্দ্র জয়ন্তী (পঁচিশে বৈশাখ)",
+        "category": "national", "icon": "📜", "type": {"en": "Observance", "hi": "सांस्कृतिक पर्व", "bn": "সাংস্কৃতিক উৎসব"},
+        "deity": {"en": "Kabiguru Rabindranath Tagore", "hi": "कविगुरु रवीन्द्रनाथ ठाकुर", "bn": "বিশ্বকবি রবীন্দ্রনাথ ঠাকুর"},
+        "description": {
+            "en": "Birth anniversary of Asia's first Nobel laureate, polymath, and poet Rabindranath Tagore.",
+            "hi": "नोबेल पुरस्कार विजेता, राष्ट्रगान के रचयिता विश्वकवि रवीन्द्रनाथ टैगोर का पावन जन्मोत्सव।",
+            "bn": "এশিয়া মহাদেশের প্রথম নোবেলজয়ী বিশ্বকবি রবীন্দ্রনাথ ঠাকুরের শুভ জন্মজয়ন্তী।"
+        },
+        "muhurta": {"en": "All Day Observance", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}
+    },
+    (9, 5): {
+        "en": "Teachers' Day (Dr. Radhakrishnan Jayanti)",
+        "hi": "शिक्षक दिवस (डॉ. सर्वपल्ली राधाकृष्णन जयंती)",
+        "bn": "জাতীয় শিক্ষক দিবস (ডঃ সর্বপল্লী রাধাকৃষ্ণণ জন্মজয়ন্তী)",
+        "category": "national", "icon": "📚", "type": {"en": "National Observance", "hi": "राष्ट्रीय दिवस", "bn": "জাতীয় দিবস"},
+        "deity": {"en": "Dr. Sarvepalli Radhakrishnan", "hi": "डॉ. सर्वपल्ली राधाकृष्णन", "bn": "ডঃ সর্বপল্লী রাধাকৃষ্ণণ"},
+        "description": {
+            "en": "Honouring teachers and celebrating the birth of philosopher-statesman Dr. S. Radhakrishnan.",
+            "hi": "शिक्षकों के प्रति कृतज्ञता समर्पण एवं पूर्व राष्ट्रपति डॉ. राधाकृष्णन की पावन जयंती।",
+            "bn": "মানুষ গড়ার কারিগর শিক্ষক মহাশয়দের প্রতি শ্রদ্ধা নিবেদন ও প্রাক্তন রাষ্ট্রপতির জন্মতিথি।"
+        },
+        "muhurta": {"en": "All Day School Observance", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন শিক্ষাপ্রতিষ্ঠানভিত্তিক উদযাপন"}
+    }
+}
+
+# মূল ডিকশনারিতে মার্জ করার জন্য:
+INDIAN_NATIONAL_HOLIDAYS.update(MISSING_SOLAR_AND_NATIONAL_DAYS)
 
 # ==============================================================================
 # ৩. খ্রিস্টান ও আন্তর্জাতিক ফিক্সড দিবস
@@ -2246,7 +2359,22 @@ def get_festivals_for_day(
             "name": kumbha_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
             "icon": "☀️", "deity": kumbha_deity[l_key], "description": kumbha_desc[l_key],
             "muhurta_type": "sunrise_snan", "muhurta_label": {"en": "Kumbha Sankranti Punya Kaal", "hi": "कुम्भ संक्रांति पुण्य काल", "bn": "কুম্ভ সংক্রান্তি পুণ্যকাল স্নান ও দান"}[l_key], "muhurta": ""
-        })    
+        })
+
+    # মীন সংক্রান্তি (Meena Sankranti)
+    elif m_d == (3, 15) or ("meena" in s_name or "pisces" in s_name):
+        meena_names = {"en": "Meena Sankranti", "hi": "मीन संक्रांति", "bn": "মীন সংক্রান্তি পুণ্যস্নান ও দান"}
+        meena_deity = {"en": "Surya Deva", "hi": "भगवान सूर्य देव", "bn": "ভগবান সূর্য দেব"}
+        meena_desc = {
+            "en": "Sun transits into Pisces (Meena Rashi), highly auspicious for holy dip and charity.",
+            "hi": "सूर्य का मीन राशि में प्रवेश, पवित्र नदियों में स्नान एवं पुण्य दान का विशेष दिन।",
+            "bn": "সূর্যের মীন রাশিতে শুভ সংক্রমণ, পবিত্র গঙ্গাস্নান ও পুণ্য অর্জনের লগ্ন।"
+        }
+        append_festival_once(festivals, {
+            "name": meena_names[l_key], "category": "hindu", "type": {"en": "Solar Festival", "hi": "सौर पर्व", "bn": "সৌর মহাপর্ব"}[l_key],
+            "icon": "☀️", "deity": meena_deity[l_key], "description": meena_desc[l_key],
+            "muhurta_type": "sunrise_snan", "muhurta_label": {"en": "Meena Sankranti Punya Kaal", "hi": "मीन संक्रांति पुण्य काल", "bn": "মীন সংক্রান্তি পুণ্যকাল স্নান ও দান"}[l_key], "muhurta": ""
+        })
 
     # ২. সর্বভারতীয় একাদশী ব্রত (Ekadashi Vrata)
     if tithi_num == 11:
