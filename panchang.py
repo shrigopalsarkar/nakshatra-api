@@ -987,18 +987,70 @@ def compute_full_drik_panchang(
     # ৩. হেডার টেক্সট তৈরি (যেমন: "8, 9", "1, 2", অথবা সাধারণ "8")
     lunar_day_formatted = ", ".join(str(n) for n in active_tithi_nums)
 
-    # ৪. উৎসব লোড (উভয় তিথির উৎসব থাকলে তা সংগ্রহ করা)
+    # ==========================================================================
+    # জ্যোতির্বৈজ্ঞানিক গ্রহ-গোচর ভিত্তিক উৎসব নিরূপণ (Sunrise, Sunset & Midnight)
+    # ==========================================================================
+    # ১. সূর্যোদয়ের সময়কার তিথি
+    sun_lon_rise, moon_lon_rise = sidereal_longitudes(jd_sunrise)
+    t_idx_rise = int(((moon_lon_rise - sun_lon_rise) % 360.0) / 12.0) % 30
+    paksha_rise = "Shukla" if t_idx_rise < 15 else "Krishna"
+    t_num_rise = (t_idx_rise % 15) + 1
+
+    # ২. সূর্যাস্তের (প্রদোষকাল) সময়কার তিথি ও পক্ষ
+    sun_lon_set, moon_lon_set = sidereal_longitudes(jd_sunset)
+    t_idx_set = int(((moon_lon_set - sun_lon_set) % 360.0) / 12.0) % 30
+    paksha_set = "Shukla" if t_idx_set < 15 else "Krishna"
+    t_num_set = (t_idx_set % 15) + 1
+
+    # ৩. মধ্যরাত্রির (নিশীথকাল) সময়কার তিথি ও পক্ষ
+    jd_midnight = (jd_sunset + jd_next_sunrise) / 2.0
+    sun_lon_mid, moon_lon_mid = sidereal_longitudes(jd_midnight)
+    t_idx_mid = int(((moon_lon_mid - sun_lon_mid) % 360.0) / 12.0) % 30
+    paksha_mid = "Shukla" if t_idx_mid < 15 else "Krishna"
+    t_num_mid = (t_idx_mid % 15) + 1
+
+    # ৪. সমস্ত মহাজাগতিক সংযোগের উৎসব একত্রীকরণ
     today_festivals = []
-    for t_num in active_tithi_nums:
-        fests = get_festivals_for_day(
-            current_date=local_date,
-            lunar_month=lunar_masa,
-            paksha=paksha_val,
-            tithi_num=t_num,
-            sankranti_name=None,
-            lang=lang
-        )
-        for f in fests:
+
+    # (ক) সূর্যোদয়ভিত্তিক উৎসব
+    fests_rise = get_festivals_for_day(
+        current_date=local_date,
+        lunar_month=lunar_masa,
+        paksha=paksha_rise,
+        tithi_num=t_num_rise,
+        sankranti_name=None,
+        lang=lang
+    )
+    for f in fests_rise:
+        if f.get("muhurta_type") in ["purvahna", "sunrise_snan", "madhyahna", "brahma", "aparahna"] or f.get("category") == "national" or f.get("category") == "world":
+            if not any(x.get("name") == f.get("name") for x in today_festivals):
+                today_festivals.append(f)
+
+    # (খ) প্রদোষকাল (সূর্যাস্ত) ভিত্তিক উৎসব (Dhanteras, Diwali, Pradosh Vrat)
+    fests_set = get_festivals_for_day(
+        current_date=local_date,
+        lunar_month=lunar_masa,
+        paksha=paksha_set,
+        tithi_num=t_num_set,
+        sankranti_name=None,
+        lang=lang
+    )
+    for f in fests_set:
+        if f.get("muhurta_type") in ["pradosh", "sayankal"]:
+            if not any(x.get("name") == f.get("name") for x in today_festivals):
+                today_festivals.append(f)
+
+    # (গ) নিশীথকাল (মধ্যরাত্রি) ভিত্তিক উৎসব (Kali Chaudas, Shyama Puja, Shivratri)
+    fests_mid = get_festivals_for_day(
+        current_date=local_date,
+        lunar_month=lunar_masa,
+        paksha=paksha_mid,
+        tithi_num=t_num_mid,
+        sankranti_name=None,
+        lang=lang
+    )
+    for f in fests_mid:
+        if f.get("muhurta_type") == "nishita":
             if not any(x.get("name") == f.get("name") for x in today_festivals):
                 today_festivals.append(f)
     # --------------------------------------------------------------------------
