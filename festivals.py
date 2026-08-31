@@ -2038,6 +2038,141 @@ HINDU_FESTIVAL_DATABASE = {
         "muhurta_type": "purvahna",
         "muhurta_label": {"en": "Purvahna Rangaotsav", "hi": "पूर्वाह्न रंगोत्सव", "bn": "পূর্বাহ্ন আবির খেলা ও দেব পূজা"}
     },
+    # ---------------- Chaitra (চৈত্র মাস) ----------------
+    ("Chaitra", "Shukla", 6): {
+        "en": "Yamuna Chhath / Yamuna Jayanti",
+        "hi": "यमुना छठ / यमुना जयंती",
+        "bn": "শ্রী শ্রী যমুনা ষষ্ঠী (যমুনা দেবীর শুভ আবির্ভাব)",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🌊", "deity": {"en": "Goddess Yamuna", "hi": "माँ यमुना देवी", "bn": "মা যমুনা দেবী"},
+        "description": {
+            "en": "Appearance day of sacred River Yamuna on Chaitra Shukla Shashthi, celebrated with holy dip and deepam.",
+            "hi": "चैत्र शुक्ल षष्ठी पर माँ यमुना का अवतरण दिवस, यमुना स्नान एवं दीपदान का पावन पर्व।",
+            "bn": "চৈত্র শুক্ল ষষ্ঠীতে পতিতপাবনী যমুনা দেবীর মর্ত্যে শুভ আবির্ভাব ও তীর্থস্নান মহোৎসব।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Purvahna Yamuna Puja", "hi": "पूर्वाह्न यमुना पूजन", "bn": "পূর্বাহ্ন যমুনা পূজা ও আরতি"}
+    },
+    ("Chaitra", "Shukla", 9): {
+        "en": "Sri Rama Navami / Swaminarayan Jayanti / Basanti Navami",
+        "hi": "श्री राम नवमी / स्वामीनारायण जयंती / बासंती महानवमी",
+        "bn": "শ্রী শ্রী রাম নবমী / ভগবান স্বামীনারায়ণ জয়ন্তী / বাসন্তী নবমী",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🏹", "deity": {"en": "Lord Sri Rama & Bhagwan Swaminarayan", "hi": "भगवान श्रीराम व स्वामीनारायण", "bn": "ভগবান শ্রীরামচন্দ্র ও স্বামীনারায়ণ"},
+        "description": {
+            "en": "Divine appearance day of Maryada Purushottam Lord Sri Rama and Bhagwan Swaminarayan at noon.",
+            "hi": "दोपहर में मर्यादा पुरुषोत्तम श्रीराम एवं भगवान स्वामीनारायण का पावन जन्मोत्सव।",
+            "bn": "শুভ দ্বিপ্রহরে পরম পুরুষোত্তম ভগবান শ্রীরামচন্দ্র ও ভগবান স্বামীনারায়ণের শুভ আবির্ভাব মহোৎসব।"
+        },
+        "muhurta_type": "madhyahna",
+        "muhurta_label": {"en": "Madhyahna Kaal Muhurta", "hi": "मध्याह्न काल मुहूर्त", "bn": "মধ্যাহ্ন কাল মুহূর্ত (আবির্ভাব লগ্ন)"}
+    },
+
+    # ---------------- Jyeshtha (জ্যৈষ্ঠ মাস) ----------------
+    ("Jyeshtha", "Shukla", 3): {
+        "en": "Maharana Pratap Jayanti (Tithi-based)",
+        "hi": "महाराणा प्रताप जयंती (तिथि अनुसार)",
+        "bn": "বীর শিরোমণি মহারাণা প্রতাপ জয়ন্তী",
+        "category": "hindu", "type": {"en": "Jayanti", "hi": "गौरव दिवस", "bn": "বীর স্মরণোৎসব"},
+        "icon": "⚔️", "deity": {"en": "Maharana Pratap", "hi": "महाराणा प्रताप", "bn": "বীর মহারাণা প্রতাপ"},
+        "description": {
+            "en": "Birth anniversary of the legendary Rajput warrior-king Maharana Pratap of Mewar.",
+            "hi": "अदम्य साहस एवं स्वाभिमान के प्रतीक मेवाड़ मुकुट महाराणा प्रताप का पावन जन्मोत्सव।",
+            "bn": "মাতৃভূমির স্বাধীনতার প্রতীক অসীম সাহসী রাজপুত বীর মহারাণা প্রতাপের পুণ্য জন্মতিথি।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Purvahna Smaran", "hi": "प्रातः वंदन", "bn": "প্রাতঃকালীন স্মরণ ও শ্রদ্ধাঞ্জলি"}
+    },
+
+    # ---------------- Ashadha (আষাঢ় মাস) ----------------
+    ("Ashadha", "Shukla", 13): {
+        "en": "Jayaparvati Vrat Begins",
+        "hi": "जयापार्वती व्रत प्रारंभ",
+        "bn": "শ্রী শ্রী জয়াপার্বতী ব্রতারম্ভ",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🌺", "deity": {"en": "Lord Shiva & Maa Parvati", "hi": "शिव-पार्वती", "bn": "দেবাদিদেব শিব ও মা পার্বতী"},
+        "description": {
+            "en": "Inception of the 5-day Jayaparvati fast observed by maidens and women for bliss and suitable consort.",
+            "hi": "सुहाग एवं सुयोग्य जीवनसाथी की प्राप्ति हेतु कन्याओं व महिलाओं का ५ दिवसीय जयापार्वती व्रत।",
+            "bn": "মনোমত পতি ও দাম্পত্য সুখের কামনায় ৫ দিনব্যাপী পবিত্র জয়াপার্বতী ব্রতের সূচনা।"
+        },
+        "muhurta_type": "pradosh",
+        "muhurta_label": {"en": "Pradosh Kaal Puja", "hi": "प्रदोष काल", "bn": "প্রদোষ কাল পূজা লগ্ন"}
+    },
+
+    # ---------------- Shravana (শ্রাবণ মাস) ----------------
+    ("Shravana", "Krishna", 3): {
+        "en": "Jayaparvati Vrat Ends / Mangala Gauri Vrat",
+        "hi": "जयापार्वती व्रत जागरण समापन / मंगला गौरी व्रत",
+        "bn": "জয়াপার্বতী ব্রত সমাপন (জাগরণ ও পারণ) / মঙ্গলা গৌরী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "উপবাস ব্রত", "bn": "উপবাস ব্রত"},
+        "icon": "🌸", "deity": {"en": "Maa Gauri & Shiva", "hi": "माँ गौरी व शिव", "bn": "দেবী গৌরী ও মহাদেব"},
+        "description": {
+            "en": "Conclusion of Jayaparvati fast through all-night vigil (Jagran) and morning parana.",
+            "hi": "रात्रि जागरण के पश्चात प्रातःकाल पारण के साथ जयापार्वती व्रत की पूर्णता।",
+            "bn": "সারারাত ভক্তিগীতি সহযোগে জাগরণ শেষে সকালে পারণের মাধ্যমে জয়াপার্বতী ব্রতের পূর্ণতা।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Morning Parana Muhurta", "hi": "प्रातः पारण मुहूर्त", "bn": "প্রাতঃকালীন পারণ লগ্ন"}
+    },
+
+    # ---------------- Bhadrapada (ভাদ্রপদ মাস) ----------------
+    ("Bhadrapada", "Krishna", 9): {
+        "en": "Dahi Handi / Sri Nandotsava",
+        "hi": "दही हांडी महोत्सव / श्री नंदोत्सव",
+        "bn": "দহি হাণ্ডি মহোৎসব / শ্রী শ্রী নন্দোৎসব",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🍯", "deity": {"en": "Balakrishna & Govinda", "hi": "बालकृष्ण गोविंदा", "bn": "বালগোপাল ও গোবিন্দ"},
+        "description": {
+            "en": "Commemorating Balakrishna's childhood pastime of stealing butter through human pyramids.",
+            "hi": "गोकुल में माखन चोरी की लीला को साकार करते हुए गोविंदा टोलियों द्वारा दही हांडी फोड़ने का उत्सव।",
+            "bn": "বালগোপালের মাখনচুরির মধুর লীলা স্মরণে আনন্দোল্লাসে দহি হাণ্ডি ভাঙার সর্বজনীন উৎসব।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Purvahna Utsav Muhurta", "hi": "पूर्वाह्न उत्सव काल", "bn": "পূর্বাহ্ন মহোৎসব লগ্ন"}
+    },
+    ("Bhadrapada", "Krishna", 15): {
+        "en": "Pithori Amavasya / Pola / Bhadrapada Amavasya / Anvadhan",
+        "hi": "पिठोरी अमावस्या (पोला) / भाद्रपद अमावस्या / अन्वाधान",
+        "bn": "পিথোরী অমাবস্যা (মায়েদের পুণ্য ব্রত) / ভাদ্রপদ অমাবস্যা ও অন্বাধান",
+        "category": "hindu", "type": {"en": "Vrata & Tarpan", "hi": "উপবাস ও তর্পণ", "bn": "উপবাস ও তর্পণ"},
+        "icon": "🌑", "deity": {"en": "64 Yoginis, Maa Durga & Pitrus", "hi": "६४ योगिनी, माँ दुर्गा व पितृ गण", "bn": "চৌষট্টি যোগিনী, মা দুর্গা ও পিতৃপুরুষ"},
+        "description": {
+            "en": "Mothers worship 64 Yoginis using flour figurines (Pith) for progeny longevity and health.",
+            "hi": "संतान की दीर्घायु व समृद्धि हेतु आटे की पिंडी बनाकर ६४ योगिनियों का विशेष पिठोरी व्रत।",
+            "bn": "সন্তানের নীরোগ দীর্ঘায়ু কামনায় পিঠালির প্রতিমা গড়ে ৬৪ যোগিনী ও মা দুর্গার বিশেষ ব্রত।"
+        },
+        "muhurta_type": "aparahna",
+        "muhurta_label": {"en": "Aparahna Tarpan & Sayankal Vrat", "hi": "अपराह्न तर्पण व सायं व्रत", "bn": "অপরাহ্ন তর্পণ ও সায়ংকালীন ব্রত"}
+    },
+    ("Bhadrapada", "Shukla", 7): {
+        "en": "Lalita Saptami / Mahalakshmi Vrat Begins / Durva Ashtami",
+        "hi": "ललिता सप्तमी / महालक्ष्मी व्रत प्रारंभ / दूर्वा अष्टमी",
+        "bn": "শ্রী শ্রী ললিতা সপ্তমী / মহালক্ষ্মী ব্রতারম্ভ / দূর্বা অষ্টমী",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🪷", "deity": {"en": "Lalita Sakhi, Maa Mahalakshmi & Ganesha", "hi": "ललिता सखी, माँ महालक्ष्मी व गणेश जी", "bn": "ললিতা সখী, মা মহালক্ষ্মী ও শ্রী গণেশ"},
+        "description": {
+            "en": "Appearance of Srimati Radharani's foremost companion Lalita Sakhi and inception of 16-day Mahalakshmi fast.",
+            "hi": "श्रीमती राधारानी की प्रधान सखी ललिता जी का प्राकट्य एवं १६ दिवसीय महालक्ष्मी व्रत का शुभारंभ।",
+            "bn": "শ্রীমতী রাধারাণীর প্রধানা সখী ললিতা দেবীর আবির্ভাব এবং ১৬ দিনব্যাপী মহালক্ষ্মী ব্রতের শুভ সূচনা।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Purvahna Lalita & Lakshmi Puja", "hi": "पूर्वाह्न महालक्ष्मी पूजा", "bn": "পূর্বাহ্ন ললিতা ও মহালক্ষ্মী পূজা লগ্ন"}
+    },
+    ("Bhadrapada", "Shukla", 15): {
+        "en": "Bhadrapada Purnima / Purnima Shraddha / Pitru Paksha Begins / Anvadhan",
+        "hi": "भाद्रपद पूर्णिमा / पूर्णिमा श्राद्ध / महालय पक्ष प्रारंभ / अन्वाधान",
+        "bn": "ভাদ্রপদ পূর্ণিমা / পূর্ণিমা শ্রাদ্ধ / ১৬ দিনের পিতৃপক্ষ আরম্ভ / অন্বাধান",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🙏", "deity": {"en": "Pitru Devas & Sri Satyanarayan", "hi": "पितृ गण व श्री सत्यनारायण", "bn": "পিতৃপুরুষগণ ও শ্রী সত্যনারায়ণ"},
+        "description": {
+            "en": "Commencement of the 16-day sacred Mahalaya Pitru Paksha with Purnima Shraddha and Vedic Anvadhan.",
+            "hi": "पूर्वजों की तृप्ति हेतु १६ दिवसीय महालय श्राद्ध पक्ष का पावन प्रारंभ एवं पूर्णिमा श्राद्ध।",
+            "bn": "পরলোকগত পিতৃপুরুষের আত্মার সদগতির জন্য ১৬ দিনের পিতৃপক্ষ আরম্ভ ও পূর্ণিমা শ্রাদ্ধ নিবেদন।"
+        },
+        "muhurta_type": "aparahna",
+        "muhurta_label": {"en": "Kutapa & Aparahna (Tarpan)", "hi": "कुतप व अपराह्न (तर्पण काल)", "bn": "কুতপ ও অপরাহ্ন কাল (তর্পণ লগ্ন)"}
+    },
 
 # ==============================================================================
 # ২. ভারতীয় জাতীয় ছুটির দিন ও স্মরণীয় দিবস
