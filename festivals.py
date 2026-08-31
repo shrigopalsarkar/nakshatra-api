@@ -1186,6 +1186,92 @@ HINDU_FESTIVAL_DATABASE = {
         "muhurta_type": "purvahna",
         "muhurta_label": {"en": "Purvahna Dolotsav & Pradosh Gaura Arati", "hi": "पूर्वाह्न डोल उत्सव व संध्याकाल", "bn": "পূর্বাহ্ন দোলোৎসব ও সায়ংকালীন আবির্ভাব আরতি"}
     },
+    # ==============================================================================
+# HINDU_FESTIVAL_DATABASE এ যুক্ত করার জন্য মিসিং আইটেমসমূহ:
+# ==============================================================================
+
+MISSING_HINDU_FESTIVALS = {
+    # ---------------- Chaitra ----------------
+    ("Chaitra", "Krishna", 8): {
+        "en": "Sheetala Ashtami / Basoda",
+        "hi": "शीतला अष्टमी / बसोड़ा",
+        "bn": "শ্রী শ্রী শীতলা অষ্টমী ব্রত (বাসোড়া)",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🌸", "deity": {"en": "Maa Sheetala", "hi": "माँ शीतला", "bn": "মা শীতলা দেবী"},
+        "description": {
+            "en": "Worship of Maa Sheetala offering stale food (Basoda) to seek protection from epidemics and ailments.",
+            "hi": "आरोग्यता एवं चेचक आदि रोगों से रक्षा हेतु बासी भोजन के भोग सहित माँ शीतला का पूजन।",
+            "bn": "নীরোগ স্বাস্থ্য ও মহামারী থেকে সুরক্ষার কামনায় শীতল অন্ন নিবেদনে মা শীতলার বিশেষ ব্রত।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Purvahna Sheetala Puja", "hi": "पूर्वाह्न शीतला पूजा", "bn": "পূর্বাহ্ন শীতলা পূজা লগ্ন"}
+    },
+    ("Chaitra", "Shukla", 13): {
+        "en": "Mahavir Jayanti",
+        "hi": "महावीर जयंती",
+        "bn": "শ্রী মহাবীর জয়ন্তী (২৪তম তীর্থঙ্কর)",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🙏", "deity": {"en": "Bhagwan Mahavira", "hi": "भगवान महावीर", "bn": "ভগবান মহাবীর"},
+        "description": {
+            "en": "Birth anniversary of the 24th Jain Tirthankara, propagating truth, non-violence, and self-restraint.",
+            "hi": "सत्य, अहिंसा एवं अपरिग्रह के संदेशवाहक २४वें तीर्थंकर भगवान महावीर का पावन जन्मोत्सव।",
+            "bn": "সত্য, অহিংসা ও করুণার বাণী প্রচারক চতুর্বিংশতি তীর্থঙ্কর ভগবান মহাবীরের আবির্ভাব তিথি।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Morning Abhisheka & Rally", "hi": "प्रातः महामस्तकाभिषेक", "bn": "প্রাতঃকালীন মহাজলাভিষেক ও প্রার্থনা"}
+    },
+
+    # ---------------- Shravana ----------------
+    ("Shravana", "Shukla", 11): {
+        "en": "Jhulan Yatra Begins / Pavitropana Ekadashi",
+        "hi": "झूलन यात्रा प्रारंभ / पवित्रा एकादशी",
+        "bn": "শ্রী শ্রী ঝুলনযাত্রা আরম্ভ / পবিত্রারোপণ একাদশী",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🪷", "deity": {"en": "Sri Radha Krishna", "hi": "श्रीराधा-कृष्ण", "bn": "শ্রীশ্রী রাধাকৃষ্ণ"},
+        "description": {
+            "en": "Beginning of the 5-day divine swing festival (Jhulanotsav) of Sri Radha-Krishna in Vrindavan.",
+            "hi": "वृंदावन में श्रीराधा-कृष्ण के दिव्य झूलनोत्सव का पावन शुभारंभ।",
+            "bn": "বৃন্দাবনে শ্রীশ্রী রাধাকৃষ্ণের ৫ দিনব্যাপী লীলাময় ঝুলন মহোৎসবের পুণ্য সূচনা।"
+        },
+        "muhurta_type": "sayankal",
+        "muhurta_label": {"en": "Sayankal Jhulan Arati", "hi": "सायंकाल झूलन आरती", "bn": "সায়ংকালীন ঝুলন আরতি ও পূজা"}
+    },
+
+    # ---------------- Bhadrapada ----------------
+    ("Bhadrapada", "Krishna", 3): {
+        "en": "Kajari Teej / Badi Teej",
+        "hi": "कजरी तीज / कजली तीज",
+        "bn": "কাজরী তীজ ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🌺", "deity": {"en": "Lord Shiva & Maa Parvati", "hi": "शिव-पार्वती", "bn": "শিব-পার্বতী"},
+        "description": {
+            "en": "Fasting dedicated to Goddess Parvati and Lord Shiva for matrimonial longevity and joy.",
+            "hi": "सुहाग की रक्षा एवं दांपत्य सुख हेतु कजरी तीज का कठोर उपवास।",
+            "bn": "দাম্পত্য সুখ ও স্বামীর দীর্ঘায়ু কামনায় মা পার্বতী ও শিবের নিষ্ঠাপূর্ণ উপবাস ব্রত।"
+        },
+        "muhurta_type": "sayankal",
+        "muhurta_label": {"en": "Moonrise & Pradosh Kaal", "hi": "चन्द्रोदय व प्रदोष काल", "bn": "চন্দ্রোদয় ও প্রদোষ ব্রত লগ্ন"}
+    },
+
+    # ---------------- Ashwina ----------------
+    ("Ashwina", "Krishna", 8): {
+        "en": "Jitiya Vrat (Jivitputrika Vrat)",
+        "hi": "जितिया व्रत (जीवित्पुत्रिका व्रत)",
+        "bn": "শ্রী শ্রী জীতুয়া / জীবিতপুত্রিকা ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🪔", "deity": {"en": "Jimutavahana & Lord Surya", "hi": "जीमूतवाहन व सूर्य देव", "bn": "জীমূতবাহন ও ভগবান সূর্য"},
+        "description": {
+            "en": "Mothers observe severe 24-hour nirjala fast invoking Jimutavahana for children's longevity and health.",
+            "hi": "संतानों की दीर्घायु, स्वास्थ्य व रक्षा हेतु माताओं द्वारा २४ घंटे का निर्जला जीवित्पुत्रिका व्रत।",
+            "bn": "সন্তানের নীরোগ দীর্ঘায়ু কামনায় মায়েদের পরম নিষ্ঠাপূর্ণ ২৪ ঘণ্টার নির্জলা জীবিতপুত্রিকা ব্রত।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Purvahna Puja & Paran", "hi": "पूर्वाह्न पूजन व पारण", "bn": "পূর্বাহ্ন বিহিত পূজা ও পারণ"}
+    }
+}
+
+# মূল ডিকশনারিতে মার্জ করার জন্য:
+HINDU_FESTIVAL_DATABASE.update(MISSING_HINDU_FESTIVALS)
 
     # ==========================================================================
     # DRIK PANCHANG COMPREHENSIVE ADDITIONS (দশমহাবিদ্যা, দশাবতার, দিওয়ালি, ওনাম ও ব্রত)
