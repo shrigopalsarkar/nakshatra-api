@@ -2805,6 +2805,20 @@ INDIAN_NATIONAL_HOLIDAYS = {
         },
         "muhurta": {"en": "All Day Observance", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}
     },
+    # ১৫ সেপ্টেম্বর: ইঞ্জিনিয়ার্স ডে / ডঃ বিশ্বেশ্বরায়া জয়ন্তী (PDF September 15)
+    (9, 15): {
+        "en": "Engineer's Day (Sir M. Visvesvaraya Jayanti)",
+        "hi": "अभियंता दिवस (इंजीनियर्स डे / डॉ. मोक्षगुंडम विश्वेश्वरैया जयंती)",
+        "bn": "জাতীয় প্রকৌশলী দিবস (ইঞ্জিনিয়ার্স ডে / স্যার এম. বিশ্বেশ্বরায়া জন্মজয়ন্তী)",
+        "category": "national", "icon": "⚙️", "type": {"en": "National Observance", "hi": "राष्ट्रीय दिवस", "bn": "জাতীয় দিবস"},
+        "deity": {"en": "Sir M. Visvesvaraya", "hi": "सर मोक्षगुंडम विश्वेश्वरैया", "bn": "ভারতরত্ন স্যার এম. বিশ্বেশ্বরায়া"},
+        "description": {
+            "en": "Birth anniversary of Bharat Ratna Sir M. Visvesvaraya, honouring the engineering innovations of India.",
+            "hi": "महान भारत रत्न अभियंता सर एम. विश्वेश्वरैया के योगदान के सम्मान में राष्ट्रीय इंजीनियर्स डे।",
+            "bn": "ভারতের আধুনিক প্রযুক্তির রূপকার ভারতরত্ন স্যার মোক্ষগুন্ডম বিশ্বেশ্বরায়ার শুভ জন্মজয়ন্তী।"
+        },
+        "muhurta": {"en": "All Day Observance", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}
+    },
     (10, 2): {
         "en": "Mahatma Gandhi Jayanti & Lal Bahadur Shastri Jayanti", "hi": "गांधी जयंती व लाल बहादुर शास्त्री जयंती", "bn": "গান্ধী জয়ন্তী ও লাল বাহাদুর শাস্ত্রী জন্মজয়ন্তী",
         "category": "national", "icon": "🇮🇳", "type": {"en": "National Holiday", "hi": "राष्ट्रीय महापर्व", "bn": "জাতীয় মহোৎসব"},
@@ -2979,6 +2993,35 @@ FIXED_WORLD_CHRISTIAN_DAYS = {
         "deity": {"en": "Universal", "hi": "सर्वव्यापी", "bn": "সার্বজনীন"},
         "description": {"en": "Bidding farewell to the departing year and counting down to welcome the new year.", "hi": "बीते वर्ष को विदाई देकर मध्यरात्रि में नवीन वर्ष का स्वागत करने का उत्सव।", "bn": "অতিক্রান্ত বছরকে বিদায় জানিয়ে মধ্যরাতে নতুন বছরকে বরণ করে নেওয়ার আনন্দক্ষণ।"},
         "muhurta": {"en": "Midnight Countdown (11:59 PM)", "hi": "मध्यरात्रि स्वागत (११:५९)", "bn": "মধ্যরাত্রি বর্ষবরণ কাউন্টডাউন"}
+    },
+    # ২৩ সেপ্টেম্বর: শারদ বিষুব (Autumnal Equinox - PDF September 23)
+    (9, 23): {
+        "en": "Autumnal Equinox (Autumn Equinox)",
+        "hi": "शरद विषुव (दिन-रात बराबर)",
+        "bn": "শারদ বিষুব (জলবিষুব / দিন ও রাত্রি সমান)",
+        "category": "world", "icon": "☀️", "type": {"en": "Astronomical Event", "hi": "खगोलीय घटना", "bn": "জ্যোতির্বৈজ্ঞানিক ঘটনা"},
+        "deity": {"en": "Surya Deva & Mother Nature", "hi": "भगवान सूर्य व प्रकृति", "bn": "ভগবান সূর্য দেব ও প্রকৃতি মাতা"},
+        "description": {
+            "en": "Astronomical day where the Sun crosses the celestial equator going southward, making day and night equal.",
+            "hi": "खगोलीय दिवस जब सूर्य विषुवत रेखा पर सीधा चमकता है और दिन-रात की अवधि बराबर होती है।",
+            "bn": "যে জ্যোতির্বৈজ্ঞানিক দিনে সূর্য বিষুবরেখায় অবস্থান করায় দিন ও রাত্রির দৈর্ঘ্য সমান হয়।"
+        },
+        "muhurta": {"en": "All Day Observance", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}
+    },
+
+    # ২২ ডিসেম্বর: বছরের ক্ষুদ্রতম দিন / উত্তরায়ণ প্রাক্কাল (Winter Solstice - PDF December 22)
+    (12, 22): {
+        "en": "Shortest Day of Year (Winter Solstice)",
+        "hi": "वर्ष का सबसे छोटा दिन (शीतकालीन अयनांत)",
+        "bn": "বছরের ক্ষুদ্রতম দিন (শীতকালীন অয়নান্ত / দীর্ঘতম রাত)",
+        "category": "world", "icon": "❄️", "type": {"en": "Astronomical Event", "hi": "खगोलीय घटना", "bn": "জ্যোতির্বৈজ্ঞানিক ঘটনা"},
+        "deity": {"en": "Surya Deva", "hi": "भगवान सूर्य देव", "bn": "ভগবান সূর্য দেব"},
+        "description": {
+            "en": "Winter Solstice in Northern Hemisphere marking the shortest daylight period of the year.",
+            "hi": "उत्तरी गोलार्ध में वर्ष का सबसे छोटा दिन एवं सबसे लंबी रात्रि का खगोलीय दिवस।",
+            "bn": "উত্তর গোলার্ধে বছরের সবচেয়ে ছোট দিন এবং সবচেয়ে দীর্ঘতম রাতের জ্যোতির্বৈজ্ঞানিক দিন।"
+        },
+        "muhurta": {"en": "All Day Observance", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}
     }
 }
 
