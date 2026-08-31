@@ -1877,6 +1877,20 @@ FIXED_WORLD_CHRISTIAN_DAYS = {
         "deity": {"en": "Universal", "hi": "सर्वव्यापी", "bn": "সার্বজনীন"},
         "description": {"en": "Bidding farewell to the departing year and counting down to welcome the new year.", "hi": "बीते वर्ष को विदाई देकर मध्यरात्रि में नवीन वर्ष का स्वागत करने का उत्सव।", "bn": "অতিক্রান্ত বছরকে বিদায় জানিয়ে মধ্যরাতে নতুন বছরকে বরণ করে নেওয়ার আনন্দক্ষণ।"},
         "muhurta": {"en": "Midnight Countdown (11:59 PM)", "hi": "मध्यरात्रि स्वागत (११:५९)", "bn": "মধ্যরাত্রি বর্ষবরণ কাউন্টডাউন"}
+    },
+   (12, 1): {
+        "en": "World AIDS Day",
+        "hi": "विश्व एड्स दिवस",
+        "bn": "বিশ্ব এইডস দিবস",
+        "category": "world", "icon": "🎗️", "type": {"en": "Observance", "hi": "अंतर्राष्ट्रीय दिवस", "bn": "আন্তর্জাতিক দিবস"},
+        "deity": {"en": "Universal", "hi": "सर्वव्यापी", "bn": "সার্বজনীন"},
+        "description": {
+            "en": "Global health awareness campaign showing solidarity with people affected by HIV.",
+            "hi": "एचआईवी संक्रमण के प्रति वैश्विक जागरूकता एवं स्वास्थ्य सुरक्षा का अंतर्राष्ट्रीय दिवस।",
+            "bn": "এইচআইভি সংক্রমণ রোধে সচেতনতা বৃদ্ধি ও আক্রান্তদের প্রতি সংহতি প্রকাশের আন্তর্জাতিক দিবস।"
+        },
+        "muhurta": {"en": "All Day Observance", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}
+    },     
     }
 }
 
