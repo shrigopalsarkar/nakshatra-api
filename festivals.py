@@ -1186,9 +1186,6 @@ HINDU_FESTIVAL_DATABASE = {
         "muhurta_type": "purvahna",
         "muhurta_label": {"en": "Purvahna Dolotsav & Pradosh Gaura Arati", "hi": "पूर्वाह्न डोल उत्सव व संध्याकाल", "bn": "পূর্বাহ্ন দোলোৎসব ও সায়ংকালীন আবির্ভাব আরতি"}
     },
-    # ==============================================================================
-# HINDU_FESTIVAL_DATABASE এ যুক্ত করার জন্য মিসিং আইটেমসমূহ:
-# ==============================================================================
     # ---------------- Chaitra ----------------
     ("Chaitra", "Krishna", 8): {
         "en": "Sheetala Ashtami / Basoda",
@@ -1890,10 +1887,6 @@ HINDU_FESTIVAL_DATABASE = {
         "muhurta_type": "sayankal",
         "muhurta_label": {"en": "Sayankal Chandra Darshan", "hi": "सायंकाल चंद्र दर्शन", "bn": "সায়ংকালীন চন্দ্র দর্শন লগ্ন"}
     },
-# ==============================================================================
-# ১. HINDU_FESTIVAL_DATABASE-এ যুক্ত করার জন্য মিসিং আইটেমসমূহ
-# ==============================================================================
-SCREENSHOT_MISSING_FESTIVALS = {
     # ---------------- Phalguna (ফাল্গুন মাস) ----------------
     ("Phalguna", "Krishna", 10): {
         "en": "Maharishi Dayanand Saraswati Jayanti",
