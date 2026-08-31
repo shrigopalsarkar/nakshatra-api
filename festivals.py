@@ -2357,6 +2357,24 @@ def compute_dynamic_festival_muhurta(festival_name: str, festival_type: str, sun
             "end_time": min_to_12hr(end_min),
             "formatted_display": f"{type_labels.get(lang, type_labels['en'])} ({min_to_12hr(start_min)} - {min_to_12hr(end_min)})"
         }
+        
+    # লোহড়ী বহ্নিপূজা ও প্রদোষ মুহূর্ত (সূর্যাস্তের লোকাল গ্রহ-গোচর ভিত্তিক)
+    elif "lohri" in fn_lower or "লোহড়ী" in fn_lower or "लोहड़ी" in fn_lower:
+        start_min = sunset_min
+        end_min = sunset_min + 144  # সূর্যাস্ত থেকে প্রদোষ কাল পর্যন্ত
+        type_labels = {
+            "bn": "লোহড়ী বহ্নি প্রজ্বলন ও প্রদোষ লগ্ন",
+            "hi": "लोहड़ी अग्नि पूजन व प्रदोष काल",
+            "en": "Lohri Bonfire & Pradosha Muhurta"
+        }
+        label_text = {"bn": "শুভ মুহূর্ত:", "hi": "शुभ मुहूर्त:", "en": "Auspicious Timing:"}
+        return {
+            "label": label_text.get(lang, "Auspicious Timing:"),
+            "muhurta_type": type_labels.get(lang, type_labels["en"]),
+            "start_time": min_to_12hr(start_min),
+            "end_time": min_to_12hr(end_min),
+            "formatted_display": f"{type_labels.get(lang, type_labels['en'])} ({min_to_12hr(start_min)} - {min_to_12hr(end_min)})"
+        }    
 
     # শিবরাত্রি / মাসিক শিবরাত্রি (নিশীথ কাল / মধ্যরাত্রি)
     elif "shivratri" in fn_lower or "শিবরাত্রি" in fn_lower or "शिवरात्रि" in fn_lower:
