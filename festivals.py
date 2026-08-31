@@ -1418,6 +1418,250 @@ HINDU_FESTIVAL_DATABASE = {
         "description": {"en": "Worshipping Amla tree and Shiva-Parvati's joyous arrival in Kashi with sacred Gulal.", "hi": "आँवला वृक्ष पूजन एवं काशी में माँ गौरा का प्रथम आगमन रंगोत्सव।", "bn": "আমলকী বৃক্ষ পূজা এবং কাশীতে মহাদেব ও মা পার্বতীর প্রথম গুলাল খেলার আনন্দোৎসব।"},
         "muhurta_type": "purvahna", "muhurta_label": {"en": "Purvahna Amla Puja", "hi": "पूर्वाह्न आमलकी पूजा", "bn": "পূর্বাহ্ন আমলকী পূজা লগ্ন"}
     },
+# --------------------------------------------------------------------------
+    # পূর্বে ফাইলে মিসিং থাকা গুরুত্বপূর্ণ ব্রত ও পর্বসমূহ
+    # --------------------------------------------------------------------------
+    
+    # --- চৈত্র মাস (Chaitra) ---
+    ("Chaitra", "Krishna", 11): {
+        "en": "Papmochani Ekadashi", "hi": "पापमोचिनी एकादशी", "bn": "পাপমোচিনী একাদশী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Sri Hari Vishnu", "hi": "भगवान श्री हरि विष्णु", "bn": "ভগবান শ্রীহরি বিষ্ণু"},
+        "description": {"en": "Fasting on Papmochani Ekadashi cleanses past misdeeds and grants spiritual purity.", "hi": "समस्त पापों के प्रायश्चित एवं आत्मशुद्धि हेतु पावन एकादशी व्रत।", "bn": "সর্বপাপ দূরীকরণ ও চিত্তশুদ্ধির কামনায় পরম পবিত্র পাপমোচিনী একাদশী ব্রত।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Parana & Vrata", "hi": "प्रातः पारण व पूजा", "bn": "প্রাতঃকালীন পারণ ও ব্রত"}
+    },
+    ("Chaitra", "Shukla", 11): {
+        "en": "Kamada Ekadashi", "hi": "कामदा एकादशी", "bn": "কামদা একাদশী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Sri Hari Vishnu", "hi": "भगवान श्री हरि विष्णु", "bn": "ভগবান শ্রীহরি বিষ্ণু"},
+        "description": {"en": "Kamada Ekadashi fulfills all righteous desires and eliminates afflictions.", "hi": "मनोकामना पूर्ति एवं कष्टमुक्ति हेतु चैत्र शुक्ल कामदा एकादशी व्रत।", "bn": "মনোবাঞ্ছা পূরণ ও সর্বক্লেশ মুক্তির জন্য চৈত্র শুক্ল কামদা একাদশী ব্রত।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+
+    # --- বৈশাখ মাস (Vaisakha) ---
+    ("Vaisakha", "Krishna", 11): {
+        "en": "Varuthini Ekadashi / Vallabhacharya Jayanti", "hi": "वरूथिनी एकादशी / वल्लभाचार्य जयंती", "bn": "বরূথিনী একাদশী ব্রত / বল্লভাচার্য জয়ন্তী",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Vamana & Sri Vallabhacharya", "hi": "भगवान वामन व वल्लभाचार्य", "bn": "ভগবান বামন ও শ্রী বল্লভাচার্য"},
+        "description": {"en": "Fasting on Varuthini Ekadashi protects against adversities and grants fortune.", "hi": "अखंड सौभाग्य व मोक्ष प्रदाता वरूथिनी एकादशी एवं महाप्रभु वल्लभाचार्य जयंती।", "bn": "অখণ্ড সৌভাগ্যদায়ী বরূথিনী একাদশী ও মহাপ্রভু বল্লভাচার্যের আবির্ভাব তিথি।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+    ("Vaisakha", "Shukla", 8): {
+        "en": "Maa Bagalamukhi Jayanti (Pitambara Jayanti)", "hi": "माँ बगलामुखी जयंती (पीताम्बरा जयंती)", "bn": "মা বগলামুখী জয়ন্তী (পীতাম্বরা আবির্ভাব)",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महाविद्या जयंती", "bn": "মহাবিদ্যা মহাপর্ব"},
+        "icon": "🔱", "deity": {"en": "Maa Bagalamukhi", "hi": "माँ बगलामुखी (पीताम्बरा)", "bn": "মা বগলামুখী দেবী"},
+        "description": {"en": "Appearance of the 8th Mahavidya Bagalamukhi, conquering adversaries and speech obstacles.", "hi": "शत्रुनाशिनी एवं वाक् सिद्धि प्रदाता आठवीं महाविद्या माँ बगलामुखी का प्राकट्योत्सव।", "bn": "শত্রুনাশিনী ও বাক্যস্তম্ভনকারিণী অষ্টম মহাবিদ্যা মা বগলামুখীর শুভ আবির্ভাব তিথি।"},
+        "muhurta_type": "nishita", "muhurta_label": {"en": "Nishita & Sandhya Puja", "hi": "निशीथ व संध्या पूजा", "bn": "নিশীথ ও সায়ংকালীন সাধনা লগ্ন"}
+    },
+    ("Vaisakha", "Shukla", 11): {
+        "en": "Mohini Ekadashi", "hi": "मोहिनी एकादशी", "bn": "মোহিনী একাদশী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Mohini (Vishnu)", "hi": "भगवान मोहिनी स्वरूप", "bn": "ভগবান মোহিনী অবতার"},
+        "description": {"en": "Appearance of Lord Vishnu's divine Mohini incarnation during Samudra Manthan.", "hi": "अमृत वितरण हेतु भगवान विष्णु के मोहिनी अवतार का प्राकट्य एवं मोहनाशक व्रत।", "bn": "সমুদ্র মন্থনে অমৃত বিতরণে শ্রীহরির মোহিনী রূপ ধারণের পুণ্য মোহিনী একাদশী।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+
+    # --- জ্যৈষ্ঠ মাস (Jyeshtha) ---
+    ("Jyeshtha", "Krishna", 11): {
+        "en": "Apara Ekadashi / Bhadrakali Jayanti", "hi": "अपरा एकादशी / भद्रकाली जयंती", "bn": "অপরা একাদশী ব্রত / মা ভদ্রকালী জয়ন্তী",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🔱", "deity": {"en": "Lord Vishnu & Maa Bhadrakali", "hi": "भगवान विष्णु व माँ भद्रकाली", "bn": "ভগবান বিষ্ণু ও মা ভদ্রকালী"},
+        "description": {"en": "Apara Ekadashi grants limitless fame and merit, observed alongside Bhadrakali Jayanti.", "hi": "अपार धन-कीर्ति प्रदाता अपरा एकादशी एवं देवी भद्रकाली का पावन प्राकट्य दिवस।", "bn": "অসীম পুণ্য ও যশদাত্রী অপরা একাদশী এবং দেবী ভদ্রকালীর আবির্ভাব জয়ন্তী।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Fast & Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+    ("Jyeshtha", "Shukla", 9): {
+        "en": "Maa Dhumavati Jayanti (7th Mahavidya)", "hi": "माँ धूमावती जयंती", "bn": "মা ধূমাবতী জয়ন্তী (৭ম মহাবিদ্যা)",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महाविद्या जयंती", "bn": "মহাবিদ্যা মহাপর্ব"},
+        "icon": "🔱", "deity": {"en": "Maa Dhumavati", "hi": "माँ धूमावती", "bn": "মা ধূমাবতী দেবী"},
+        "description": {"en": "Advent of 7th Mahavidya Dhumavati, dispelling poverty, despair, and deep afflictions.", "hi": "दारिद्र्य व समस्त संकटों का नाश करने वाली सातवीं महाविद्या माँ धूमावती का प्राकट्य।", "bn": "দারিদ্র্য ও সর্বসংকট বিনাশিনী সপ্তম মহাবিদ্যা মা ধূমাবতীর পবিত্র আবির্ভাব তিথি।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন সাধনা লগ্ন"}
+    },
+
+    # --- আষাঢ় মাস (Ashadha) ---
+    ("Ashadha", "Krishna", 11): {
+        "en": "Yogini Ekadashi", "hi": "योगिनी एकादशी", "bn": "যোগিনী একাদশী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Sri Hari Vishnu", "hi": "भगवान श्री हरि विष्णु", "bn": "ভগবান শ্রীহরি বিষ্ণু"},
+        "description": {"en": "Fasting on Yogini Ekadashi relieves bodily ailments and cleanses previous karmas.", "hi": "समस्त रोगों व शापों से मुक्ति दिलाकर पुण्य प्रदान करने वाला पावन योगिनी एकादशी व्रत।", "bn": "সর্বপ্রকার রোগব্যাধি ও পাপ থেকে মুক্তিদায়ী পরম পবিত্র যোগিনী একাদশী ব্রত।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+
+    # --- শ্রাবণ মাস (Shravana) ---
+    ("Shravana", "Krishna", 4): {
+        "en": "Gajanana Sankashti Chaturthi", "hi": "गजानन संकष्टी चतुर्थी", "bn": "শ্রী গজানন সংকষ্টী চতুর্থী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🐘", "deity": {"en": "Lord Gajanana (Ganesha)", "hi": "भगवान गजानन", "bn": "ভগবান শ্রী গজানন গণেশ"},
+        "description": {"en": "Shravana Krishna Chaturthi fast dedicated to Lord Gajanana, concluded with moonrise arghya.", "hi": "समस्त विघ्न बाधाओं के निवारण हेतु श्रावण मास की गजानन संकष्टी चतुर्थी का पावन व्रत।", "bn": "সর্ববিঘ্ন বিনাশ ও শান্তির কামনায় শ্রাবণ কৃষ্ণ চতুর্থীতে শ্রী গজানন গণেশের উপবাস ও চন্দ্রোদয়ে পূজা।"},
+        "muhurta_type": "sayankal", "muhurta_label": {"en": "Moonrise & Puja Time", "hi": "चन्द्रोदय व पूजन", "bn": "চন্দ্রোদয় ও পূজা লগ্ন"}
+    },
+    ("Shravana", "Krishna", 11): {
+        "en": "Kamika Ekadashi", "hi": "कामिका एकादशी", "bn": "কামিকা একাদশী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Sri Hari Vishnu", "hi": "भगवान श्री हरि विष्णु", "bn": "ভগবান শ্রীহরি বিষ্ণু"},
+        "description": {"en": "Worshipping Lord Vishnu with Tulsi leaves on Kamika Ekadashi cleanses sins.", "hi": "तुलसी दल से भगवान विष्णु के पूजन द्वारा समस्त मनोकामना पूर्ति हेतु कामिका एकादशी।", "bn": "তুলসীপত্র দিয়ে শ্রীহরির পূজায় সর্বপাপ মুক্তিদায়ী শ্রাবণ মাসের কামিকা একাদশী।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+    ("Shravana", "Shukla", 8): {
+        "en": "Maa Chinnamasta Jayanti (5th Mahavidya)", "hi": "माँ छिन्नमस्ता जयंती", "bn": "মা ছিন্নমস্তা জয়ন্তী (৫ম মহাবিদ্যা)",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महाविद्या जयंती", "bn": "মহাবিদ্যা মহাপর্ব"},
+        "icon": "🔱", "deity": {"en": "Maa Chinnamasta", "hi": "माँ छिन्नमस्ता", "bn": "মা ছিন্নমস্তা দেবী"},
+        "description": {"en": "Appearance of the 5th Mahavidya Chinnamasta, granting courage and sensory victory.", "hi": "इंद्रिय संयम व आत्मबल की अधिष्ठात्री पांचवीं महाविद्या माँ छिन्नमस्ता का पावन प्राकट्य।", "bn": "আত্মসংযম ও কুণ্ডলিনী শক্তির বরদাত্রী পঞ্চম মহাবিদ্যা মা ছিন্নমস্তার আবির্ভাব তিথি।"},
+        "muhurta_type": "nishita", "muhurta_label": {"en": "Nishita Midnight Puja", "hi": "निशीथ काल पूजा", "bn": "নিশীথ কাল সাধনা মুহূর্ত"}
+    },
+    ("Shravana", "Shukla", 11): {
+        "en": "Shravana Putrada Ekadashi / Pavitropana Ekadashi", "hi": "श्रावण पुत्रदा एकादशी / पवित्रा एकादशी", "bn": "শ্রাবণ পুত্রদা একাদশী (পবিত্রারোপণ ব্রত)",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Sri Hari Vishnu", "hi": "भगवान श्री हरि विष्णु", "bn": "ভগবান শ্রীহরি বিষ্ণু"},
+        "description": {"en": "Fasting observed for worthy progeny, peace, and spiritual purification.", "hi": "संतान प्राप्ति व परिवार की सुख-समृद्धि हेतु श्रावण मास की पवित्र पुत्रदा एकादशी।", "bn": "সুসন্তান লাভ ও পারিবারিক সুখ-শান্তির কামনায় শ্রাবণ শুক্ল পুত্রদা একাদশী ব্রত।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+
+    # --- ভাদ্রপদ মাস (Bhadrapada) ---
+    ("Bhadrapada", "Krishna", 4): {
+        "en": "Bahula Chaturthi / Bol Choth", "hi": "बहुला चतुर्थी (बोल चौथ) / गो-पूजा", "bn": "বহুলা চতুর্থী (গোরু ও বাছুর পূজা)",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🐄", "deity": {"en": "Gau Mata & Lord Krishna", "hi": "बहुला गाय व श्रीकृष्ण", "bn": "বহুলা গাভী ও শ্রীকৃষ্ণ"},
+        "description": {"en": "Veneration of Mother Cow and her calf with fast observed until moonrise.", "hi": "संतान रक्षा हेतु बहुला गाय व बछड़े का सत्कार एवं चंद्रोदय तक व्रत।", "bn": "সন্তানের মঙ্গল কামনায় বহুলা গাভী পূজা ও চন্দ্রোদয় পর্যন্ত উপবাস ব্রত।"},
+        "muhurta_type": "sayankal", "muhurta_label": {"en": "Moonrise & Gau Puja", "hi": "चन्द्रोदय व गो-पूजा", "bn": "চন্দ্রোদয় ও গো-পূজা কাল"}
+    },
+    ("Bhadrapada", "Krishna", 6): {
+        "en": "Balarama Jayanti / Hal Sasthi / Lahaee Chhath", "hi": "बलराम जयंती / हलषष्ठी / ललही छठ", "bn": "শ্রী বলরাম জন্মজয়ন্তী / হল ষষ্ঠী ব্রত",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🌾", "deity": {"en": "Lord Balarama", "hi": "भगवान बलराम", "bn": "ভগবান বলরাম দেব"},
+        "description": {"en": "Advent of Lord Balarama, the elder brother of Sri Krishna bearing the divine plough.", "hi": "भगवान श्रीकृष्ण के अग्रज शेषनाग अवतारी श्री बलराम जी का पावन जन्मोत्सव।", "bn": "শেষাবতার শ্রীকৃষ্ণের জ্যেষ্ঠ ভ্রাতা ভগবান বলরামের পরম আবির্ভাব তিথি।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Purvahna Kaal", "hi": "पूर्वाह्न काल", "bn": "পূর্বাহ্ন কাল পূজা"}
+    },
+    ("Bhadrapada", "Krishna", 11): {
+        "en": "Aja Ekadashi", "hi": "अजा एकादशी", "bn": "অজা একাদশী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Sri Hari Vishnu", "hi": "भगवान श्री हरि विष्णु", "bn": "ভগবান শ্রীহরি বিষ্ণু"},
+        "description": {"en": "Aja Ekadashi dispels all past grief, observed by King Harishchandra.", "hi": "राजा हरिश्चंद्र द्वारा समस्त कष्टों से मुक्ति हेतु आचरित परम फलदायी अजा एकादशी व्रत।", "bn": "রাজা হরিশচন্দ্র কর্তৃক সর্বকষ্ট মুক্তির উদ্দেশ্যে পালিত পবিত্র অজা একাদশী ব্রত।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+
+    # --- আশ্বিন মাস (Ashvina) ---
+    ("Ashvina", "Krishna", 4): {
+        "en": "Vighnaraja Sankashti Chaturthi", "hi": "विघ्नराज संकष्टी चतुर्थी", "bn": "শ্রী বিঘ্নরাজ সংকষ্টী চতুর্থী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🐘", "deity": {"en": "Lord Vighnaraja Ganesha", "hi": "भगवान विघ्नराज गणेश", "bn": "ভগবান বিঘ্নরাজ শ্রী গণেশ"},
+        "description": {"en": "Ashwina Krishna Chaturthi fast invoking Lord Vighnaraja for eliminating life's adversities.", "hi": "जीवन के समस्त संकटों व विघ्नों के समूल नाश हेतु विघ्नराज गणेश की चंद्रोदय पूजा।", "bn": "জীবনের সর্বসংকট ও বাধা দূরীকরণে আশ্বিন কৃষ্ণ চতুর্থীতে বিঘ্নরাজ গণেশের নিষ্ঠাপূর্ণ ব্রতপালন।"},
+        "muhurta_type": "sayankal", "muhurta_label": {"en": "Moonrise & Puja Time", "hi": "चन्द्रोदय व पूजन", "bn": "চন্দ্রোদয় ও পূজা লগ্ন"}
+    },
+    ("Ashvina", "Krishna", 11): {
+        "en": "Indira Ekadashi (Pitru Paksha Ekadashi)", "hi": "इन्दिरा एकादशी (पितृपक्ष एकादशी)", "bn": "ইন্দিরা একাদশী ব্রত (পিতৃপক্ষীয় একাদশী)",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Sri Hari Vishnu", "hi": "भगवान श्री हरि विष्णु", "bn": "ভগবান শ্রীহরি বিষ্ণু"},
+        "description": {"en": "Fasting on Indira Ekadashi delivers departed ancestors from lower realms to Vaikuntha.", "hi": "पितरों को मोक्ष प्रदान करने एवं यमलोक के कष्टों से मुक्ति हेतु पावन इन्दिरा एकादशी व्रत।", "bn": "পরলোকগত পিতৃপুরুষের নরকক্লেশ মুক্তি ও বৈকুণ্ঠ ধাম প্রাপ্তির কামনায় ইন্দিরা একাদশী ব্রত।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Fast & Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+    ("Ashvina", "Shukla", 7): {
+        "en": "Saraswati Avahan (Mula Nakshatra)", "hi": "सरस्वती आवाहन (मूल नक्षत्र)", "bn": "শ্রী শ্রী সরস্বতী আবাহন (মূল নক্ষত্র)",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "মহাপর্ব", "bn": "মহাপর্ব"},
+        "icon": "🪕", "deity": {"en": "Maa Saraswati", "hi": "माँ सरस्वती", "bn": "মা সরস্বতী"},
+        "description": {"en": "Invoking Goddess Saraswati under Mula Nakshatra during Durga Navratri.", "hi": "मूल नक्षत्र में विद्या की देवी माँ सरस्वती का पावन आवाहन व अर्चन।", "bn": "মূল নক্ষত্রযুক্ত শারদ নবরাত্রিতে দেবী সরস্বতীর পবিত্র আবাহন ও পূজা আরম্ভ।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Mula Nakshatra Avahan", "hi": "मूल नक्षत्र आवाहन", "bn": "মূল নক্ষত্রে আবাহন লগ্ন"}
+    },
+    ("Ashvina", "Shukla", 11): {
+        "en": "Papankusha Ekadashi", "hi": "पापांकुशा एकादशी", "bn": "পাপাঙ্কুশা একাদশী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Padmanabha (Vishnu)", "hi": "भगवान पद्मनाभ विष्णु", "bn": "ভগবান পদ্মনাভ বিষ্ণু"},
+        "description": {"en": "Papankusha Ekadashi subdues past demerits like an elephant goad.", "hi": "समस्त पाप रूपी गज को वश में करने वाली कल्याणकारी पापांकुशा एकादशी।", "bn": "পাপরূপ বন্য হস্তীকে দমনকারী পরম কল্যাণপ্রদ পাপাঙ্কুশা একাদশী ব্রত।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+
+    # --- কার্তিক মাস (Kartika) ---
+    ("Kartika", "Krishna", 11): {
+        "en": "Rama Ekadashi", "hi": "रमा एकादशी", "bn": "রমা একাদশী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🪷", "deity": {"en": "Lord Vishnu & Maa Rama (Lakshmi)", "hi": "भगवान विष्णु व रमा (लक्ष्मी)", "bn": "শ্রীহরি বিষ্ণু ও দেবী রমা (লক্ষ্মী)"},
+        "description": {"en": "Observed before Diwali to invite Goddess Lakshmi's enduring grace.", "hi": "दीपावली से पूर्व माँ लक्ष्मी की कृपा व अखंड ऐश्वर्य प्राप्ति हेतु रमा एकादशी।", "bn": "দীপাবলির পূর্বে দেবী লক্ষ্মীর চিরকৃপা ও সমৃদ্ধি লাভের জন্য রমা একাদশী ব্রত।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+    ("Kartika", "Shukla", 5): {
+        "en": "Labh Pancham (Saubhagya Panchami)", "hi": "लाभ पंचम (सौभाग्य पंचमी)", "bn": "লাভ পঞ্চম (সৌভাগ্য পঞ্চমী)",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "व्यापारिक पर्व", "bn": "মহাপর্ব"},
+        "icon": "🪙", "deity": {"en": "Lord Ganesha & Maa Lakshmi", "hi": "भगवान गणेश व माँ लक्ष्मी", "bn": "শ্রী গণেশ ও মা লক্ষ্মী"},
+        "description": {"en": "Auspicious day for opening new business ventures and ledgers after Diwali.", "hi": "दीपावली के बाद नए व्यापार, दुकान व प्रतिष्ठानों को पुनः खोलने का परम शुभ दिन।", "bn": "দীপাবলির পর নতুন ব্যবসা ও দোকান খোলার পরম সৌভাগ্যদায়ী লাভ পঞ্চম তিথি।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Labh Muhurta (Morning)", "hi": "लाभ काल मुहूर्त", "bn": "লাভ কাল প্রাতঃ মুহূর্ত"}
+    },
+    ("Kartika", "Shukla", 12): {
+        "en": "Vaishnava Devutthana Ekadashi / Gauna Ekadashi", "hi": "वैष्णव देवउठनी एकादशी / गौण एकादशी", "bn": "বৈষ্ণব দেবউত্থান একাদশী / গৌণ একাদশী",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🌿", "deity": {"en": "Lord Shaligram & Tulsi Maharani", "hi": "भगवान शालिग्राम व तुलसी", "bn": "ভগবান শালগ্রাম ও তুলসী মহারাণী"},
+        "description": {"en": "Vaishnava community observance of Devutthana Ekadashi after Harivasara.", "hi": "वैष्णव संप्रदाय का देवउठनी एकादशी व्रत एवं शालिग्राम पूजन अनुष्ठान।", "bn": "হরিবাসর পরবর্তী বৈষ্ণব পরম্পরার দেবউত্থান একাদশী উপবাস ও ব্রত।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+
+    # --- মার্গশীর্ষ মাস (Margashirsha) ---
+    ("Margashirsha", "Krishna", 4): {
+        "en": "Ganadhipa Sankashti Chaturthi", "hi": "गणाधिप संकष्टी चतुर्थी", "bn": "গণাধিপ সংকষ্টী চতুর্থী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🐘", "deity": {"en": "Lord Ganesha (Ganadhipa)", "hi": "भगवान गणाधिप गणेश", "bn": "ভগবান গণাধিপ শ্রী গণেশ"},
+        "description": {"en": "Margashirsha Krishna Chaturthi fast invoking Ganadhipa Ganesha for eliminating hindrances.", "hi": "मार्गशीर्ष कृष्ण चतुर्थी पर समस्त विघ्नों के शमन हेतु गणाधिप गणेश का चंद्रोदय व्रत।", "bn": "মার্গশীর্ষ কৃষ্ণ চতুর্থীতে বিঘ্নবিনাশক শ্রী গণাধিপ গণেশের ব্রত ও চন্দ্রোদয়ে পূজা সমাপন।"},
+        "muhurta_type": "sayankal", "muhurta_label": {"en": "Moonrise & Puja Muhurta", "hi": "चन्द्रोदय व पूजन", "bn": "চন্দ্রোদয় ও পূজা লগ্ন"}
+    },
+    ("Margashirsha", "Krishna", 11): {
+        "en": "Utpanna Ekadashi", "hi": "उत्पन्ना एकादशी", "bn": "উৎপন্না একাদশী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Ekadashi Devi & Lord Vishnu", "hi": "एकादशी देवी व श्री हरि", "bn": "একাদশী দেবী ও ভগবান বিষ্ণু"},
+        "description": {"en": "Celebrates the emergence of Ekadashi Devi from Lord Vishnu's body to slay Mura.", "hi": "भगवान विष्णु के शरीर से एकादशी देवी के पावन प्राकट्य का मूल एकादशी दिवस।", "bn": "মুর অসুর বিনাশে শ্রীহরির অঙ্গ থেকে একাদশী দেবীর শুভ উৎপত্তির মহাপুণ্য তিথি।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+    ("Margashirsha", "Shukla", 14): {
+        "en": "Maa Matangi Jayanti (9th Mahavidya)", "hi": "माँ मातंगी जयंती (नवमी महाविद्या)", "bn": "মা মাতঙ্গী জয়ন্তী (৯ম মহাবিদ্যা)",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महाविद्या जयंती", "bn": "মহাবিদ্যা মহাপর্ব"},
+        "icon": "🦜", "deity": {"en": "Maa Matangi (Tantric Saraswati)", "hi": "माँ मातंगी देवी", "bn": "মা মাতঙ্গী দেবী"},
+        "description": {"en": "Appearance of the 9th Mahavidya Matangi, presiding over arts and divine speech.", "hi": "संगीत, कला व तंत्र विद्या की अधिष्ठात्री नौवीं महाविद्या माँ मातंगी का प्राकट्योत्सव।", "bn": "শিল্প, সংগীত ও সর্ববিদ্যার অধিষ্ঠাত্রী নবম মহাবিদ্যা মা মাতঙ্গীর শুভ আবির্ভাব।"},
+        "muhurta_type": "nishita", "muhurta_label": {"en": "Nishita Midnight Puja", "hi": "निशीथ काल", "bn": "নিশীথ কাল সাধনা মুহূর্ত"}
+    },
+
+    # --- পৌষ মাস (Pausha) ---
+    ("Pausha", "Krishna", 11): {
+        "en": "Saphala Ekadashi", "hi": "सफला एकादशी", "bn": "সফলা একাদশী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Narayana", "hi": "भगवान नारायण", "bn": "ভগবান নারায়ণ"},
+        "description": {"en": "Saphala Ekadashi makes all noble endeavors and efforts entirely fruitful.", "hi": "समस्त कार्यों को सफल बनाने एवं सद्गति देने वाला सफला एकादशी व्रत।", "bn": "সকল সৎকর্মকে সফল ও সার্থক করে তোলার পরম কল্যাণদায়ী সফলা একাদশী ব্রত।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+    ("Pausha", "Shukla", 11): {
+        "en": "Pausha Putrada Ekadashi", "hi": "पौष पुत्रदा एकादशी", "bn": "পৌষ পুত্রদা একাদশী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Sri Hari Vishnu", "hi": "भगवान श्री हरि विष्णु", "bn": "ভগবান শ্রীহরি বিষ্ণু"},
+        "description": {"en": "Observed in Pausha Shukla Paksha for offspring welfare, joy, and peace.", "hi": "संतान के कल्याण व पारिवारिक सुख की वृद्धि हेतु पौष शुक्ल पुत्रदा एकादशी।", "bn": "সন্তানের নীরোগ দীর্ঘায়ু ও বংশবৃদ্ধির কামনায় পৌষ পুত্রদা একাদশী ব্রত।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+
+    # --- মাঘ মাস (Magha) ---
+    ("Magha", "Krishna", 11): {
+        "en": "Shattila Ekadashi (6 Sesame Rituals)", "hi": "षटतिला एकादशी", "bn": "ষট্তিলা একাদশী ব্রত (৬ প্রকার তিল দান)",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Sri Hari Vishnu", "hi": "भगवान श्री हरि विष्णु", "bn": "ভগবান শ্রীহরি বিষ্ণু"},
+        "description": {"en": "Observing 6 types of sesame charity on Shattila Ekadashi eradicates afflictions.", "hi": "तिल के ६ प्रकार के प्रयोग व दान से दरिद्रता का नाश करने वाली षटतिला एकादशी।", "bn": "৬ প্রকার তিলের ব্যবহারে পাপ ও দুর্ভাগ্য দূরকারী মহাপুণ্যময়ী ষট্তিলা একাদশী ব্রত।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Snan & Til Dan", "hi": "प्रातः स्नान व तिल दान", "bn": "প্রাতঃস্নান ও তিল দান লগ্ন"}
+    },
+    ("Magha", "Shukla", 11): {
+        "en": "Jaya Ekadashi / Bhaimi Ekadashi", "hi": "जया एकादशी (भैमी एकादशी)", "bn": "জয়া একাদশী ব্রত (ভৈমী একাদশী)",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🕉️", "deity": {"en": "Lord Sri Hari Vishnu", "hi": "भगवान श्री हरि विष्णु", "bn": "ভগবান শ্রীহরি বিষ্ণু"},
+        "description": {"en": "Jaya Ekadashi dispels lower spiritual traps and grants enduring victory.", "hi": "पिशाच योनि से मुक्ति दिलाकर विजय प्रदान करने वाला जया एकादशी महाव्रत।", "bn": "প্রেতযোনি থেকে মুক্তি ও সর্বক্ষেত্রে জয়লাভের বরদাত্রী জয়া একাদশী ব্রত।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+
+    # --- ফাল্গুন মাস (Phalguna) ---
+    ("Phalguna", "Krishna", 11): {
+        "en": "Vijaya Ekadashi", "hi": "विजया एकादशी", "bn": "বিজয়া একাদশী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🏹", "deity": {"en": "Lord Sri Rama & Vishnu", "hi": "भगवान श्रीराम व विष्णु", "bn": "ভগবান শ্রীরামচন্দ্র ও বিষ্ণু"},
+        "description": {"en": "Lord Rama observed Vijaya Ekadashi prior to Lanka crossing, granting victory in struggles.", "hi": "लंका विजय हेतु भगवान श्रीराम द्वारा आचरित सर्वविजय प्रदाता एकादशी व्रत।", "bn": "লঙ্কা বিজয়ের উদ্দেশ্যে শ্রীরামচন্দ্র কর্তৃক পালিত সর্বসংকটে বিজয়দাত্রী একাদশী।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Morning Puja", "hi": "प्रातः पूजा", "bn": "প্রাতঃকালীন পূজা"}
+    },
+    ("Phalguna", "Shukla", 11): {
+        "en": "Amalaki Ekadashi / Rangbhari Ekadashi", "hi": "आमलकी एकादशी (रंगभरी एकादशी)", "bn": "আমলকী একাদশী ব্রত (রংভরী একাদশী / কাশী উৎসব)",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🌿", "deity": {"en": "Lord Shiva, Parvati & Sri Hari", "hi": "काशी विश्वनाथ व श्रीहरि", "bn": "কাশী বিশ্বনাথ, পার্বতী ও শ্রীহরি"},
+        "description": {"en": "Worshipping Amla tree alongside Shiva-Parvati's joyous arrival in Kashi.", "hi": "आँवला वृक्ष पूजन एवं काशी में माँ गौरा का प्रथम आगमन रंगोत्सव।", "bn": "আমলকী বৃক্ষ পূজা এবং কাশীতে মহাদেব ও মা পার্বতীর প্রথম গুলাল খেলার আনন্দোৎসব।"},
+        "muhurta_type": "purvahna", "muhurta_label": {"en": "Purvahna Amla Puja", "hi": "पूर्वाह्न आमलकी पूजा", "bn": "পূর্বাহ্ন আমলকী পূজা লগ্ন"}
+    },
 
 # ==============================================================================
 # ২. ভারতীয় জাতীয় ছুটির দিন ও স্মরণীয় দিবস
@@ -1487,6 +1731,19 @@ INDIAN_NATIONAL_HOLIDAYS = {
         "muhurta": {"en": "All Day School Celebrations", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন বিদ্যালয়ভিত্তিক উৎসব"}
     }
 }
+(9, 14): {
+        "en": "Hindi Diwas (National Hindi Day)",
+        "hi": "हिन्दी दिवस",
+        "bn": "জাতীয় হিন্দি দিবস",
+        "category": "national", "icon": "🇮🇳", "type": {"en": "National Observance", "hi": "राष्ट्रीय दिवस", "bn": "জাতীয় দিবস"},
+        "deity": {"en": "Official Language of India", "hi": "राजभाषा हिन्दी", "bn": "ভারত সরকারি ভাষা"},
+        "description": {
+            "en": "Commemorating the adoption of Hindi as the official language of the Republic of India in 1949.",
+            "hi": "१४ सितंबर १९४९ को हिन्दी को भारत की राजभाषा का दर्जा मिलने पर गौरवशाली हिन्दी दिवस।",
+            "bn": "১৯৪৯ সালের ১৪ই সেপ্টেম্বর ভারতীয় গণপরিষদ কর্তৃক হিন্দিকে সরকারি ভাষার স্বীকৃতিদানের স্মারক দিবস।"
+        },
+        "muhurta": {"en": "All Day Observance", "hi": "सम्पूर्ण दिवस", "bn": "সারাদিন উদযাপিত"}
+    },
 
 # ==============================================================================
 # ৩. খ্রিস্টান ও আন্তর্জাতিক ফিক্সড দিবস
