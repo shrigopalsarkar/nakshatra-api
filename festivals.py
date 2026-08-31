@@ -1185,8 +1185,7 @@ HINDU_FESTIVAL_DATABASE = {
         },
         "muhurta_type": "purvahna",
         "muhurta_label": {"en": "Purvahna Dolotsav & Pradosh Gaura Arati", "hi": "पूर्वाह्न डोल उत्सव व संध्याकाल", "bn": "পূর্বাহ্ন দোলোৎসব ও সায়ংকালীন আবির্ভাব আরতি"}
-    }
-}
+    },
 
     # ==========================================================================
     # DRIK PANCHANG COMPREHENSIVE ADDITIONS (দশমহাবিদ্যা, দশাবতার, দিওয়ালি, ওনাম ও ব্রত)
