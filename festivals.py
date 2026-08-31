@@ -2634,4 +2634,8 @@ VARIABLE_RELIGIOUS_DAYS = {
 
 def get_language_key(lang: str = "en") -> str:
     value = str(lang or "en").lower().strip()
-    if value.startswithI'm having a hard time fulfilling your request. Can I help you with something else instead?
+    if value.startswith("bn") or "bengali" in value or "bangla" in value:
+        return "bn"
+    elif value.startswith("hi") or "hindi" in value:
+        return "hi"
+    return "en"
