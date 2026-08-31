@@ -1702,6 +1702,176 @@ HINDU_FESTIVAL_DATABASE = {
         "muhurta_type": "pradosh",
         "muhurta_label": {"en": "Pradosh Kaal & Full Moon Night", "hi": "प्रदोष काल व दीपदान मुहूर्त", "bn": "প্রদোষ কাল ও দেব দীপাবলি লগ্ন"}
     },
+    # ==============================================================================
+# কার্তিক মাস (Kartika) - বিশুদ্ধ শাস্ত্রীয় চান্দ্রতিথি ভিত্তিক ডাটাবেস
+# (সম্পূর্ণরূপে সূর্য-চন্দ্রের অবস্থান ও তিথির ওপর নির্ভরশীল, কোনো ফিক্সড তারিখ নেই)
+# ==============================================================================
+    # --- কার্তিক কৃষ্ণ পক্ষ ---
+    ("Kartika", "Krishna", 7): {
+        "en": "Surya Saptami Vrata",
+        "hi": "सूर्य सप्तमी व्रत",
+        "bn": "সূর্য সপ্তমী ব্রত (ভানু সপ্তমী স্নান ও অর্ঘ্যদান)",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "☀️", "deity": {"en": "Lord Surya Narayana", "hi": "भगवान सूर्य नारायण", "bn": "ভগবান সূর্য নারায়ণ"},
+        "description": {
+            "en": "Auspicious solar day dedicated to Sun God for health, vitality, and freedom from afflictions.",
+            "hi": "आरोग्य व तेज की प्राप्ति हेतु भगवान सूर्यनारायण को तांबे के पात्र से अर्घ्य समर्पण।",
+            "bn": "আরোগ্য ও তেজ বৃদ্ধির কামনায় ভগবান সূর্যদেবের উদ্দেশ্যে পবিত্র স্নান ও রক্তচন্দন সহযোগে তর্পণ।"
+        },
+        "muhurta_type": "sunrise_snan",
+        "muhurta_label": {"en": "Sunrise Arghya Muhurta", "hi": "सूर्योदय अर्घ्य मुहूर्त", "bn": "সূর্যোদয় অর্ঘ্যদান মুহূর্ত"}
+    },
+
+    ("Kartika", "Krishna", 8): {
+        "en": "Ahoi Ashtami Vrat / Radha Kunda Snan",
+        "hi": "अहोई अष्टमी व्रत / राधा कुंड स्नान",
+        "bn": "শ্রী শ্রী অহোই অষ্টমী ব্রত / শ্রী রাধাকুণ্ডে মধ্যরাত্রি মহাস্নান",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🪔", "deity": {"en": "Maa Ahoi & Srimati Radharani", "hi": "माँ अहोई व श्रीमती राधारानी", "bn": "মা অহোই ও শ্রীমতী রাধারাণী"},
+        "description": {
+            "en": "Mothers observe nirjala fast for child longevity until evening star sighting, alongside sacred Radha Kunda snan.",
+            "hi": "संतान की दीर्घायु हेतु माताओं द्वारा निर्जला अहोई व्रत, संध्या तारा दर्शन एवं राधाकुंड मध्यरात्रि स्नान।",
+            "bn": "সন্তানের দীর্ঘায়ু কামনায় সায়াহ্নে নক্ষত্র দর্শন পর্যন্ত অহোই ব্রত এবং ব্রজমণ্ডলে পবিত্র রাধাকুণ্ডে নিশীথ স্নান।"
+        },
+        "muhurta_type": "sayankal",
+        "muhurta_label": {"en": "Sayankal Star Gazing & Puja", "hi": "सायंकाल तारा दर्शन व पूजा", "bn": "সায়ংকালে তারা দর্শন ও পূজা লগ্ন"}
+    },
+
+    ("Kartika", "Krishna", 11): {
+        "en": "Rama Ekadashi Vrata",
+        "hi": "रमा एकादशी व्रत",
+        "bn": "শ্রী শ্রী রমা একাদশী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🪷", "deity": {"en": "Lord Sri Hari Vishnu & Maa Rama (Lakshmi)", "hi": "भगवान विष्णु व माता रमा (लक्ष्मी)", "bn": "শ্রীহরি বিষ্ণু ও দেবী রমা (লক্ষ্মী)"},
+        "description": {
+            "en": "Auspicious fast prior to Diwali to invoke the divine grace of Lord Vishnu and Goddess Lakshmi.",
+            "hi": "दीपावली से पूर्व अखंड सौभाग्य एवं लक्ष्मी-नारायण की कृपा प्राप्ति हेतु रमा एकादशी महाव्रत।",
+            "bn": "দীপাবলির প্রাক্কালে শ্রীশ্রী লক্ষ্মী-নারায়ণের চিরকৃপা ও সর্বপাপ মুক্তির উদ্দেশ্যে পরম পবিত্র ব্রত।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Morning Fast & Puja", "hi": "प्रातः पूजा व व्रत", "bn": "প্রাতঃকালীন পূজা ও উপবাস সংকল্প"}
+    },
+
+    ("Kartika", "Krishna", 12): {
+        "en": "Govatsa Dwadashi (Bachh Baras / Gau Puja)",
+        "hi": "गोवत्स द्वादशी (बछ बारस / गौ माता पूजा)",
+        "bn": "শ্রী শ্রী গোবৎসা দ্বাদশী (কামধেনু রূপিণী গাভী ও বাছুর পূজা)",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "पारंपरिक पर्व", "bn": "মহাপর্ব"},
+        "icon": "🐄", "deity": {"en": "Kamadhenu Gau Mata & Sri Krishna", "hi": "कामधेनु गौ माता व श्रीकृष्ण", "bn": "কামধেনু গো-মাতা ও শ্রীকৃষ্ণ"},
+        "description": {
+            "en": "Veneration of sacred Mother Cow and her calf with traditional offerings, expressing gratitude to Kamadhenu.",
+            "hi": "संतान रक्षा ও सुख-समृद्धि हेतु कामधेनु स्वरूपा गौ माता एवं बछड़े का कृतज्ञतापूर्वक पूजन।",
+            "bn": "সন্তানের মঙ্গল ও পারিবারিক সমৃদ্ধির কামনায় গো-মাতা ও বাছুরের সস্নেহ আরাধনা ও খাদ্য নিবেদন।"
+        },
+        "muhurta_type": "pradosh",
+        "muhurta_label": {"en": "Pradosh Kaal Gau Puja", "hi": "प्रदोष काल गो-पूजा", "bn": "প্রদোষ কাল গো-পূজা মুহূর্ত"}
+    },
+
+    ("Kartika", "Krishna", 13): {
+        "en": "Dhanteras / Dhanvantari Jayanti / Kuber Puja / Yama Deepam",
+        "hi": "धनतेरस / धन्वंतरि जयंती / कुबेर पूजा / यम दीपदान",
+        "bn": "শ্রী শ্রী ধনতেরাস / ধন্বন্তরি জয়ন্তী / কুবের পূজা / যম প্রদীপ দান",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🪙", "deity": {"en": "Lord Dhanvantari, Kuber & Yamaraja", "hi": "भगवान धन्वंतरि, कुबेर व यमराज", "bn": "ভগবান ধন্বন্তরি, কুবের দেব ও যমরাজ"},
+        "description": {
+            "en": "Appearance of Lord Dhanvantari with the pot of Amrita, worshipping Lord Kuber, and evening Yama Deepam.",
+            "hi": "समुद्र मंथन से अमृत कलश युक्त भगवान धन्वंतरि का प्राकट्य, कुबेर पूजन एवं अकाल मृत्यु निवारण दीपदान।",
+            "bn": "সমুদ্র মন্থনে অমৃত কলশসহ ধন্বন্তরীর আবির্ভাব, কুবের দেবের অর্চনা এবং অকালমৃত্যু নিবারণে যম প্রদীপ দান।"
+        },
+        "muhurta_type": "pradosh",
+        "muhurta_label": {"en": "Pradosh Kaal & Vrishabha Lagna", "hi": "प्रदोष काल व स्थिर वृषभ लग्न", "bn": "প্রদোষ কাল ও স্থির বৃষ লগ্ন"}
+    },
+
+    ("Kartika", "Krishna", 14): {
+        "en": "Kali Chaudas / Naraka Chaturdashi / Bhoot Chaturdashi / 14 Deepam",
+        "hi": "काली चौदस / नरक चतुर्दशी / रूप चौदस / यम दीपदान",
+        "bn": "শ্রী শ্রী কালী চৌদস / নরক চতুর্দশী / ভূত চতুর্দশী (১৪ প্রদীপ ও ১৪ শাক গ্রহণ)",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🔱", "deity": {"en": "Maa Mahakali, Yamaraja & Sri Krishna", "hi": "माँ महाकाली, यमराज व श्रीकृष्ण", "bn": "মা মহাকালী, যমরাজ ও শ্রীকৃষ্ণ"},
+        "description": {
+            "en": "Midnight worship of Mahakali, Abhyanga Snan, and lighting 14 lamps to dispel dark energies and honour ancestors.",
+            "hi": "नकारात्मक शक्तियों के नाश हेतु मध्यरात्रि महाकाली पूजा, अभ्यंग स्नान एवं चौदह यमदीप प्रज्वलन।",
+            "bn": "নিশীথ রাতে মা মহাকালীর আরাধনা, চতুর্দশ প্রদীপ দান ও চোদ্দ শাক গ্রহণ করে অশুভ শক্তি দূরীকরণ।"
+        },
+        "muhurta_type": "nishita",
+        "muhurta_label": {"en": "Nishita Kaal Mahakali Puja", "hi": "निशीथ काल महाकाली पूजा", "bn": "নিশীথ কাল মহাকালী পূজা লগ্ন"}
+    },
+
+    ("Kartika", "Krishna", 15): {
+        "en": "Diwali (Lakshmi Puja) / Shyama Kali Puja / Kartika Amavasya",
+        "hi": "दीपावली (महालक्ष्मी पूजा) / श्यामा काली पूजा / कार्तिक अमावस्या",
+        "bn": "শ্রী শ্রী দীপাবলি মহোৎসব (মহালক্ষ্মী পূজা) / শ্রী শ্রী শ্যামাপূজা (কালীপূজা) / অমাবস্যা",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🪔", "deity": {"en": "Maa Mahalakshmi, Ganesha & Maa Shyama Kali", "hi": "माँ महालक्ष्मी, गणेश जी व माँ श्यामा काली", "bn": "মা মহালক্ষ্মী, শ্রী গণেশ ও মা শ্যামা কালী"},
+        "description": {
+            "en": "Grand celebration of light over darkness, worshipping Goddess Lakshmi in Pradosha and Mother Kali at midnight.",
+            "hi": "अंधकार पर प्रकाश की विजय का दीपोत्सव, प्रदोष काल में महालक्ष्मी पूजन एवं मध्यरात्रि में तांत्रिक काली पूजा।",
+            "bn": "অজ্ঞানতার অন্ধকার বিনাশে আলোর দীপাবলি, প্রদোষে মা লক্ষ্মী পূজা এবং অমাবস্যার নিশীথে শ্যামাপূজা।"
+        },
+        "muhurta_type": "pradosh",
+        "muhurta_label": {"en": "Pradosh & Nishita Kaal Puja", "hi": "प्रदोष व निशीथ काल", "bn": "প্রদোষ ও নিশীথ কাল মহালগ্ন"}
+    },
+
+    # --- কার্তিক শুক্ল পক্ষ ---
+    ("Kartika", "Shukla", 1): {
+        "en": "Govardhan Puja / Annakut Mahotsav / Dyuta Krida / Ishti Havan",
+        "hi": "गोवर्धन पूजा / अन्नकूट महोत्सव / द्यूत क्रीड़ा / वैदिक इष्टि",
+        "bn": "শ্রী শ্রী গোবর্ধন পূজা / অন্নকূট মহোৎসব / দ্যূত ক্রীড়া / বৈদিক ইষ্টি যজ্ঞ",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "⛰️", "deity": {"en": "Lord Giriraj Krishna & Shiva-Parvati", "hi": "गिरिराज भगवान श्रीकृष्ण व शिव-पार्वती", "bn": "গিরিরাজ ভগবান শ্রীকৃষ্ণ ও শিব-পার্বতী"},
+        "description": {
+            "en": "Offering 56 delicacies (Chhappan Bhog) to Govardhan Hill, traditional Dyuta Krida, and Vedic Ishti rituals.",
+            "hi": "भगवान श्रीकृष्ण द्वारा गोवर्धन पर्वत धारण, ५६ भोग अन्नकूट समर्पण, पावन द्यूत क्रीड़ा एवं इष्टि दिवस।",
+            "bn": "ছাপ্পান্ন ভোগসহ শ্রীগোবর্ধন পূজা, অন্নকূট মহোৎসব, পাশাখেলা স্মরণে দ্যূত ক্রীড়া ও বৈদিক ইষ্টি হোম।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Pratah & Sayankal Annakut", "hi": "प्रातः व सायंकाल अन्नकूट", "bn": "প্রাতঃ ও সায়ংকালীন অন্নকূট লগ্ন"}
+    },
+
+    ("Kartika", "Shukla", 2): {
+        "en": "Bhai Phonta / Bhaiya Dooj / Yama Dwitiya / Chandra Darshana",
+        "hi": "भाई दूज / यम द्वितीया / भ्रातृ द्वितीया / चन्द्र दर्शन",
+        "bn": "পবিত্র ভাইফোঁটা (ভ্রাতৃদ্বিতীয়া / যমদ্বিতীয়া) / শুক্ল দ্বিতীয়া চন্দ্র দর্শন",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🌸", "deity": {"en": "Yamuna, Yamaraja & Chandra Deva", "hi": "यमुना जी, यमराज व चन्द्र देव", "bn": "যমুনা দেবী, যমরাজ ও চন্দ্র দেব"},
+        "description": {
+            "en": "Sisters apply protective tilak for brothers' longevity on Yama Dwitiya, followed by evening crescent moon sighting.",
+            "hi": "भाई की दीर्घायु व सर्वविपत्ति नाश हेतु तिलक संस्कार एवं सायंकाल नवचंद्र (द्वितीया चंद्र) दर्शन।",
+            "bn": "যমের দুয়ারে কাঁটা দিয়ে ভাইয়ের দীর্ঘায়ু কামনায় পবিত্র ভাইফোঁটা প্রদান এবং সায়াহ্নে শুক্ল দ্বিতীয়া চন্দ্র দর্শন।"
+        },
+        "muhurta_type": "aparahna",
+        "muhurta_label": {"en": "Aparahna Tilak & Chandra Darshan", "hi": "अपराह्न तिलक व चंद्र दर्शन", "bn": "অপরাহ্ন ভাইফোঁটা ও চন্দ্র দর্শন লগ্ন"}
+    },
+
+    ("Kartika", "Shukla", 5): {
+        "en": "Labh Panchami (Saubhagya Panchami / Chopda Pujan)",
+        "hi": "लाभ पंचम (सौभाग्य पंचमी / चोपड़ा पूजन)",
+        "bn": "শ্রী শ্রী লাভ পঞ্চম (সৌভাগ্য পঞ্চমী / ব্যবসায়িক শুভ খাতা পূজা)",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "व्यापारिक पर्व", "bn": "মহাপর্ব"},
+        "icon": "🪙", "deity": {"en": "Lord Ganesha & Maa Mahalakshmi", "hi": "भगवान श्री गणेश व माँ महालक्ष्मी", "bn": "শ্রী গণেশ ও মা মহালক্ষ্মী"},
+        "description": {
+            "en": "Auspicious day for opening new ledgers, shops, and business enterprises following Diwali.",
+            "hi": "दीपावली के बाद नए व्यापार, दुकान व प्रतिष्ठानों के शुभ उद्घाटन हेतु लाभ पंचम।",
+            "bn": "দীপাবলি পরবর্তী নতুন ব্যবসা, দোকান ও হিসাবের খাতা খোলার পরম সৌভাগ্যদায়ী লাভ পঞ্চম তিথি।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Labh Muhurta (Morning)", "hi": "लाभ काल मुहूर्त", "bn": "লাভ কাল প্রাতঃ মুহূর্ত"}
+    },
+
+    ("Kartika", "Shukla", 6): {
+        "en": "Chhath Puja (Sandhya Arghya / Surya Sashthi)",
+        "hi": "छठ पूजा (संध्या अर्घ्य / सूर्य षष्ठी महाव्रत)",
+        "bn": "ছট পূজা (সন্ধ্যার অর্ঘ্যদান ও সূর্য ষষ্ঠী মহাব্রত)",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "☀️", "deity": {"en": "Surya Deva & Chhathi Maiya", "hi": "भगवान सूर्य व छठी मइया", "bn": "ভগবান সূর্য দেব ও ছটি মাইয়া"},
+        "description": {
+            "en": "Offering sacred evening oblation (Sanjhiya Arghya) in water bodies to the setting Sun God.",
+            "hi": "पवित्र जलाशयों में खड़े होकर अस्ताचलगामी भगवान सूर्य एवं छठी मइया को प्रथम संध्या अर्घ्य अर्पण।",
+            "bn": "জলে দাঁড়িয়ে অস্তগামী ভগবান সূর্য দেব ও পরমাপ্রকৃতি ছটি মাইয়ার উদ্দেশ্যে পবিত্র সায়ং অর্ঘ্যদান।"
+        },
+        "muhurta_type": "sayankal",
+        "muhurta_label": {"en": "Sunset / Sandhya Arghya Muhurta", "hi": "सूर्यास्त संध्या अर्घ्य मुहूर्त", "bn": "সূর্যাস্ত সায়ং অর্ঘ্যদান মুহূর্ত"}
+    },
 
     # --------------------------------------------------------------------------
     # মার্গশীর্ষ মাস (Margashirsha)
