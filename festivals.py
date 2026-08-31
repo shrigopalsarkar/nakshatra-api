@@ -1569,6 +1569,13 @@ FIXED_WORLD_CHRISTIAN_DAYS = {
 # ==============================================================================
 VARIABLE_RELIGIOUS_DAYS = {
     # --- 2026 ---
+    (2026, 8, 27): {
+        "en": "Thiruvonam / Onam Festival (Kerala)", "hi": "ओणम / थिरुवोणम (महाबली आगमन)", "bn": "ওনাম উৎসব / তিরুভোনাম (মহারাজ বলি আগমন)",
+        "category": "hindu", "icon": "🌸", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "deity": {"en": "Lord Vamana & King Mahabali", "hi": "भगवान वामन व राजा बलि", "bn": "ভগবান বামন ও রাজা বলি"},
+        "description": {"en": "Grand harvest festival of Kerala welcoming the annual return of King Mahabali.", "hi": "केरल का पावन फसल उत्सव एवं दानवीर राजा बलि के स्वागत का महापर्व।", "bn": "কেরালার ঐতিহ্যবাহী ফসল কাটার মহোৎসব ও প্রজাবৎসল রাজা বলির ধরাধামে আগমন।"},
+        "muhurta": {"en": "Purvahna Thiruvonam Puja", "hi": "पूर्वाह्न ओणम पूजा", "bn": "পূর্বাহ্ন ওনাম পূজা ও পুকলম লগ্ন"}
+    },
     (2026, 3, 20): {
         "en": "Eid-ul-Fitr (Ramadan Eid)", "hi": "ईद-उल-फ़ित्र", "bn": "পবিত্র ঈদুল ফিতর",
         "category": "muslim", "icon": "☪️", "type": {"en": "Islamic Festival", "hi": "इस्लामी महापर्व", "bn": "ইসলামিক উৎসব"},
