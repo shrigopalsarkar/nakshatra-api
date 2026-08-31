@@ -1956,11 +1956,102 @@ SCREENSHOT_MISSING_FESTIVALS = {
         },
         "muhurta_type": "sayankal",
         "muhurta_label": {"en": "Sayankal Chandra Darshan & Puja", "hi": "सायंकाल चंद्र दर्शन व पूजा", "bn": "সায়ংকালীন চন্দ্র দর্শন ও আরতি লগ্ন"}
-    }
-}
+    },
 
-# মূল ডাটাবেসে আপডেট করার জন্য:
-HINDU_FESTIVAL_DATABASE.update(SCREENSHOT_MISSING_FESTIVALS)
+    # ১৯ মার্চ ২০২৭: বৈষ্ণব আমলকী একাদশী
+    ("Phalguna", "Shukla", 12): {
+        "en": "Vaishnava Amalaki Ekadashi",
+        "hi": "वैष्णव आमलकी एकादशी",
+        "bn": "শ্রী শ্রী বৈষ্ণব আমলকী একাদশী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🌿", "deity": {"en": "Lord Sri Hari Vishnu", "hi": "भगवान श्री हरि विष्णु", "bn": "ভগবান শ্রীহরি বিষ্ণু"},
+        "description": {
+            "en": "Vaishnava observance of Amalaki Ekadashi worshipping the sacred Amla tree and Lord Vishnu.",
+            "hi": "वैष्णव संप्रदाय द्वारा आमलकी एकादशी व्रत एवं आँवला वृक्ष सहित श्रीहरि का पावन पूजन।",
+            "bn": "বৈষ্ণব পরম্পরায় আমলকী বৃক্ষ পূজা এবং শ্রীহরি নারায়ণের প্রীত্যর্থে পরম পবিত্র একাদশী ব্রত।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Purvahna Amla Puja", "hi": "पूर्वाह्न आमलकी पूजा", "bn": "পূর্বাহ্ন আমলকী পূজা লগ্ন"}
+    },
+
+    # ২২ মার্চ ২০২৭: শ্রীচৈতন্য মহাপ্রভু জয়ন্তী ও বসন্ত পূর্ণিমা
+    ("Phalguna", "Shukla", 15): {
+        "en": "Gaura Purnima / Sri Chaitanya Mahaprabhu Jayanti / Vasanta Purnima / Holi",
+        "hi": "गौर पूर्णिमा / श्री चैतन्य महाप्रभु जयंती / वसंत पूर्णिमा / होली",
+        "bn": "শ্রী শ্রী গৌর পূর্ণিমা / শ্রীমন্মহাপ্রভুর শুভ আবির্ভাব / বসন্ত পূর্ণিমা / হোলি",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🎨", "deity": {"en": "Sri Chaitanya Mahaprabhu & Radha Krishna", "hi": "श्री चैतन्य महाप्रभु व राधा-कृष्ण", "bn": "শ্রীচৈতন্য মহাপ্রভু ও শ্রীশ্রী রাধাকৃষ্ণ"},
+        "description": {
+            "en": "Divine appearance day of Sri Chaitanya Mahaprabhu, Vasanta Purnima and joyous festival of colors.",
+            "hi": "युगावतार श्री चैतन्य महाप्रभु का पावन प्राकट्योत्सव, वसंत पूर्णिमा एवं रंगों का महापर्व होली।",
+            "bn": "যুগাবতার শ্রী শ্রী গৌরাঙ্গ মহাপ্রভুর শুভ আবির্ভাব তিথি, বসন্ত পূর্ণিমা ও পরম আনন্দময় হোলি উৎসব।"
+        },
+        "muhurta_type": "sayankal",
+        "muhurta_label": {"en": "Pradosh Gaura Arati & Purnima", "hi": "संध्या गौर आरती व पूर्णिमा", "bn": "সায়ংকালীন গৌর আবির্ভাব আরতি ও পূর্ণিমা"}
+    },
+
+    # ২৪ মার্চ ২০২৭: চৈত্র ভ্রাতৃদ্বিতীয়া / ভাইদুজ
+    ("Chaitra", "Krishna", 2): {
+        "en": "Bhai Dooj / Bhratri Dwitiya (Holi Bhai Dooj)",
+        "hi": "भाई दूज / भ्रातृ द्वितीया (होली भाई दूज)",
+        "bn": "ভ্রাতৃদ্বিতীয়া / ভাইদুজ (হোলি ভাইফোঁটা)",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "पारंपरिक पर्व", "bn": "মহাপর্ব"},
+        "icon": "🌸", "deity": {"en": "Yamuna & Yamaraja", "hi": "यमुना जी व यमराज", "bn": "যমুনা দেবী ও যমরাজ"},
+        "description": {
+            "en": "Post-Holi celebration of brother-sister bond with tilak and prayers for brother's longevity.",
+            "hi": "होली के उपरांत भाई-बहन के अटूट स्नेह का प्रतीक भ्रातृ द्वितीया (भाई दूज) तिलक पर्व।",
+            "bn": "হোলি উৎসব পরবর্তী ভাই-বোনের পবিত্র স্নেহবন্ধন ও ভাইয়ের দীর্ঘায়ু কামনায় ভ্রাতৃদ্বিতীয়া তিলক উৎসব।"
+        },
+        "muhurta_type": "aparahna",
+        "muhurta_label": {"en": "Aparahna Tilak Muhurta", "hi": "अपराह्न तिलक मुहूर्त", "bn": "অপরাহ্ন ভাইফোঁটা লগ্ন"}
+    },
+
+    # ২৫ মার্চ ২০২৭: ভালচন্দ্র সংকষ্টী চতুর্থী (পূর্ণিমান্ত ফাল্গুন / অমাবস্যান্ত চৈত্র কৃষ্ণ ৪র্থী)
+    ("Chaitra", "Krishna", 4): {
+        "en": "Bhalachandra Sankashti Chaturthi",
+        "hi": "भालचंद्र संकष्टी चतुर्थी",
+        "bn": "শ্রী ভালচন্দ্র সংকষ্টী চতুর্থী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🐘", "deity": {"en": "Lord Bhalachandra Ganesha & Chandra", "hi": "भगवान भालचंद्र गणेश व चन्द्र देव", "bn": "ভগবান ভালচন্দ্র শ্রী গণেশ ও চন্দ্র দেব"},
+        "description": {
+            "en": "Fasting dedicated to Lord Bhalachandra Ganesha to dispel obstacles, broken after moonrise sighting.",
+            "hi": "समस्त संकटों के निवारण हेतु भगवान भालचंद्र गणेश का पावन व्रत एवं चंद्रोदय अर्घ्य।",
+            "bn": "সর্ববিঘ্ন ও সঙ্কট দূরীকরণে শ্রী ভালচন্দ্র গণেশের উপবাস ব্রত এবং চন্দ্রোদয়ে ভক্তিপূর্ণ অর্ঘ্যদান।"
+        },
+        "muhurta_type": "sayankal",
+        "muhurta_label": {"en": "Moonrise & Bhalachandra Puja", "hi": "चन्द्रोदय व पूजन मुहूर्त", "bn": "চন্দ্রোদয় ও গণেশ পূজা লগ্ন"}
+    },
+    ("Phalguna", "Krishna", 4): {
+        "en": "Bhalachandra Sankashti Chaturthi (Purnimanta)",
+        "hi": "भालचंद्र संकष्टी चतुर्थी",
+        "bn": "শ্রী ভালচন্দ্র সংকষ্টী চতুর্থী ব্রত",
+        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+        "icon": "🐘", "deity": {"en": "Lord Bhalachandra Ganesha & Chandra", "hi": "भगवान भालचंद्र गणेश व चन्द्र देव", "bn": "ভগবান ভালচন্দ্র শ্রী গণেশ ও চন্দ্র দেব"},
+        "description": {
+            "en": "Fasting dedicated to Lord Bhalachandra Ganesha, concluded with evening moonrise arghya.",
+            "hi": "समस्त संकटों के निवारण हेतु भगवान भालचंद्र गणेश का पावन व्रत एवं चंद्रोदय अर्घ्य।",
+            "bn": "সর্ববিঘ্ন ও সঙ্কট দূরীকরণে শ্রী ভালচন্দ্র গণেশের উপবাস ব্রত এবং চন্দ্রোদয়ে ভক্তিপূর্ণ অর্ঘ্যদান।"
+        },
+        "muhurta_type": "sayankal",
+        "muhurta_label": {"en": "Moonrise & Bhalachandra Puja", "hi": "चन्द्रोदय व पूजन मुहूर्त", "bn": "চন্দ্রোদয় ও গণেশ পূজা লগ্ন"}
+    },
+
+    # ২৭ মার্চ ২০২৭: রঙ্গ পঞ্চমী
+    ("Chaitra", "Krishna", 5): {
+        "en": "Ranga Panchami",
+        "hi": "रंग पंचमी",
+        "bn": "শ্রী শ্রী রঙ্গ পঞ্চমী মহোৎসব",
+        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+        "icon": "🎨", "deity": {"en": "Sri Radha Krishna & Devas", "hi": "श्रीराधा-कृष्ण व देवगण", "bn": "শ্রীশ্রী রাধাকৃষ্ণ ও দেবগণ"},
+        "description": {
+            "en": "Joyous celebration of colors dedicated to invocation of positive celestial energies (Deva Tatva) with Gulal.",
+            "hi": "देवताओं के स्वागत एवं सकारात्मक ऊर्जा के संचरण हेतु गुलाल-अबीर का पावन रंग पंचमी उत्सव।",
+            "bn": "দেবতাদের সন্তুষ্টি ও সমাজে পবিত্র আনন্দ ছড়িয়ে দিতে আবির ও গুলালের ঐশ্বরিক রঙ্গ পঞ্চমী মহোৎসব।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Purvahna Rangaotsav", "hi": "पूर्वाह्न रंगोत्सव", "bn": "পূর্বাহ্ন আবির খেলা ও দেব পূজা"}
+    },
+
 # ==============================================================================
 # ২. ভারতীয় জাতীয় ছুটির দিন ও স্মরণীয় দিবস
 # ==============================================================================
