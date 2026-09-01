@@ -1187,7 +1187,7 @@ HINDU_FESTIVAL_DATABASE = {
         },
 
         # ৩. ললহী ছট ব্রত
-        ("Bhadrapada", "Krishna", 6):
+        ("Bhadrapada", "Krishna", 6): {
             "en": "Lahaee Chhath Vrat (Lalhi Chhath)",
             "hi": "ललही छठ व्रत (संतान रक्षा पर्व)",
             "bn": "শ্রী শ্রী ললহী ছট ব্রত (সন্তান রক্ষা পর্ব)",
