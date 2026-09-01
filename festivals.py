@@ -3826,22 +3826,6 @@ def get_festivals_for_day(
             "muhurta": ""
         })
 
-    # অন্বাধান (অমাবস্যা বা চতুর্দশী সংযোগে বৈদিক যজ্ঞ তিথি)
-    if (tithi_num == 15 and paksha == "Krishna") or (tithi_num == 14 and paksha == "Krishna"):
-        anvadhan_name = {"en": "Anvadhan (Vedic Ritual)", "hi": "अन्वाधान (वैदिक अनुष्ठान)", "bn": "বৈদিক অন্বাধান সংস্কার"}
-        append_festival_once(festivals, {
-            "name": anvadhan_name[l_key], "category": "hindu", "type": {"en": "Vedic Ritual", "hi": "वैदिक अनुष्ठान", "bn": "বৈদিক সংস্কার"}[l_key],
-            "icon": "🔥", "deity": {"en": "Agni Deva & Sri Vishnu", "hi": "अग्नि देव व श्री विष्णु", "bn": "অগ্নি দেব ও শ্রীহরি বিষ্ণু"}[l_key],
-            "description": {
-                "en": "Vedic rite performed prior to Ishti.",
-                "hi": "इष्टि अनुष्ठान से पूर्व अग्नि प्रज्वलन का पावन वैदिक संस्कार।",
-                "bn": "ইষ্টি যজ্ঞের পূর্বে যজ্ঞাগ্নি রক্ষা ও সংযমের বৈদিক অন্বাধান সংস্কার।"
-            }[l_key],
-            "muhurta_type": "purvahna",
-            "muhurta_label": {"en": "Purvahna Havan", "hi": "पूर्वाह्न हवन", "bn": "পূর্বাহ্ন সংস্কার লগ্ন"}[l_key],
-            "muhurta": ""
-        })
-
     elif m_d == (11, 16) or ("vrishchika" in s_name or "scorpio" in s_name):
         vrishchika_names = {"en": "Vrishchika Sankranti", "hi": "वृश्चिक संक्रांति", "bn": "বৃশ্চিক সংক্রান্তি মহাতীর্থ স্নান ও দান"}
         vrishchika_deity = {"en": "Surya Deva", "hi": "भगवान सूर्य देव", "bn": "ভগবান সূর্য দেব"}
