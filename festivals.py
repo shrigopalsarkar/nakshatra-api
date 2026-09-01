@@ -906,6 +906,22 @@ HINDU_FESTIVAL_DATABASE = {
         "muhurta_type": "aparahna",
         "muhurta_label": {"en": "Aparahna & Pradosh (Bhadra Free)", "hi": "अपराह्न व प्रदोष काल (भद्रा रहित)", "bn": "অপরাহ্ন ও প্রদোষ কাল (ভদ্রামুক্ত শুভ লগ্ন)"}
     },
+    ("Shravana", "Shukla", 15): {
+        "en": "Anvadhan (Vedic Ritual)",
+        "hi": "अन्वाधान (वैदिक अनुष्ठान)",
+        "bn": "বৈদিক অন্বাধান সংস্কার",
+        "category": "hindu",
+        "type": {"en": "Vedic Ritual", "hi": "वैदिक अनुष्ठान", "bn": "বৈদিক সংস্কার"},
+        "icon": "🔥",
+        "deity": {"en": "Agni Deva & Sri Vishnu", "hi": "अग्नि देव व श्री विष्णु", "bn": "অগ্নি দেব ও শ্রীহরি বিষ্ণু"},
+        "description": {
+            "en": "Sacred Vedic rite of adding fuel to sacrificial fires and observing austerity prior to Ishti.",
+            "hi": "इष्टि अनुष्ठान से पूर्व पवित्र यज्ञाग्नि में समिधा स्थापन व संयम का पावन वैदिक संस्कार।",
+            "bn": "ইষ্টি যজ্ঞের পূর্বে যজ্ঞের পবিত্র অগ্নি প্রজ্বলন, রক্ষা ও সংযম পালনের বৈদিক অন্বাধান সংস্কার।"
+        },
+        "muhurta_type": "purvahna",
+        "muhurta_label": {"en": "Purvahna Havan Muhurta", "hi": "पूर्वाह्न हवन मुहूर्त", "bn": "পূর্বাহ্ন সংস্কার লগ্ন"}
+    },
 
     # --------------------------------------------------------------------------
     # ভাদ্রপদ মাস (Bhadrapada)
