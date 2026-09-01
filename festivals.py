@@ -1078,7 +1078,7 @@ HINDU_FESTIVAL_DATABASE = {
             "muhurta_label": {
                 "en": "Purvahna Abhisheka & Puja Muhurta",
                 "hi": "पूर्वाह्न अभिषेक व पूजन मुहूर्त",
-                "bn": "পূর্বাহ্ন অভিষেক ও পূজা লগ্ন"
+                "bn": "পূর্বাহ্ন অভিষেক ও পূজা লগ্ন"}
         },
 
         # ২. হল ষষ্ঠী ব্রত (হরছট)
@@ -1103,7 +1103,7 @@ HINDU_FESTIVAL_DATABASE = {
             "muhurta_label": {
                 "en": "Purvahna Hal Sasthi Puja",
                 "hi": "पूर्वाह्न हलषष्ठी पूजन",
-                "bn": "পূর্বাহ্ন হল ষষ্ঠী পূজা লগ্ন"
+                "bn": "পূর্বাহ্ন হল ষষ্ঠী পূজা লগ্ন"}          
         },
 
         # ৩. ললহী ছট ব্রত
@@ -1128,7 +1128,7 @@ HINDU_FESTIVAL_DATABASE = {
             "muhurta_label": {
                 "en": "Sayankal Pradosh Vrat Puja",
                 "hi": "सायंकाल प्रदोष पूजा",
-                "bn": "সায়ংকালীন প্রদোষ পূজা লগ্ন"
+                "bn": "সায়ংকালীন প্রদোষ পূজা লগ্ন"}
             },
     # --------------------------------------------------------------------------
     # ভাদ্রপদ কৃষ্ণ ৬ (ষষ্ঠী তিথি) - পৃথক পৃথক উৎসব ও ব্রত
@@ -1208,7 +1208,7 @@ HINDU_FESTIVAL_DATABASE = {
             "muhurta_label": {
                 "en": "Sayankal Pradosh Vrat Puja",
                 "hi": "सायंकाल प्रदोष पूजा",
-                "bn": "সায়ংকালীন প্রদোষ পূজা লগ্ন"
+                "bn": "সায়ংকালীন প্রদোষ পূজা লগ্ন"}
             },
     ("Bhadrapada", "Krishna", 8): {
         "en": "Krishna Janmashtami / Gokulashtami",
