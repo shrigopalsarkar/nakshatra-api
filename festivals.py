@@ -1053,20 +1053,163 @@ HINDU_FESTIVAL_DATABASE = {
         "muhurta_type": "sayankal",
         "muhurta_label": {"en": "Moonrise & Gau Puja", "hi": "चन्द्रोदय व गो-पूजा", "bn": "চন্দ্রোদয় ও গো-পূজা কাল"}
     },
-    ("Bhadrapada", "Krishna", 6): {
-        "en": "Balarama Jayanti / Hal Sasthi / Lahaee Chhath",
-        "hi": "बलराम जयंती / हलषष्ठी / ललही छठ",
-        "bn": "শ্রী বলরাম জন্মজয়ন্তী / হল ষষ্ঠী ব্রত",
-        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
-        "icon": "🌾", "deity": {"en": "Lord Balarama", "hi": "भगवान बलराम", "bn": "ভগবান বলরাম দেব"},
-        "description": {
-            "en": "Advent of Lord Balarama, the elder brother of Sri Krishna bearing the divine plough.",
-            "hi": "भगवान श्रीकृष्ण के अग्रज शेषनाग अवतारी श्री बलराम जी का पावन जन्मोत्सव।",
-            "bn": "শেষাবতার শ্রীকৃষ্ণের জ্যেষ্ঠ ভ্রাতা ভগবান বলরামের পরম আবির্ভাব তিথি।"
+    # --------------------------------------------------------------------------
+    # ভাদ্রপদ কৃষ্ণ ৫ (পঞ্চমী তিথি) - পৃথক পৃথক উৎসব ও ব্রত
+    # --------------------------------------------------------------------------
+        # ১. ভগবান শ্রী বলরাম জন্মজয়ন্তী
+        ("Bhadrapada", "Krishna", 5): {
+            "en": "Sri Balarama Jayanti",
+            "hi": "श्री बलराम जयंती",
+            "bn": "শ্রী শ্রী বলরাম জন্মজয়ন্তী",
+            "category": "hindu",
+            "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+            "icon": "🌾",
+            "deity": {
+                "en": "Lord Balarama (Sheshanaga)",
+                "hi": "भगवान बलराम (शेषनाग अवतार)",
+                "bn": "ভগবান বলরাম দেব ও শেষনাগ"
+            },
+            "description": {
+                "en": "Divine appearance day of Lord Balarama, the elder brother of Lord Krishna bearing the sacred golden plough.",
+                "hi": "भगवान श्रीकृष्ण के बड़े भाई एवं शेषनाग अवतारी भगवान बलराम जी का पावन प्राकट्योत्सव।",
+                "bn": "ভগবান শ্রীকৃষ্ণের জ্যেষ্ঠ ভ্রাতা ও দিব্য হলধারী শেষাবতার শ্রী বলরামদেবের পরম আবির্ভাব তিথি।"
+            },
+            "muhurta_type": "purvahna",
+            "muhurta_label": {
+                "en": "Purvahna Abhisheka & Puja Muhurta",
+                "hi": "पूर्वाह्न अभिषेक व पूजन मुहूर्त",
+                "bn": "পূর্বাহ্ন অভিষেক ও পূজা লগ্ন"
         },
-        "muhurta_type": "purvahna",
-        "muhurta_label": {"en": "Purvahna Kaal", "hi": "पूर्वाह्न काल", "bn": "পূর্বাহ্ন কাল পূজা"}
-    },
+
+        # ২. হল ষষ্ঠী ব্রত (হরছট)
+        ("Bhadrapada", "Krishna", 5): {
+            "en": "Hal Sasthi Vrat (Har Chhath)",
+            "hi": "हलषष्ठी व्रत (हरछठ)",
+            "bn": "শ্রী শ্রী হল ষষ্ঠী ব্রত (হরছট)",
+            "category": "hindu",
+            "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+            "icon": "🌾",
+            "deity": {
+                "en": "Haladhara Balarama & Lord Shiva",
+                "hi": "हलधर बलराम व भगवान शिव",
+                "bn": "হলধর বলরাম ও দেবাদিদেব শিব"
+            },
+            "description": {
+                "en": "Fasting observed by mothers for their children's long life, consuming only unplowed produce (Pasin rice) and buffalo milk.",
+                "hi": "संतान की दीर्घायु हेतु माताओं द्वारा आचरित हलषष्ठी व्रत, जिसमें बिना जुते हुए अन्न व भैंस के दूध का प्रयोग होता है।",
+                "bn": "সন্তানের নীরোগ দীর্ঘায়ুর কামনায় মায়েদের হল ষষ্ঠী ব্রত; বিনা চাষের উৎপন্ন শস্য ও মহিষের দুগ্ধ গ্রহণ।"
+            },
+            "muhurta_type": "purvahna",
+            "muhurta_label": {
+                "en": "Purvahna Hal Sasthi Puja",
+                "hi": "पूर्वाह्न हलषष्ठी पूजन",
+                "bn": "পূর্বাহ্ন হল ষষ্ঠী পূজা লগ্ন"
+        },
+
+        # ৩. ললহী ছট ব্রত
+        ("Bhadrapada", "Krishna", 5): {
+            "en": "Lahaee Chhath Vrat (Lalhi Chhath)",
+            "hi": "ललही छठ व्रत (संतान रक्षा पर्व)",
+            "bn": "শ্রী শ্রী ললহী ছট ব্রত (সন্তান রক্ষা পর্ব)",
+            "category": "hindu",
+            "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+            "icon": "🪔",
+            "deity": {
+                "en": "Maa Sasthi & Lord Balarama",
+                "hi": "माँ षष्ठी व बलराम जी",
+                "bn": "মা ষষ্ঠী দেবী ও শ্রী বলরাম"
+            },
+            "description": {
+                "en": "Traditional maternal observance invoking blessings of Maa Sasthi and Lord Balarama for progeny protection.",
+                "hi": "संतान की सर्वविपत्ति से रक्षा एवं सौभाग्य प्राप्ति हेतु ललही छठ की पावन पूजा।",
+                "bn": "সন্তানের সর্বপ্রকার বিপদমুক্তি ও কল্যাণের কামনায় মা ষষ্ঠী ও বলরামদেবের পুণ্য ললহী ছট অর্চনা।"
+            },
+            "muhurta_type": "sayankal",
+            "muhurta_label": {
+                "en": "Sayankal Pradosh Vrat Puja",
+                "hi": "सायंकाल प्रदोष पूजा",
+                "bn": "সায়ংকালীন প্রদোষ পূজা লগ্ন"
+            },
+    # --------------------------------------------------------------------------
+    # ভাদ্রপদ কৃষ্ণ ৬ (ষষ্ঠী তিথি) - পৃথক পৃথক উৎসব ও ব্রত
+    # --------------------------------------------------------------------------
+    ("Bhadrapada", "Krishna", 6):
+        # ১. হল ষষ্ঠী ব্রত (হরছট / বলরাম পূজা)
+        {
+            "en": "Hal Sasthi Vrat (Har Chhath)",
+            "hi": "हलषष्ठी व्रत (हरछठ)",
+            "bn": "শ্রী শ্রী হল ষষ্ঠী ব্রত (হরছট)",
+            "category": "hindu",
+            "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+            "icon": "🌾",
+            "deity": {
+                "en": "Haladhara Balarama",
+                "hi": "हलधर बलराम जी",
+                "bn": "হলধর বলরাম দেব"
+            },
+            "description": {
+                "en": "Strict maternal fasting for children's longevity and health, worshipping the sacred plough and Lord Balarama.",
+                "hi": "संतान की दीर्घायु व आरोग्य हेतु माताओं द्वारा निर्जला हलषष्ठी व्रत एवं बलराम जी का पावन पूजन।",
+                "bn": "সন্তানের দীর্ঘায়ু ও সুস্বাস্থ্যের কামনায় মায়েদের নির্জলা হল ষষ্ঠী ব্রত এবং লাঙলধারী বলরামদেবের আরাধনা।"
+            },
+            "muhurta_type": "purvahna",
+            "muhurta_label": {
+                "en": "Purvahna Hal Sasthi Puja",
+                "hi": "पूर्वाह्न हलषष्ठी पूजन",
+                "bn": "পূর্বাহ্ন হল ষষ্ঠী পূজা লগ্ন"
+            }
+        },
+
+        # ২. শ্রী বলরাম আবির্ভাব স্মরণ
+        ("Bhadrapada", "Krishna", 6):{
+            "en": "Sri Balarama Jayanti (Appearance Day)",
+            "hi": "श्री बलराम जयंती (प्राकट्योत्सव)",
+            "bn": "শ্রী শ্রী বলরাম জয়ন্তী (আবির্ভাব স্মরণ)",
+            "category": "hindu",
+            "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+            "icon": "🌾",
+            "deity": {
+                "en": "Lord Balarama",
+                "hi": "भगवान बलराम",
+                "bn": "ভগবান বলরাম দেব"
+            },
+            "description": {
+                "en": "Advent of Lord Balarama, the source of spiritual strength and elder brother of Lord Krishna.",
+                "hi": "आत्मिक बल प्रदाता एवं भगवान श्रीकृष्ण के बड़े भाई शेषनाग अवतारी बलराम जी का पावन आविर्भाव।",
+                "bn": "আধ্যাত্মিক শক্তির আধার এবং ভগবান শ্রীকৃষ্ণের জ্যেষ্ঠ ভ্রাতা শেষাবতার বলরামদেবের পবিত্র আবির্ভাব।"
+            },
+            "muhurta_type": "purvahna",
+            "muhurta_label": {
+                "en": "Purvahna Puja Muhurta",
+                "hi": "पूर्वाह्न पूजा मुहूर्त",
+                "bn": "পূর্বাহ্ন পূজা লগ্ন"
+            }
+        },
+
+        # ৩. ললহী ছট ব্রত
+        ("Bhadrapada", "Krishna", 6):
+            "en": "Lahaee Chhath Vrat (Lalhi Chhath)",
+            "hi": "ललही छठ व्रत (संतान रक्षा पर्व)",
+            "bn": "শ্রী শ্রী ললহী ছট ব্রত (সন্তান রক্ষা পর্ব)",
+            "category": "hindu",
+            "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
+            "icon": "🪔",
+            "deity": {
+                "en": "Maa Sasthi",
+                "hi": "माँ षष्ठी",
+                "bn": "মা ষষ্ঠী দেবী"
+            },
+            "description": {
+                "en": "Maternal worship of Maa Sasthi on Shashthi tithi for progeny protection and blessings.",
+                "hi": "षष्ठी तिथि पर संतानों के कल्याण एवं रक्षा हेतु माता षष्ठी की पावन आराधना।",
+                "bn": "ষষ্ঠী তিথিতে সন্তানের সার্বিক সুরক্ষা ও কল্যাণের জন্য মা ষষ্ঠী দেবীর বিশেষ ব্রত।"
+            },
+            "muhurta_type": "sayankal",
+            "muhurta_label": {
+                "en": "Sayankal Pradosh Vrat Puja",
+                "hi": "सायंकाल प्रदोष पूजा",
+                "bn": "সায়ংকালীন প্রদোষ পূজা লগ্ন"
+            },
     ("Bhadrapada", "Krishna", 8): {
         "en": "Krishna Janmashtami / Gokulashtami",
         "hi": "श्रीकृष्ण जन्माष्टमी / गोकुलाष्टमी",
