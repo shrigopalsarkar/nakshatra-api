@@ -1274,8 +1274,8 @@ def compute_full_drik_panchang(
         "samvat_year": samvat_year,               # <- এই লাইনটি যোগ করুন
         "vikram_samvat": samvat_year,
         # সংবৎসর (Brihat Samhita 60 Samvatsara Drik Sync)
-        "samvatsara_name": get_samvatsara(samvat_year, lang=lang_key),
-        "samvatsara_details": get_samvatsara_details(samvat_year, lang=lang_key),
+        "samvatsara_name": get_samvatsara((int(samvat_year) + 135) if (1800 <= int(samvat_year or 0) <= 2000) else int(samvat_year or 2051), lang=lang_key),
+        "samvatsara_details": get_samvatsara_details((int(samvat_year) + 135) if (1800 <= int(samvat_year or 0) <= 2000) else int(samvat_year or 2051), lang=lang_key),
         "mantri_mandal_title": mantri_title,       # <- এই লাইনটি যোগ করুন
         "weekday_name": WEEKDAY_NAMES[lang_key][(weekday + 1) % 7],
         "sunrise": fmt_time(dt_rise),
