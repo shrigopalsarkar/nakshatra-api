@@ -126,6 +126,89 @@ DAY_START_INDEX = {0: 3, 1: 6, 2: 2, 3: 5, 4: 1, 5: 4, 6: 0}
 NIGHT_START_INDEX = {0: 1, 1: 4, 2: 0, 3: 3, 4: 6, 5: 2, 6: 5}
 
 # ==============================================================================
+# ১.১ ৬০ সংবৎসর তালিকা ও অ্যালগরিদম (Brihat Samhita / Drik Standard)
+# ==============================================================================
+SAMVATSARA_NAMES = [
+    {"bn": "প্রভব", "hi": "प्रभव", "en": "Prabhava", "sa_iast": "Prabhava", "ruler": {"en": "Lord Brahma", "hi": "भगवान ब्रह्मा", "bn": "ভগবান ব্রহ্মা"}, "nature": {"en": "Highly Auspicious", "hi": "अत्यंत शुभ", "bn": "পরম শুভ"}},
+    {"bn": "বিভব", "hi": "विभव", "en": "Vibhava", "sa_iast": "Vibhava", "ruler": {"en": "Lord Brahma", "hi": "भगवान ब्रह्मा", "bn": "ভগবান ব্রহ্মা"}, "nature": {"en": "Auspicious", "hi": "शुभ ফলदायी", "bn": "শুভদায়ী"}},
+    {"bn": "শুক্ল", "hi": "शुक्ल", "en": "Shukla", "sa_iast": "Śukla", "ruler": {"en": "Lord Brahma", "hi": "भगवान ब्रह्मा", "bn": "ভগবান ব্রহ্মা"}, "nature": {"en": "Auspicious", "hi": "शुभ", "bn": "শুভ"}},
+    {"bn": "প্রমোদ", "hi": "प्रमोद", "en": "Pramoda", "sa_iast": "Pramoda", "ruler": {"en": "Lord Brahma", "hi": "भगवान ब्रह्मा", "bn": "ভগবান ব্রহ্মা"}, "nature": {"en": "Joyous & Prosperous", "hi": "आनंद व समृद्धि", "bn": "আনন্দ ও সমৃদ্ধিদায়ক"}},
+    {"bn": "প্রজাপতি (প্রজোৎপত্তি)", "hi": "प्रजापति (प्रजोत्पत्ति)", "en": "Prajapati (Prajotpatti)", "sa_iast": "Prajāpati", "ruler": {"en": "Lord Brahma", "hi": "भगवान ब्रह्मा", "bn": "ভগবান ব্রহ্মা"}, "nature": {"en": "Growth & Wealth", "hi": "वृद्धि व ऐश्वर्य", "bn": "প্রবৃদ্ধিদায়ক"}},
+    {"bn": "অঙ্গিরা", "hi": "अंगिरा", "en": "Angirasa", "sa_iast": "Aṅgiras", "ruler": {"en": "Lord Brahma", "hi": "भगवान ब्रह्मा", "bn": "ভগবান ব্রহ্মা"}, "nature": {"en": "Intellectual Growth", "hi": "बुद्धि व ज्ञान वृद्धि", "bn": "জ্ঞান ও প্রজ্ঞাদায়ক"}},
+    {"bn": "শ্রীমুখ", "hi": "श्रीमुख", "en": "Shrimukha", "sa_iast": "Śrīmukha", "ruler": {"en": "Lord Brahma", "hi": "भगवान ब्रह्मा", "bn": "ভগবান ব্রহ্মা"}, "nature": {"en": "Wealth & Fortune", "hi": "धन व सौभाग्य", "bn": "শ্রী ও সৌভাগ্যদায়ক"}},
+    {"bn": "ভাব", "hi": "भाव", "en": "Bhava", "sa_iast": "Bhāva", "ruler": {"en": "Lord Brahma", "hi": "भगवान ब्रह्मा", "bn": "ভগবান ব্রহ্মা"}, "nature": {"en": "Creative & Auspicious", "hi": "रचनात्मक व शुभ", "bn": "কল্যাণকর"}},
+    {"bn": "যুব", "hi": "युवा", "en": "Yuva", "sa_iast": "Yuvan", "ruler": {"en": "Lord Brahma", "hi": "भगवान ब्रह्मा", "bn": "ভগবান ব্রহ্মা"}, "nature": {"en": "Energy & Vitality", "hi": "ऊर्जा व शक्ति", "bn": "তেজ ও বলবিকাশ"}},
+    {"bn": "ধাতৃ", "hi": "धाता", "en": "Dhatri", "sa_iast": "Dhātṛ", "ruler": {"en": "Lord Brahma", "hi": "भगवान ब्रह्मा", "bn": "ভগবান ব্রহ্মা"}, "nature": {"en": "Stability & Peace", "hi": "स्थिरता व शांति", "bn": "শান্তি ও স্থায়িত্ব"}},
+    {"bn": "ঈশ্বর", "hi": "ईश्वर", "en": "Ishvara", "sa_iast": "Īśvara", "ruler": {"en": "Lord Vishnu", "hi": "भगवान विष्णु", "bn": "ভগবান বিষ্ণু"}, "nature": {"en": "Supreme Good Fortune", "hi": "सर्वकल्याणकारी", "bn": "পরম মঙ্গলময়"}},
+    {"bn": "বহুধান্য", "hi": "बहुधान्य", "en": "Bahudhanya", "sa_iast": "Bahudhānya", "ruler": {"en": "Lord Vishnu", "hi": "भगवान विष्णु", "bn": "ভগবান বিষ্ণু"}, "nature": {"en": "Abundant Harvest & Food", "hi": "अन्न-धन प्रचुरता", "bn": "অন্ন ও শস্য প্রাচুর্য"}},
+    {"bn": "প্রমাদী", "hi": "प्रमाथी", "en": "Pramathi", "sa_iast": "Pramāthin", "ruler": {"en": "Lord Vishnu", "hi": "भगवान विष्णु", "bn": "ভগবান বিষ্ণু"}, "nature": {"en": "Challenging", "hi": "सावधानी आवश्यक", "bn": "সংযম প্রয়োজনীয়"}},
+    {"bn": "বিক্রম", "hi": "विक्रम", "en": "Vikrama", "sa_iast": "Vikrama", "ruler": {"en": "Lord Vishnu", "hi": "भगवान विष्णु", "bn": "ভগবান বিষ্ণু"}, "nature": {"en": "Courage & Victory", "hi": "पराक्रम व विजय", "bn": "বীরত্ব ও বিজয়"}},
+    {"bn": "বৃষপ্রজা (বৃষ)", "hi": "वृषप्रजा (वृष)", "en": "Vrishaprajapathi", "sa_iast": "Vṛṣaprajāpati", "ruler": {"en": "Lord Vishnu", "hi": "भगवान विष्णु", "bn": "ভগবান বিষ্ণু"}, "nature": {"en": "Virtue & Righteousness", "hi": "धर्म व सदाचार", "bn": "ধর্ম ও সদাচার"}},
+    {"bn": "চিত্রভানু", "hi": "चित्रभानु", "en": "Chitrabhanu", "sa_iast": "Citrabhānu", "ruler": {"en": "Lord Vishnu", "hi": "भगवान विष्णु", "bn": "ভগবান বিষ্ণু"}, "nature": {"en": "Fame & Prosperity", "hi": "यश व समृद्धि", "bn": "যশ ও খ্যাতি"}},
+    {"bn": "সুভানু (স্বভানু)", "hi": "सुभानु (स्वभानु)", "en": "Subhanu", "sa_iast": "Subhānu", "ruler": {"en": "Lord Vishnu", "hi": "भगवान विष्णु", "bn": "ভগবান বিষ্ণু"}, "nature": {"en": "Radiance & Good Health", "hi": "तेज व आरोग्य", "bn": "তেজ ও সুস্বাস্থ্য"}},
+    {"bn": "তারণ", "hi": "तारण", "en": "Tarana", "sa_iast": "Tāraṇa", "ruler": {"en": "Lord Vishnu", "hi": "भगवान विष्णु", "bn": "ভগবান বিষ্ণু"}, "nature": {"en": "Liberation from Sorrows", "hi": "संकट मुक्ति", "bn": "সংকট থেকে মুক্তিদায়ক"}},
+    {"bn": "পার্থিব", "hi": "पार्थिव", "en": "Parthiva", "sa_iast": "Pārthiva", "ruler": {"en": "Lord Vishnu", "hi": "भगवान विष्णु", "bn": "ভগবান বিষ্ণু"}, "nature": {"en": "Material Abundance", "hi": "भौतिक समृद्धि", "bn": "পার্থিব সমৃদ্ধি"}},
+    {"bn": "ব্যয়", "hi": "व्यय", "en": "Vyaya", "sa_iast": "Vyaya", "ruler": {"en": "Lord Vishnu", "hi": "भगवान विष्णु", "bn": "ভগবান বিষ্ণু"}, "nature": {"en": "Charity & Expenses", "hi": "दान व व्यय", "bn": "দান ও ত্যাগের সময়"}},
+    {"bn": "সর্বজিৎ", "hi": "सर्वजित्", "en": "Sarvajit", "sa_iast": "Sarvajit", "ruler": {"en": "Lord Shiva", "hi": "भगवान शिव", "bn": "দেবাদিদেব শিব"}, "nature": {"en": "All-Conquering Success", "hi": "सर्वविजय प्रदाता", "bn": "সর্ববিজয়ী কল্যাণকর"}},
+    {"bn": "সর্বধারী", "hi": "सर्वधारी", "en": "Sarvadhari", "sa_iast": "Sarvadhārin", "ruler": {"en": "Lord Shiva", "hi": "भगवान शिव", "bn": "দেবাদিদেব শিব"}, "nature": {"en": "Sustenance & Security", "hi": "सुरक्षा व पोषण", "bn": "ধারণ ও স্থায়িত্ব"}},
+    {"bn": "বিরোধী", "hi": "विरोधी", "en": "Virodhi", "sa_iast": "Virodhin", "ruler": {"en": "Lord Shiva", "hi": "भगवान शिव", "bn": "দেবাদিদেব শিব"}, "nature": {"en": "Conflicts & Remedial", "hi": "विरोध व शांति उपाय", "bn": "সংযম ও বিরোধ নিবারণ"}},
+    {"bn": "বিকৃত", "hi": "विकृत", "en": "Vikrita", "sa_iast": "Vikṛta", "ruler": {"en": "Lord Shiva", "hi": "भगवान शिव", "bn": "দেবাদিদেব শিব"}, "nature": {"en": "Fluctuations & Transformation", "hi": "परिवर्तनकारी", "bn": "পরিবর্তনশীল"}},
+    {"bn": "খর", "hi": "खर", "en": "Khara", "sa_iast": "Khara", "ruler": {"en": "Lord Shiva", "hi": "भगवान शिव", "bn": "দেবাদিদেব শিব"}, "nature": {"en": "Hard Work & Endurance", "hi": "कठिन परिश्रम", "bn": "ধৈর্য ও সহিষ্ণুতা"}},
+    {"bn": "নন্দন", "hi": "नन्दन", "en": "Nandana", "sa_iast": "Nandana", "ruler": {"en": "Lord Shiva", "hi": "भगवान शिव", "bn": "দেবাদিদেব শিব"}, "nature": {"en": "Bliss & Child Welfare", "hi": "आनंद व संतान सुख", "bn": "সন্তানসুখ ও পরমানন্দ"}},
+    {"bn": "বিজয়", "hi": "विजय", "en": "Vijaya", "sa_iast": "Vijaya", "ruler": {"en": "Lord Shiva", "hi": "भगवान शिव", "bn": "দেবাদিদেব শিব"}, "nature": {"en": "Supreme Victory", "hi": "परम विजय", "bn": "পরম বিজয়প্রদ"}},
+    {"bn": "জয়", "hi": "जय", "en": "Jaya", "sa_iast": "Jaya", "ruler": {"en": "Lord Shiva", "hi": "भगवान शिव", "bn": "দেবাদিদেব শিব"}, "nature": {"en": "Triumph in Endeavors", "hi": "कार्य सिद्धि", "bn": "সর্বকার্য সিদ্ধিদায়ক"}},
+    {"bn": "মন্মথ", "hi": "मन्मथ", "en": "Manmatha", "sa_iast": "Manmatha", "ruler": {"en": "Lord Shiva", "hi": "भगवान शिव", "bn": "দেবাদিদেব শিব"}, "nature": {"en": "Love, Arts & Harmony", "hi": "प्रेम, कला व सौहार्द", "bn": "প্রেম, শিল্প ও সৌহার্দ্য"}},
+    {"bn": "দুর্মুখ", "hi": "दुर्मुख", "en": "Durmukha", "sa_iast": "Durmukha", "ruler": {"en": "Lord Shiva", "hi": "भगवान शिव", "bn": "দেবাদিদেব শিব"}, "nature": {"en": "Requires Truth & Restraint", "hi": "वाणी संयम आवश्यक", "bn": "বাক্সংযম প্রয়োজনীয়"}},
+    {"bn": "হেমলম্বী", "hi": "हेमलम्बी", "en": "Hemalambi", "sa_iast": "Hemalambi", "ruler": {"en": "Lord Indra", "hi": "देवराज इंद्र", "bn": "দেবরাজ ইন্দ্র"}, "nature": {"en": "Golden Prosperity", "hi": "स्वर्ण व धन लाभ", "bn": "স্বর্ণ ও ধনলাভ"}},
+    {"bn": "বিলম্বী", "hi": "विलम्बी", "en": "Vilambi", "sa_iast": "Vilambin", "ruler": {"en": "Lord Indra", "hi": "देवराज इंद्र", "bn": "দেবরাজ ইন্দ্র"}, "nature": {"en": "Slow & Steady Progress", "hi": "धीमी किन्तु स्थिर प्रगति", "bn": "ধৈর্য্যশীল কর্মপ্রগতি"}},
+    {"bn": "বিকরী", "hi": "विकारी", "en": "Vikari", "sa_iast": "Vikārin", "ruler": {"en": "Lord Indra", "hi": "देवराज इंद्र", "bn": "দেবরাজ ইন্দ্র"}, "nature": {"en": "Caution in Health", "hi": "स्वास्थ्य सतर्कता", "bn": "স্বাস্থ্য সচেতনতা"}},
+    {"bn": "শর্বরী", "hi": "शार्वरी", "en": "Sharvari", "sa_iast": "Śārvarī", "ruler": {"en": "Lord Indra", "hi": "देवराज इंद्र", "bn": "দেবরাজ ইন্দ্র"}, "nature": {"en": "Peaceful Night/Calm", "hi": "शांति व आध्यात्म", "bn": "আধ্যাত্মিক শান্তি"}},
+    {"bn": "প্লব", "hi": "प्लव", "en": "Plava", "sa_iast": "Plava", "ruler": {"en": "Lord Indra", "hi": "देवराज इंद्र", "bn": "দেবরাজ ইন্দ্র"}, "nature": {"en": "Water Abundance/Travel", "hi": "यात्रा व जल समृद्धि", "bn": "ভ্রমণ ও জলসমৃদ্ধি"}},
+    {"bn": "শুভকৃৎ", "hi": "शुभकृत्", "en": "Shubhakritha", "sa_iast": "Śubhakṛt", "ruler": {"en": "Lord Indra", "hi": "देवराज इंद्र", "bn": "দেবরাজ ইন্দ্র"}, "nature": {"en": "Benefic & Auspicious Deeds", "hi": "सत्कर्म व शुभ फल", "bn": "পুণ্যকর্ম ও শুভফল"}},
+    {"bn": "শোভন", "hi": "शोभन", "en": "Shobhana", "sa_iast": "Śobhana", "ruler": {"en": "Lord Indra", "hi": "देवराज इंद्र", "bn": "দেবরাজ ইন্দ্র"}, "nature": {"en": "Grace, Beauty & Joy", "hi": "सौंदर्य व हर्ष", "bn": "সৌন্দর্য ও আনন্দ"}},
+    {"bn": "ক্রোধী", "hi": "क्रोधी", "en": "Krodhi", "sa_iast": "Krodhin", "ruler": {"en": "Lord Indra", "hi": "देवराज इंद्र", "bn": "দেবরাজ ইন্দ্র"}, "nature": {"en": "Restrain Anger", "hi": "क्रोध नियंत्रण आवश्यक", "bn": "ক্রোধসংবরণ প্রয়োজনীয়"}},
+    {"bn": "বিশ্বাবসু", "hi": "विश्वावसु", "en": "Vishvavasu", "sa_iast": "Viśvāvasu", "ruler": {"en": "Lord Indra", "hi": "देवराज इंद्र", "bn": "দেবরাজ ইন্দ্র"}, "nature": {"en": "Universal Wealth & Music", "hi": "वैश्विक समृद्धि व संगीत", "bn": "সংগীত ও বিশ্বসমৃদ্ধি"}},
+    {"bn": "পরাভব", "hi": "पराभव", "en": "Parabhava", "sa_iast": "Parābhava", "ruler": {"en": "Lord Indra", "hi": "देवराज इंद्र", "bn": "দেবরাজ ইন্দ্র"}, "nature": {"en": "Humble Learning", "hi": "धैर्य व विनम्रता", "bn": "বিনম্র সাধনা"}},
+    {"bn": "প্লবঙ্গ", "hi": "प्लवंग", "en": "Plavanga", "sa_iast": "Plavaṅga", "ruler": {"en": "Agni Deva", "hi": "अग्नि देव", "bn": "অগ্নি দেব"}, "nature": {"en": "Speed, Agility & Movement", "hi": "गतिशीलता व उत्साह", "bn": "গতিশীলতা ও উদ্যোগ"}},
+    {"bn": "কীলক", "hi": "कीलक", "en": "Kilaka", "sa_iast": "Kīlaka", "ruler": {"en": "Agni Deva", "hi": "अग्नि देव", "bn": "অগ্নি দেব"}, "nature": {"en": "Solid Foundation", "hi": "दृढ़ता व स्थायित्व", "bn": "দৃঢ়তা ও ভিত্তি"}},
+    {"bn": "সৌমা", "hi": "सौम्य", "en": "Saumya", "sa_iast": "Saumya", "ruler": {"en": "Agni Deva", "hi": "अग्नि देव", "bn": "অগ্নি দেব"}, "nature": {"en": "Gentle, Pure & Merciful", "hi": "सौम्यता व करुणा", "bn": "স্নিগ্ধতা ও অহিংসা"}},
+    {"bn": "সাধারণ", "hi": "साधारण", "en": "Sadharana", "sa_iast": "Sādhāraṇa", "ruler": {"en": "Agni Deva", "hi": "अग्नि देव", "bn": "অগ্নি দেব"}, "nature": {"en": "Balanced & Steady", "hi": "संतुलित व सामान्य", "bn": "ভারসাম্যপূর্ণ"}},
+    {"bn": "বিরোধকৃৎ", "hi": "विरोधकृत्", "en": "Virodhakritha", "sa_iast": "Virodhakṛt", "ruler": {"en": "Agni Deva", "hi": "अग्नि देव", "bn": "অগ্নি দেব"}, "nature": {"en": "Overcome Opposition", "hi": "बाधाओं पर विजय", "bn": "প্রতিদ্বন্দ্বিতা জয়"}},
+    {"bn": "পরিধাবী", "hi": "परिधावी", "en": "Paridhavi", "sa_iast": "Paridhāvin", "ruler": {"en": "Agni Deva", "hi": "अग्नि देव", "bn": "অগ্নি দেব"}, "nature": {"en": "Vigilance & Protection", "hi": "सुरक्षा व सतर्कता", "bn": "সতর্কতা ও সুরক্ষা"}},
+    {"bn": "প্রমাদীচা", "hi": "प्रमादीचा", "en": "Pramadicha", "sa_iast": "Pramādīca", "ruler": {"en": "Agni Deva", "hi": "अग्नि देव", "bn": "অগ্নি দেব"}, "nature": {"en": "Spiritual Focus Needed", "hi": "एकाग्रता आवश्यक", "bn": "আধ্যাত্মিক একাগ্রতা"}},
+    {"bn": "আনন্দ", "hi": "आनन्द", "en": "Ananda", "sa_iast": "Ānanda", "ruler": {"en": "Agni Deva", "hi": "अग्नि देव", "bn": "অগ্নি দেব"}, "nature": {"en": "Supreme Delight & Happiness", "hi": "परमानंद व सुख", "bn": "পরম আনন্দ ও উল্লাস"}},
+    {"bn": "রাক্ষস", "hi": "राक्षस", "en": "Rakshasa", "sa_iast": "Rākṣasa", "ruler": {"en": "Agni Deva", "hi": "अग्नि देव", "bn": "অগ্নি দেব"}, "nature": {"en": "Spiritual Protection Essential", "hi": "सुरक्षा व साधना", "bn": "ধর্মরক্ষা ও সংযম"}},
+    {"bn": "অনল (নল)", "hi": "अनल (नल)", "en": "Anala (Nala)", "sa_iast": "Anala", "ruler": {"en": "Agni Deva", "hi": "अग्नि देव", "bn": "অগ্নি দেব"}, "nature": {"en": "Purifying Fire & Energy", "hi": "अग्नि समान तेज", "bn": "অগ্নিশুদ্ধি ও তেজ"}},
+    {"bn": "পিঙ্গল", "hi": "पिंगल", "en": "Pingala", "sa_iast": "Piṅgala", "ruler": {"en": "Lord Surya & Chandra", "hi": "सूर्य-चन्द्र देव", "bn": "সূর্য ও চন্দ্র দেব"}, "nature": {"en": "Inner Light & Realization", "hi": "आत्मज्ञान व तेज", "bn": "সূর্যতেজ ও প্রজ্ঞা"}},
+    {"bn": "কালযুক্ত", "hi": "कालयुक्त", "en": "Kalayukta", "sa_iast": "Kālayukta", "ruler": {"en": "Lord Surya & Chandra", "hi": "सूर्य-चन्द्र देव", "bn": "সূর্য ও চন্দ্র দেব"}, "nature": {"en": "Patience through Time", "hi": "समय का सदुपयोग", "bn": "সময়ানুবর্তিতা"}},
+    {"bn": "সিদ্ধার্থ (সিদ্ধার্থী)", "hi": "सिद्धार्थ (सिद्धार्थी)", "en": "Siddharthi", "sa_iast": "Siddhārthin", "ruler": {"en": "Lord Surya & Chandra", "hi": "सूर्य-चन्द्र देव", "bn": "সূর্য ও চন্দ্র দেব"}, "nature": {"en": "Fulfillment of Desires", "hi": "मनोकामना पूर्ति व सिद्धि", "bn": "সর্বমনোরথ সিদ্ধি"}},
+    {"bn": "রৌদ্র", "hi": "रौद्र", "en": "Raudra", "sa_iast": "Raudra", "ruler": {"en": "Lord Surya & Chandra", "hi": "सूर्य-चन्द्र देव", "bn": "সূর্য ও চন্দ্র দেব"}, "nature": {"en": "Fierce Strength & Courage", "hi": "साहस व शक्ति", "bn": "রুদ্রতেজ ও পরাক্রম"}},
+    {"bn": "দুর্মতি", "hi": "दुर्मति", "en": "Durmati", "sa_iast": "Durmati", "ruler": {"en": "Lord Surya & Chandra", "hi": "सूर्य-चन्द्र देव", "bn": "সূর্য ও চন্দ্র দেব"}, "nature": {"en": "Discernment & Wisdom", "hi": "सद्विचार व विवेक", "bn": "সদ্বিবেচনা ও জ্ঞান"}},
+    {"bn": "দুন্দুভি", "hi": "दुन्दुभि", "en": "Dundubhi", "sa_iast": "Dundubhi", "ruler": {"en": "Lord Surya & Chandra", "hi": "सूर्य-चन्द्र देव", "bn": "সূর্য ও চন্দ্র দেব"}, "nature": {"en": "Celebration & Fame", "hi": "उत्सव व जयघोष", "bn": "উৎসবের দামামা ও জয়ধ্বনি"}},
+    {"bn": "রুধিরোদ্গারী", "hi": "रुधिरोद्गारी", "en": "Rudhirodgari", "sa_iast": "Rudhirodgārin", "ruler": {"en": "Lord Surya & Chandra", "hi": "सूर्य-चन्द्र देव", "bn": "সূর্য ও চন্দ্র দেব"}, "nature": {"en": "Spiritual Vigilance", "hi": "शांति साधना आवश्यक", "bn": "শান্তি ও আধ্যাত্মিক সাধনা"}},
+    {"bn": "রক্তাক্ষ", "hi": "रक्ताक्ष", "en": "Raktaksha", "sa_iast": "Raktākṣa", "ruler": {"en": "Lord Surya & Chandra", "hi": "सूर्य-चन्द्र देव", "bn": "সূর্য ও চন্দ্র দেব"}, "nature": {"en": "Focused Vision & Meditation", "hi": "गंभीर दृष्टि व ध्यान", "bn": "তীব্র দৃষ্টি ও ধ্যান"}},
+    {"bn": "ক্রোধনা (মন্যু)", "hi": "क्रोधन (मन्यु)", "en": "Krodhana (Manyu)", "sa_iast": "Krodhana", "ruler": {"en": "Lord Surya & Chandra", "hi": "सूर्य-चन्द्र देव", "bn": "সূর্য ও চন্দ্র দেব"}, "nature": {"en": "Compassion & Peace Practices", "hi": "धैर्य व अहिंसा", "bn": "শান্তি ও সহনশীলতা"}},
+    {"bn": "অক্ষয় (ক্ষয়)", "hi": "अक्षय (क्षय)", "en": "Akshaya (Kshaya)", "sa_iast": "Akṣaya", "ruler": {"en": "Lord Surya & Chandra", "hi": "सूर्य-चन्द्र देव", "bn": "সূর্য ও চন্দ্র দেব"}, "nature": {"en": "Imperishable Spiritual Merits", "hi": "अक्षय पुण्य फल", "bn": "অক্ষয় পুণ্যফল"}}
+]
+
+def get_samvatsara_details(vikrama_samvat: int, lang: str = "en") -> Dict[str, Any]:
+    idx = (int(vikrama_samvat) + 9) % 60
+    item = SAMVATSARA_NAMES[idx]
+    lang_str = str(lang or "").lower().strip()
+    l_key = "bn" if (lang_str.startswith("bn") or "bangla" in lang_str) else ("hi" if (lang_str.startswith("hi") or "hindi" in lang_str) else "en")
+
+    return {
+        "index_1_based": idx + 1,
+        "name": item.get(l_key, item["en"]),
+        "name_sa_iast": item.get("sa_iast", item["en"]),
+        "ruler": item["ruler"].get(l_key, item["ruler"]["en"]),
+        "nature": item["nature"].get(l_key, item["nature"]["en"])
+    }
+
+def get_samvatsara(vikrama_samvat: int, lang: str = "en") -> str:
+    return get_samvatsara_details(vikrama_samvat, lang)["name"]
+
+# ==============================================================================
 # ২. অ্যাস্ট্রোনমিক্যাল কোর ও জুলিয়ান ডেট
 # ==============================================================================
 
@@ -1175,6 +1258,9 @@ def compute_full_drik_panchang(
         "date_local": local_date.isoformat(),
         "samvat_year": samvat_year,               # <- এই লাইনটি যোগ করুন
         "vikram_samvat": samvat_year,
+        # সংবৎসর (Brihat Samhita 60 Samvatsara Drik Sync)
+        "samvatsara_name": get_samvatsara(samvat_year, lang=lang_key),
+        "samvatsara_details": get_samvatsara_details(samvat_year, lang=lang_key),
         "mantri_mandal_title": mantri_title,       # <- এই লাইনটি যোগ করুন
         "weekday_name": WEEKDAY_NAMES[lang_key][(weekday + 1) % 7],
         "sunrise": fmt_time(dt_rise),
