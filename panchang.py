@@ -192,17 +192,32 @@ SAMVATSARA_NAMES = [
 ]
 
 def get_samvatsara_details(vikrama_samvat: int, lang: str = "en") -> Dict[str, Any]:
-    idx = (int(vikrama_samvat) + 9) % 60
+    vs = int(vikrama_samvat)
+    # যদি কোনো কারণে ভুল করে শকাব্দ (যেমন 1916) পাস হয়ে থাকে, তাকে বিক্রম সংবতে নিয়ে আসা
+    if vs < 2000 and vs > 1800:
+        vs = vs + 135  # শকা থেকে বিক্রম রূপান্তর
+
+    # Brihat Samhita / Drik Standard: (VS + 9) % 60
+    # For VS 2051 -> (2051 + 9) % 60 = 20 -> 21st: Sarvajit
+    idx = (vs + 9) % 60
+    
     item = SAMVATSARA_NAMES[idx]
     lang_str = str(lang or "").lower().strip()
     l_key = "bn" if (lang_str.startswith("bn") or "bangla" in lang_str) else ("hi" if (lang_str.startswith("hi") or "hindi" in lang_str) else "en")
 
+    chosen_name = item.get(l_key, item["en"])
+
     return {
         "index_1_based": idx + 1,
-        "name": item.get(l_key, item["en"]),
+        "samvatsara_number": idx + 1,
+        "samvatsara_name": item["en"],
+        "name": chosen_name,
+        "name_en": item["en"],
+        "name_hi": item.get("hi", item["en"]),
+        "name_bn": item.get("bn", item["en"]),
         "name_sa_iast": item.get("sa_iast", item["en"]),
-        "ruler": item["ruler"].get(l_key, item["ruler"]["en"]),
-        "nature": item["nature"].get(l_key, item["nature"]["en"])
+        "ruler": item["ruler"].get(l_key, item["ruler"]["en"]) if isinstance(item.get("ruler"), dict) else item.get("ruler", ""),
+        "nature": item["nature"].get(l_key, item["nature"]["en"]) if isinstance(item.get("nature"), dict) else item.get("nature", "")
     }
 
 def get_samvatsara(vikrama_samvat: int, lang: str = "en") -> str:
