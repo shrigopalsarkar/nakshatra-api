@@ -209,7 +209,7 @@ async def generate_chat_response(request: BackendChatRequest):
         import urllib.request
         import json
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
         payload = {"contents": cleaned_contents}
         if sys_prompt:
             payload["systemInstruction"] = {"parts": [{"text": sys_prompt}]}
