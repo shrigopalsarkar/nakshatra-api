@@ -838,10 +838,9 @@ def get_mantri_mandala_title(samvat_year: int, lang_key: str) -> str:
 # =============================================================================
 # VEDIC DAY-NIGHT PERIODS (অহোরাত্র কাল বিভাজন)
 # =============================================================================
-
 def calculate_vedic_day_periods(dt_sunrise: datetime, dt_sunset: datetime, dt_next_sunrise: datetime, lang: str = "en") -> list:
     """
-    সূর্যোদয় ও সূর্যাস্তের উপর ভিত্তি করে ৭টি প্রধান শাস্ত্রীয় কাল গণনা।
+    ২৪ ঘণ্টার সম্পূর্ণ নির্বিঘ্ন বৈদিক অহোরাত্র বিভাজন (১০টি শাস্ত্রীয় কাল - কোনো ফাঁক থাকবে না)।
     """
     day_duration = dt_sunset - dt_sunrise
     night_duration = dt_next_sunrise - dt_sunset
@@ -849,48 +848,97 @@ def calculate_vedic_day_periods(dt_sunrise: datetime, dt_sunset: datetime, dt_ne
     solar_noon = dt_sunrise + (day_duration / 2)
     solar_midnight = dt_sunset + (night_duration / 2)
 
+    # ১. ব্রাহ্ম মুহূর্ত: সূর্যোদয়ের ৯৬ মি. আগে থেকে ৪৮ মি. আগে
+    brahma_start = dt_sunrise - timedelta(minutes=96)
+    brahma_end = dt_sunrise - timedelta(minutes=48)
+
+    # ২. প্রাতঃকাল (ঊষা): সূর্যোদয়ের ৪৮ মি. আগে থেকে সূর্যোদয়
+    pratah_start = brahma_end
+    pratah_end = dt_sunrise
+
+    # ৩. সকাল / পূর্বাহ্ণ: সূর্যোদয় থেকে মধ্যাহ্নের প্রারম্ভ
+    sakal_start = dt_sunrise
+    sakal_end = solar_noon - timedelta(minutes=60)
+
+    # ৪. দুপুরবেলা / মধ্যাহ্ন: দ্বিপ্রহর (অভিজিৎ সংলগ্ন সময়)
+    dupur_start = sakal_end
+    dupur_end = solar_noon + timedelta(minutes=60)
+
+    # ৫. বিকাল বেলা (অপরাহ্ণ): দুপুর থেকে গোধূলি বেলার পূর্ব পর্যন্ত (যেটা মিসিং ছিল)
+    bikal_start = dupur_end
+    bikal_end = dt_sunset - timedelta(minutes=48)
+
+    # ৬. সায়াহ্ন / গোধূলি বেলা: সূর্যাস্তের ঠিক পূর্বের ৪৮ মিনিট
+    godhuli_start = bikal_end
+    godhuli_end = dt_sunset
+
+    # ৭. সন্ধ্যা কাল / প্রদোষ: সূর্যাস্ত থেকে রাত্রির শুরু (৭২ মিনিট)
+    sandhya_start = dt_sunset
+    sandhya_end = dt_sunset + timedelta(minutes=72)
+
+    # ৮. রাত্রিকাল (প্রথম প্রহর): সন্ধ্যা সমাপ্তি থেকে মহানিশার পূর্ব পর্যন্ত
+    ratri_start = sandhya_end
+    ratri_end = solar_midnight - timedelta(minutes=48)
+
+    # ৯. নিশীথ রাত্রি কাল (মহানিশা): মধ্যরাত্রি কেন্দ্রিক কাল
+    nishi_start = ratri_end
+    nishi_end = solar_midnight + timedelta(minutes=48)
+
+    # ১০. শেষ রাত্রি / উষাকাল: মধ্যরাত্রি থেকে পরদিনের ব্রাহ্ম মুহূর্তের প্রারম্ভ
+    next_brahma_start = dt_next_sunrise - timedelta(minutes=96)
+    shesh_ratri_start = nishi_end
+    shesh_ratri_end = next_brahma_start
+
     periods_data = [
         {
             "id": "brahma_muhurta",
             "name": {"bn": "ব্রাহ্ম মুহূর্ত", "hi": "ब्रह्म मुहूर्त", "en": "Brahma Muhurta"},
-            "start": dt_sunrise - timedelta(minutes=96),
-            "end": dt_sunrise - timedelta(minutes=48)
+            "start": brahma_start, "end": brahma_end
         },
         {
             "id": "pratah_kal",
-            "name": {"bn": "প্রাতঃকাল", "hi": "प्रातःकाल", "en": "Pratah Kaal (Dawn)"},
-            "start": dt_sunrise - timedelta(minutes=48),
-            "end": dt_sunrise + timedelta(minutes=48)
+            "name": {"bn": "প্রাতঃকাল (ঊষা)", "hi": "प्रातःकाल (उषा)", "en": "Dawn (Pratah Kaal)"},
+            "start": pratah_start, "end": pratah_end
         },
         {
             "id": "sakal",
-            "name": {"bn": "সকাল (পূর্বাহ্ণ)", "hi": "सुबह (पूर्वाह्न)", "en": "Morning (Forenoon)"},
-            "start": dt_sunrise + timedelta(minutes=48),
-            "end": solar_noon - timedelta(minutes=48)
+            "name": {"bn": "সকাল / পূর্বাহ্ণ", "hi": "सवेरा / पूर्वाह्न", "en": "Morning (Forenoon)"},
+            "start": sakal_start, "end": sakal_end
         },
         {
             "id": "dupur_bela",
-            "name": {"bn": "দুপুর বেলা (মধ্যাহ্ন)", "hi": "दोपहर (मध्याह्न)", "en": "Midday (Noon)"},
-            "start": solar_noon - timedelta(minutes=48),
-            "end": solar_noon + timedelta(minutes=48)
+            "name": {"bn": "দুপুরবেলা / মধ্যাহ্ন", "hi": "दोपहर / मध्याह्न", "en": "Midday (Madhyahna)"},
+            "start": dupur_start, "end": dupur_end
+        },
+        {
+            "id": "bikal_aparahna",
+            "name": {"bn": "বিকাল বেলা (অপরাহ্ণ)", "hi": "तीसरा पहर / अपराह्न", "en": "Afternoon (Aparahna)"},
+            "start": bikal_start, "end": bikal_end
+        },
+        {
+            "id": "sayahna_godhuli",
+            "name": {"bn": "গোধূলি বেলা / সায়াহ্ন", "hi": "गोधूलि वेला / सायं", "en": "Twilight / Godhuli"},
+            "start": godhuli_start, "end": godhuli_end
         },
         {
             "id": "sandhya_kal",
-            "name": {"bn": "সন্ধ্যা কাল (সায়াহ্ন)", "hi": "संध्या काल (सायंकाल)", "en": "Evening Sandhya"},
-            "start": dt_sunset - timedelta(minutes=24),
-            "end": dt_sunset + timedelta(minutes=48)
+            "name": {"bn": "সন্ধ্যা কাল / প্রদোষ", "hi": "संध्या काल / प्रदोष", "en": "Evening / Pradosh"},
+            "start": sandhya_start, "end": sandhya_end
         },
         {
             "id": "ratrikal",
-            "name": {"bn": "রাত্রিকাল", "hi": "रात्रि काल", "en": "Night Period"},
-            "start": dt_sunset + timedelta(minutes=48),
-            "end": solar_midnight - timedelta(minutes=48)
+            "name": {"bn": "রাত্রিকাল (প্রথম প্রহর)", "hi": "रात्रिकाल (प्रथम प्रहर)", "en": "Night (Early Watch)"},
+            "start": ratri_start, "end": ratri_end
         },
         {
             "id": "nishi_ratri_kal",
-            "name": {"bn": "নিশীথ রাত্রি কাল (মহানিশা)", "hi": "निशीथ काल", "en": "Midnight (Nishitha)"},
-            "start": solar_midnight - timedelta(minutes=48),
-            "end": solar_midnight + timedelta(minutes=48)
+            "name": {"bn": "নিশীথ রাত্রি কাল (মহানিশা)", "hi": "निशीथ काल (महानिशा)", "en": "Midnight (Nishitha)"},
+            "start": nishi_start, "end": nishi_end
+        },
+        {
+            "id": "shesh_ratri_usha",
+            "name": {"bn": "শেষ রাত্রি / ঊষাকাল", "hi": "उषाकाल / अंतिम प्रहर", "en": "Pre-Dawn / Last Watch"},
+            "start": shesh_ratri_start, "end": shesh_ratri_end
         }
     ]
 
