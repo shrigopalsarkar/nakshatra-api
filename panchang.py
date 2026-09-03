@@ -834,6 +834,83 @@ def get_mantri_mandala_title(samvat_year: int, lang_key: str) -> str:
     elif lang_key == "hi":
         return f"विक्रम संवत {year_str} का मंत्रिमंडल"
     return f"Mantri Mandala of Vikram Samvat {year_str}"
+
+# =============================================================================
+# VEDIC DAY-NIGHT PERIODS (অহোরাত্র কাল বিভাজন)
+# =============================================================================
+
+def calculate_vedic_day_periods(dt_sunrise: datetime, dt_sunset: datetime, dt_next_sunrise: datetime, lang: str = "en") -> list:
+    """
+    সূর্যোদয় ও সূর্যাস্তের উপর ভিত্তি করে ৭টি প্রধান শাস্ত্রীয় কাল গণনা।
+    """
+    day_duration = dt_sunset - dt_sunrise
+    night_duration = dt_next_sunrise - dt_sunset
+
+    solar_noon = dt_sunrise + (day_duration / 2)
+    solar_midnight = dt_sunset + (night_duration / 2)
+
+    periods_data = [
+        {
+            "id": "brahma_muhurta",
+            "name": {"bn": "ব্রাহ্ম মুহূর্ত", "hi": "ब्रह्म मुहूर्त", "en": "Brahma Muhurta"},
+            "start": dt_sunrise - timedelta(minutes=96),
+            "end": dt_sunrise - timedelta(minutes=48)
+        },
+        {
+            "id": "pratah_kal",
+            "name": {"bn": "প্রাতঃকাল", "hi": "प्रातःकाल", "en": "Pratah Kaal (Dawn)"},
+            "start": dt_sunrise - timedelta(minutes=48),
+            "end": dt_sunrise + timedelta(minutes=48)
+        },
+        {
+            "id": "sakal",
+            "name": {"bn": "সকাল (পূর্বাহ্ণ)", "hi": "सुबह (पूर्वाह्न)", "en": "Morning (Forenoon)"},
+            "start": dt_sunrise + timedelta(minutes=48),
+            "end": solar_noon - timedelta(minutes=48)
+        },
+        {
+            "id": "dupur_bela",
+            "name": {"bn": "দুপুর বেলা (মধ্যাহ্ন)", "hi": "दोपहर (मध्याह्न)", "en": "Midday (Noon)"},
+            "start": solar_noon - timedelta(minutes=48),
+            "end": solar_noon + timedelta(minutes=48)
+        },
+        {
+            "id": "sandhya_kal",
+            "name": {"bn": "সন্ধ্যা কাল (সায়াহ্ন)", "hi": "संध्या काल (सायंकाल)", "en": "Evening Sandhya"},
+            "start": dt_sunset - timedelta(minutes=24),
+            "end": dt_sunset + timedelta(minutes=48)
+        },
+        {
+            "id": "ratrikal",
+            "name": {"bn": "রাত্রিকাল", "hi": "रात्रि काल", "en": "Night Period"},
+            "start": dt_sunset + timedelta(minutes=48),
+            "end": solar_midnight - timedelta(minutes=48)
+        },
+        {
+            "id": "nishi_ratri_kal",
+            "name": {"bn": "নিশীথ রাত্রি কাল (মহানিশা)", "hi": "निशीथ काल", "en": "Midnight (Nishitha)"},
+            "start": solar_midnight - timedelta(minutes=48),
+            "end": solar_midnight + timedelta(minutes=48)
+        }
+    ]
+
+    l_key = "bn" if "bn" in lang or "bangla" in lang else ("hi" if "hi" in lang else "en")
+
+    formatted_list = []
+    for p in periods_data:
+        formatted_list.append({
+            "id": p["id"],
+            "title": p["name"].get(l_key, p["name"]["en"]),
+            "title_bn": p["name"]["bn"],
+            "title_hi": p["name"]["hi"],
+            "title_en": p["name"]["en"],
+            "start_time": p["start"].strftime("%I:%M %p"),
+            "end_time": p["end"].strftime("%I:%M %p"),
+            "display_range": f"{p['start'].strftime('%I:%M %p')} - {p['end'].strftime('%I:%M %p')}"
+        })
+
+    return formatted_list
+
 # ==============================================================================
 # ৬. সম্পূর্ণ পঞ্চাঙ্গ (ANDROID DTO & DRIK PANCHANG 100% REPLICA)
 # ==============================================================================
@@ -1298,6 +1375,8 @@ def compute_full_drik_panchang(
         "karana_type": "Fixed" if (k_idx % 60) in KARANA_FIXED else "Movable",
         "pada_timeline": pada_timeline,
         "nakshatra_pada_display": f"{NAKSHATRAS[n_idx]} (Pada {pada_timeline[0]['pada'] if pada_timeline else 1})",
+        # অহোরাত্র কাল বিভাজন (Day-Night Timeline)
+        "day_timeline_periods": calculate_vedic_day_periods(dt_rise, dt_set, jd_to_local(jd_next_sunrise), lang=lang_key),
         
         # রাশি ও সূর্য স্থিতি
         "moonsign": RASHIS[m_rashi_idx],
