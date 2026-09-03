@@ -895,107 +895,95 @@ HINDU_FESTIVAL_DATABASE = {
     # --------------------------------------------------------------------------
     # শ্রাবণ শুক্ল ১৫ (পূর্ণিমা) - ৬টি সম্পূর্ণ পৃথক শাস্ত্রীয় উৎসব ও ব্রত
     # --------------------------------------------------------------------------
-    ("Shravana", "Shukla", 15): {
-        "en": "Raksha Bandhan (Rakhi)",
-        "hi": "रक्षाबंधन (राखी पर्व)",
-        "bn": "পবিত্র রাখীবন্ধন উৎসব",
-        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
-        "icon": "🧵", "deity": {"en": "Lord Krishna & Draupadi", "hi": "भगवान श्रीकृष्ण व द्रौपदी", "bn": "শ্রীকৃষ্ণ ও দ্রৌপদী"},
-        "description": {
-            "en": "Sacred festival celebrating the eternal protective bond of love and trust between brothers and sisters.",
-            "hi": "भाई-बहन के अटूट स्नेह, विश्वास एवं रक्षा संकल्प का परम पावन पर्व।",
-            "bn": "ভাই ও বোনের মধ্যকার অকৃত্রিম স্নেহ, সুরক্ষা ও সৌভ্রাতৃত্বের পবিত্র মিলনোৎসব।"
-    },
-        "muhurta_type": "aparahna",
-        "muhurta_label": {"en": "Aparahna Rakhi Muhurta (Bhadra Free)", "hi": "अपराह्न राखी मुहूर्त (भद्रा रहित)", "bn": "অপরাহ্ন রাখীবন্ধন লগ্ন (ভদ্রামুক্ত)"}
+    # --------------------------------------------------------------------------
+    # শ্রাবণ শুক্ল ১৫ (পূর্ণিমা)
+    # --------------------------------------------------------------------------
+    ("Shravana", "Shukla", 15): [
+        {
+            "en": "Raksha Bandhan (Rakhi)",
+            "hi": "रक्षाबंधन (राखी पर्व)",
+            "bn": "পবিত্র রাখীবন্ধন উৎসব",
+            "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+            "icon": "🧵", "deity": {"en": "Lord Krishna & Draupadi", "hi": "भगवान श्रीकृष्ण व द्रौपदी", "bn": "শ্রীকৃষ্ণ ও দ্রৌপদী"},
+            "description": {
+                "en": "Sacred festival celebrating the protective bond between brothers and sisters.",
+                "hi": "भाई-बहन के अटूट स्नेह एवं रक्षा संकल्प का पावन पर्व।",
+                "bn": "ভাই ও বোনের পবিত্র স্নেহ ও সুরক্ষার মিলন উৎসব।"
+            },
+            "muhurta_type": "aparahna",
+            "muhurta_label": {"en": "Aparahna Rakhi Muhurta", "hi": "अपराह्न राखी मुहूर्त", "bn": "অপরাহ্ন রাখীবন্ধন লগ্ন"}
         },
-    ("Shravana", "Shukla", 15): {
-        "en": "Sri Balarama Purnima (Balarama Jayanti)",
-        "hi": "श्री बलराम पूर्णिमा (बलराम जयंती)",
-        "bn": "শ্রী শ্রী বলরাম পূর্ণিমা (বলরাম জয়ন্তী)",
-        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
-        "icon": "🌾", "deity": {"en": "Lord Balarama (Sheshanaga)", "hi": "भगवान बलराम", "bn": "ভগবান বলরাম দেব ও শেষনাগ"},
-        "description": {
-            "en": "Divine appearance day of Lord Balarama, the elder brother of Lord Krishna and incarnation of Sheshanaga.",
-            "hi": "भगवान श्रीकृष्ण के अग्रज एवं शेषनाग अवतारी भगवान बलराम जी का पावन प्राकट्योत्सव।",
-            "bn": "ভগবান শ্রীকৃষ্ণের জ্যেষ্ঠ ভ্রাতা এবং শেষাবতার শ্রী বলরামদেবের পরম শুভ আবির্ভাব মহোৎসব।"
-   },
-        "muhurta_type": "madhyahna",
-        "muhurta_label": {"en": "Madhyahna Abhisheka Muhurta", "hi": "मध्याह्न महाभिषेक मुहूर्त", "bn": "মধ্যাহ্ন মহাজলাভিষেক লগ্ন"}
+        {
+            "en": "Sri Balarama Purnima (Balarama Jayanti)",
+            "hi": "श्री बलराम पूर्णिमा (बलराम जयंती)",
+            "bn": "শ্রী শ্রী বলরাম পূর্ণিমা (বলরাম জয়ন্তী)",
+            "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+            "icon": "🌾", "deity": {"en": "Lord Balarama", "hi": "भगवान बलराम", "bn": "ভগবান বলরাম দেব"},
+            "description": {
+                "en": "Divine appearance day of Lord Balarama, elder brother of Sri Krishna.",
+                "hi": "भगवान श्रीकृष्ण के अग्रज भगवान बलराम जी का पावन आविर्भाव दिवस।",
+                "bn": "শ্রীকৃষ্ণের জ্যেষ্ঠ ভ্রাতা শ্রী বলরামদেবের আবির্ভাব মহোৎসব।"
+            },
+            "muhurta_type": "madhyahna",
+            "muhurta_label": {"en": "Madhyahna Abhisheka Muhurta", "hi": "मध्याह्न महाभिषेक मुहूर्त", "bn": "মধ্যাহ্ন মহাজলাভিষেক লগ্ন"}
         },
-   ("Shravana", "Shukla", 15): {
-        "en": "Lord Hayagriva Jayanti",
-        "hi": "भगवान हयग्रीव जयंती",
-        "bn": "ভগবান হয়গ্রীব জয়ন্তী",
-        "category": "hindu", "type": {"en": "Jayanti", "hi": "जयंती पर्व", "bn": "জয়ন্তী উৎসব"},
-        "icon": "🐴", "deity": {"en": "Lord Hayagriva (Vishnu)", "hi": "भगवान हयग्रीव", "bn": "ভগবান হয়গ্রীব (শ্রীহরি বিষ্ণু)"},
-        "description": {
-            "en": "Advent of Lord Vishnu's horse-headed incarnation to restore the sacred Vedas from demons.",
-            "hi": "असुरों से वेदों का उद्धार करने हेतु भगवान विष्णु के हयग्रीव स्वरूप का पावन प्राकट्य।",
-            "bn": "অসুরদের থেকে বেদ উদ্ধার করে জ্ঞান পুনঃপ্রতিষ্ঠার উদ্দেশ্যে শ্রীহরির অশ্বমুখী হয়গ্রীব অবতারের আবির্ভাব।"
-     },
-        "muhurta_type": "purvahna",
-        "muhurta_label": {"en": "Purvahna Veda Puja", "hi": "पूर्वाह्न वेद पूजन", "bn": "পূর্বাহ্ন বেদ পূজা ও সাধনা"}
+        {
+            "en": "Lord Hayagriva Jayanti",
+            "hi": "भगवान हयग्रीव जयंती",
+            "bn": "ভগবান হয়গ্রীব জয়ন্তী",
+            "category": "hindu", "type": {"en": "Jayanti", "hi": "जयंती पर्व", "bn": "জয়ন্তী উৎসব"},
+            "icon": "🐴", "deity": {"en": "Lord Hayagriva (Vishnu)", "hi": "भगवान हयग्रीव", "bn": "ভগবান হয়গ্রীব (শ্রীহরি)"},
+            "description": {
+                "en": "Advent of Lord Vishnu's horse-headed incarnation to protect sacred Vedas.",
+                "hi": "वेदों की रक्षा हेतु भगवान विष्णु के हयग्रीव अवतार का प्राकट्य।",
+                "bn": "বেদ রক্ষার উদ্দেশ্যে শ্রীহরির হয়গ্রীব রূপ ধারণের পুণ্য তিথি।"
+            },
+            "muhurta_type": "purvahna",
+            "muhurta_label": {"en": "Purvahna Veda Puja", "hi": "पूर्वाह्न वेद पूजन", "bn": "পূর্বাহ্ন বেদ পূজা লগ্ন"}
         },
-    ("Shravana", "Shukla", 15): {
-        "en": "Vedmata Gayatri Jayanti",
-        "hi": "वेदमंत्र अधिष्ठात्री माँ गायत्री जयंती",
-        "bn": "বেদমাতা গায়ত্রী জন্মজয়ন্তী",
-        "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
-        "icon": "🪷", "deity": {"en": "Vedmata Gayatri", "hi": "माँ गायत्री", "bn": "বেদমাতা দেবী গায়ত্রী"},
-        "description": {
-            "en": "Appearance day of Goddess Gayatri, the mother of all Vedas and supreme knowledge.",
-            "hi": "समस्त वेदों की जननी एवं ज्ञान प्रदाता माँ गायत्री का पावन प्राकट्योत्सव।",
-            "bn": "সর্ববেদের জননী এবং দিব্য প্রজ্ঞার দেবী শ্রী গায়ত্রী মাতার শুভ আবির্ভাব তিথি।"
-    },
-        "muhurta_type": "sunrise_snan",
-        "muhurta_label": {"en": "Sunrise Gayatri Japa Muhurta", "hi": "सूर्योदय गायत्री जप मुहूर्त", "bn": "সূর্যোদয় গায়ত্রী জপ মুহূর্ত"}
+        {
+            "en": "Vedmata Gayatri Jayanti",
+            "hi": "माँ गायत्री जयंती",
+            "bn": "বেদমাতা গায়ত্রী জন্মজয়ন্তী",
+            "category": "hindu", "type": {"en": "Major Festival", "hi": "महापर्व", "bn": "মহাপর্ব"},
+            "icon": "🪷", "deity": {"en": "Vedmata Gayatri", "hi": "माँ गायत्री", "bn": "বেদমাতা দেবী গায়ত্রী"},
+            "description": {
+                "en": "Appearance day of Goddess Gayatri, presiding deity of Gayatri Mantra.",
+                "hi": "गायत्री मंत्र की अधिष्ठात्री माँ गायत्री का पावन जन्मोत्सव।",
+                "bn": "বেদমাতা শ্রী গায়ত্রী দেবীর শুভ আবির্ভাব তিথি।"
+            },
+            "muhurta_type": "sunrise_snan",
+            "muhurta_label": {"en": "Sunrise Gayatri Japa Muhurta", "hi": "सूर्योदय जप मुहूर्त", "bn": "সূর্যোদয় জপ লগ্ন"}
         },
-    ("Shravana", "Shukla", 15): {
-        "en": "Jhulan Yatra Samapti (Culmination)",
-        "hi": "झूलन यात्रा समापन",
-        "bn": "শ্রী শ্রী ঝুলনযাত্রা সমাপন",
-        "category": "hindu", "type": {"en": "Major Festival", "hi": "उत्सव समापन", "bn": "মহোৎসব সমাপন"},
-        "icon": "🌸", "deity": {"en": "Sri Radha Krishna", "hi": "श्रीराधा-कृष्ण", "bn": "শ্রীশ্রী রাধাকৃষ্ণ"},
-        "description": {
-            "en": "Grand culmination of the 5-day divine monsoon swing festival of Sri Radha-Krishna in Braj.",
-            "hi": "ब्रज एवं वृंदावन में श्रीराधा-कृष्ण के ५ दिवसीय पावन झूलनोत्सव की पूर्णता।",
-            "bn": "ব্রজমণ্ডলে শ্রীশ্রী রাধাকৃষ্ণের ৫ দিনব্যাপী প্রেমময় ঝুলন মহোৎসবের ভক্তিপূর্ণ সমাপন।"
-    },
-       "muhurta_type": "sayankal",
-       "muhurta_label": {"en": "Sayankal Maha Arati", "hi": "सायंकाल महाआरती", "bn": "সায়ংকালীন মহাঝুলন আরতি"}
+        {
+            "en": "Jhulan Yatra Samapti (Culmination)",
+            "hi": "झूलन यात्रा समापन",
+            "bn": "শ্রী শ্রী ঝুলনযাত্রা সমাপন",
+            "category": "hindu", "type": {"en": "Major Festival", "hi": "उत्सव समापन", "bn": "মহোৎসব সমাপন"},
+            "icon": "🌸", "deity": {"en": "Sri Radha Krishna", "hi": "श्रीराधा-कृष्ण", "bn": "শ্রীশ্রী রাধাকৃষ্ণ"},
+            "description": {
+                "en": "Culmination of the 5-day divine monsoon swing festival of Sri Radha-Krishna.",
+                "hi": "श्रीराधा-कृष्ण के ५ दिवसीय पावन झूलनोत्सव की पूर्णता।",
+                "bn": "শ্রীশ্রী রাধাকৃষ্ণের ৫ দিনব্যাপী ঝুলন মহোৎসবের সমাপন।"
+            },
+            "muhurta_type": "sayankal",
+            "muhurta_label": {"en": "Sayankal Maha Arati", "hi": "सायंकाल महाआरती", "bn": "সায়ংকালীন আরতি লগ্ন"}
         },
-    ("Shravana", "Shukla", 15): {
-        "en": "Shravana Purnima (Sri Satyanarayan Puja)",
-        "hi": "श्रावण पूर्णिमा (सत्यनारायण व्रत)",
-        "bn": "শ্রাবণী পূর্ণিমা (শ্রী সত্যনারায়ণ পূজা)",
-        "category": "hindu", "type": {"en": "Vrata", "hi": "उपवास व्रत", "bn": "উপবাস ব্রত"},
-        "icon": "🌕", "deity": {"en": "Lord Sri Satyanarayan", "hi": "भगवान सत्यनारायण", "bn": "শ্রী সত্যনারায়ণ নারায়ণ"},
-        "description": {
-            "en": "Offering holy shinni and listening to the sacred Katha of Lord Satyanarayan on Shravana Purnima.",
-            "hi": "श्रावण पूर्णिमा पर सत्यनारायण भगवान का पूजन, पंचामृत भोग एवं पावन कथा श्रवण।",
-            "bn": "শ্রাবণ পূর্ণিমায় শ্রী সত্যনারায়ণ দেবের সিন্নি ভোগ নিবেদন ও মাহাত্ম্য কথা শ্রবণ।"
-        },
-        "muhurta_type": "pradosh",
-        "muhurta_label": {"en": "Pradosh Satyanarayan Puja", "hi": "प्रदोष सत्यनारायण कथा", "bn": "প্রদোষ সত্যনারায়ণ পূজা লগ্ন"}
-    },
-    ("Shravana", "Shukla", 15): {
-        "en": "Anvadhan (Vedic Ritual)",
-        "hi": "अन्वाधान (वैदिक अनुष्ठान)",
-        "bn": "বৈদিক অন্বাধান সংস্কার",
-        "category": "hindu",
-        "type": {"en": "Vedic Ritual", "hi": "वैदिक अनुष्ठान", "bn": "বৈদিক সংস্কার"},
-        "icon": "🔥",
-        "deity": {"en": "Agni Deva & Sri Vishnu", "hi": "अग्नि देव व श्री विष्णु", "bn": "অগ্নি দেব ও শ্রীহরি বিষ্ণু"},
-        "description": {
-            "en": "Sacred Vedic rite of adding fuel to sacrificial fires and observing austerity prior to Ishti.",
-            "hi": "इष्टि अनुष्ठान से पूर्व पवित्र यज्ञाग्नि में समिधा स्थापन व संयम का पावन वैदिक संस्कार।",
-            "bn": "ইষ্টি যজ্ঞের পূর্বে যজ্ঞের পবিত্র অগ্নি প্রজ্বলন, রক্ষা ও সংযম পালনের বৈদিক অন্বাধান সংস্কার।"
-        },
-        "muhurta_type": "purvahna",
-        "muhurta_label": {"en": "Purvahna Havan Muhurta", "hi": "पूर्वाह्न हवन मुहूर्त", "bn": "পূর্বাহ্ন সংস্কার লগ্ন"}
-    },
-
+        {
+            "en": "Anvadhan (Vedic Ritual)",
+            "hi": "अन्वाधान (वैदिक अनुष्ठान)",
+            "bn": "বৈদিক অন্বাধান সংস্কার",
+            "category": "hindu", "type": {"en": "Vedic Ritual", "hi": "वैदिक अनुष्ठान", "bn": "বৈদিক সংস্কার"},
+            "icon": "🔥", "deity": {"en": "Agni Deva & Sri Vishnu", "hi": "अग्नि देव व श्री विष्णु", "bn": "অগ্নি দেব ও শ্রীহরি বিষ্ণু"},
+            "description": {
+                "en": "Sacred Vedic rite of maintaining sacrificial fires prior to Ishti.",
+                "hi": "इष्टि अनुष्ठान से पूर्व पवित्र यज्ञाग्नि प्रज्वलन का पावन वैदिक संस्कार।",
+                "bn": "ইষ্টি যজ্ঞের পূর্বে যজ্ঞাগ্নি রক্ষা ও সংযম পালনের বৈদিক অন্বাধান সংস্কার।"
+            },
+            "muhurta_type": "purvahna",
+            "muhurta_label": {"en": "Purvahna Havan Muhurta", "hi": "पूर्वाह्न हवन मुहूर्त", "bn": "পূর্বাহ্ন সংস্কার লগ্ন"}
+        }
+    ],
     # --------------------------------------------------------------------------
     # ভাদ্রপদ মাস (Bhadrapada)
     # --------------------------------------------------------------------------
@@ -3378,12 +3366,15 @@ def get_festivals_for_day(
     except (TypeError, ValueError):
         tithi_num = 0
 
-    # ১. তিথিভিত্তিক সনাতন উৎসব
+    # ১. তিথিভিত্তিক সনাতন উৎসব (Single Dict ও List of Dicts উভয়ই হ্যান্ডেল করবে)
     h_key = (lunar_month, paksha, tithi_num)
     if h_key in HINDU_FESTIVAL_DATABASE:
-        item = HINDU_FESTIVAL_DATABASE[h_key]
-        append_festival_once(
-            festivals,
+        raw_items = HINDU_FESTIVAL_DATABASE[h_key]
+        item_list = raw_items if isinstance(raw_items, list) else [raw_items]
+        
+        for item in item_list:
+            append_festival_once(
+                festivals,
             {
                 "name": item.get(l_key, item.get("en", "")),
                 "category": item.get("category", "hindu"),
