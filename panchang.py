@@ -1350,24 +1350,50 @@ def compute_full_drik_panchang(
     rise_total_min = int(dt_rise.hour * 60 + dt_rise.minute)
     set_total_min = int(dt_set.hour * 60 + dt_set.minute)
 
-    # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি
+    # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি (100% Native Mapping)
     for fest in today_festivals:
-        try:
-            m_res = compute_dynamic_festival_muhurta(
-                festival_name=str(fest.get("name", "")),
-                festival_type=str(fest.get("category", "hindu")),
-                sunrise_min=rise_total_min,
-                sunset_min=set_total_min,
-                lang=lang_key
-            )
-            fest["muhurta_label"] = m_res.get("label", "শুভ মুহূর্ত:")
-            fest["muhurta_type"] = m_res.get("muhurta_type", "")
-            fest["muhurta"] = m_res.get("formatted_display", "")
-            fest["muhurta_start"] = m_res.get("start_time", "")
-            fest["muhurta_end"] = m_res.get("end_time", "")
-        except Exception as err:
-            fest["muhurta_label"] = "শুভ মুহূর্ত:"
-            fest["muhurta"] = f"প্রদোষ কাল ({pradosh_timing})"
+        # festivals.py থেকে টাইপ ও লেবেল নিয়ে আসা
+        m_type = fest.get("muhurta_type", "abhijit")
+        m_label = fest.get("muhurta_label", "শুভ মুহূর্ত:")
+        
+        # অ্যান্ড্রয়েড অ্যাপের DTO-এর জন্য ফিল্ড প্রস্তুত করা
+        fest["tithi_span_title"] = "উৎসবের সময়সীমা / তিথি মান:"
+        if t_end:
+            fest["tithi_span_time"] = f"সমাপ্তি: {fmt_m(jd_to_local(t_end))}"
+        else:
+            fest["tithi_span_time"] = ""
+
+        fest["puja_muhurta_title"] = m_label
+        fest["is_puja"] = True
+
+        # panchang.py-এর নিজস্ব ১০০% নিখুঁত ক্যালকুলেশন থেকে সময় বসানো
+        if m_type == "nishita":
+            fest["puja_muhurta_time"] = nishita_timing
+        elif m_type == "purvahna":
+            fest["puja_muhurta_time"] = purvahna_timing
+        elif m_type == "madhyahna":
+            fest["puja_muhurta_time"] = madhyahna_timing
+        elif m_type == "pradosh":
+            fest["puja_muhurta_time"] = pradosh_timing
+        elif m_type == "sayankal":
+            fest["puja_muhurta_time"] = sayankal_timing
+        elif m_type == "aparahna":
+            fest["puja_muhurta_time"] = aparahna_timing
+        elif m_type == "sunrise_snan":
+            fest["puja_muhurta_time"] = sunrise_snan_timing
+        elif m_type == "brahma":
+            fest["puja_muhurta_time"] = brahma_timing
+        elif m_type == "sandhi":
+            fest["puja_muhurta_time"] = sandhi_timing
+        else:
+            # যদি স্পেসিফিক কোনো কাল না থাকে তবে শুভ অভিজিৎ মুহূর্ত বসবে
+            fest["puja_muhurta_title"] = "শুভ মুহূর্ত:"
+            fest["puja_muhurta_time"] = f"{fmt_m(abhijit_s)} - {fmt_m(abhijit_e)}"
+            fest["is_puja"] = False
+            
+        # ব্যাকওয়ার্ড কম্প্যাটিবিলিটি (যাতে অ্যাপ ক্র্যাশ না করে)
+        fest["muhurta_label"] = fest["puja_muhurta_title"]
+        fest["muhurta"] = fest["puja_muhurta_time"]
 
     # লাইভ ট্রানজিট আইডির সাথে মেটাডেটা ম্যাচিং
     tithi_num_key = (t_idx % 15) + 1
