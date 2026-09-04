@@ -1046,7 +1046,17 @@ def compute_full_drik_panchang(
         if not jd:
             return ""
         dt_val = jd_to_local(jd)
-        time_str = format_time_mode(dt_val, local_date, time_format)
+        
+        # সেফ ইনলাইন টাইম ফরম্যাটার (সার্ভার ক্র্যাশ এড়াতে format_time_mode মুছে ফেলা হয়েছে)
+        m_format = str(time_format).lower().replace(" ", "").replace("-", "")
+        if "24+" in m_format or "plus" in m_format:
+            h = dt_val.hour + 24 if dt_val.date() > local_date else dt_val.hour
+            time_str = f"{h:02d}:{dt_val.minute:02d}"
+        elif "24" in m_format:
+            time_str = dt_val.strftime("%H:%M")
+        else:
+            time_str = dt_val.strftime("%I:%M %p")
+            
         diff_days = (dt_val.date() - local_date).days
         
         def format_short_date(dt_obj, l_key):
