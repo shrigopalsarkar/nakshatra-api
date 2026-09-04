@@ -1560,10 +1560,21 @@ def compute_full_drik_panchang(
 
     # লাইভ ট্রানজিট আইডির সাথে মেটাডেটা ম্যাচিং
     tithi_num_key = (t_idx % 15) + 1
-    tithi_detail_info = TITHI_METADATA.get(tithi_num_key, {})
-    nakshatra_detail_info = NAKSHATRA_METADATA.get(n_idx + 1, {})
-    yoga_detail_info = YOGA_METADATA.get(y_idx + 1, {})
-    karana_detail_info = KARANA_METADATA.get(karana_name, {})
+    
+    # মেটাডেটা এক্সট্রাক্ট করে ভাষা অনুযায়ী ফিল্টার করা
+    def process_meta(meta_dict):
+        result = {}
+        for k, v in meta_dict.items():
+            if isinstance(v, dict) and "en" in v:
+                result[k] = v.get(lang_key, v.get("en", ""))
+            else:
+                result[k] = v
+        return result
+
+    tithi_detail_info = process_meta(TITHI_METADATA.get(tithi_num_key, {}))
+    nakshatra_detail_info = process_meta(NAKSHATRA_METADATA.get(n_idx + 1, {}))
+    yoga_detail_info = process_meta(YOGA_METADATA.get(y_idx + 1, {}))
+    karana_detail_info = process_meta(KARANA_METADATA.get(karana_name, {}))
 
     return {
         # মূল পঞ্চাঙ্গ ও রেট্রোফিট ডিটিও
