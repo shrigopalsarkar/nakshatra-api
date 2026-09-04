@@ -1427,9 +1427,9 @@ def compute_full_drik_panchang(
     rise_total_min = int(dt_rise.hour * 60 + dt_rise.minute)
     set_total_min = int(dt_set.hour * 60 + dt_set.minute)
 
-    # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি (100% Clean Formatting & Expanded Social Logic)
+    # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি (100% Perfect Title & Time Split)
     for fest in today_festivals:
-        # ১. পুরনো ফাংশন কল (শুধুমাত্র তিথির শুরুর সময়টা পাওয়ার জন্য)
+        # ১. পুরনো ফাংশন কল (তিথির শুরুর সময়ের জন্য)
         try:
             from festivals import compute_dynamic_festival_muhurta
             m_res = compute_dynamic_festival_muhurta(
@@ -1471,7 +1471,7 @@ def compute_full_drik_panchang(
                 extra = f" (Next Day, {date_text})" if diff_days == 1 else (f" ({diff_days} Days Later, {date_text})" if diff_days > 1 else "")
                 tithi_str = f"Ends at: {fmt_m(t_end_dt)}{extra}" if not (" - " in tithi_str or " – " in tithi_str) else f"{tithi_str.split(' (')[0]}{extra}"
         
-        # ৩. "পূজা" বনাম "শুভ মুহূর্ত" নির্ণয় (রাখীবন্ধন, ভাইফোঁটা, জামাই ষষ্ঠী, দোল, হোলি ইত্যাদির জন্য)
+        # ৩. "পূজা" বনাম "শুভ মুহূর্ত" নির্ণয়
         social_keywords = [
             "rakhi", "bhai", "phonta", "dooj", "new year", "labh pancham", "jamai", "aranya sasthi", 
             "holi", "dol jatra", "dahi handi", "lohri", "chhoti holi",
@@ -1480,62 +1480,57 @@ def compute_full_drik_panchang(
         ]
         is_social = any(k in fest_name.lower() for k in social_keywords)
 
-        # ৪. মূল নাম ও সময়কে একসঙ্গে মার্জ করা 
+        # ৪. সাফিক্স (ব্র্যাকেটের ভেতরের লেখা)
+        if lang_key == "bn":
+            puja_suffix = "(শুভ মুহূর্ত):" if is_social else "(পূজার মুহূর্ত):"
+            snan_suffix = "(স্নান ও পূজা):"
+        elif lang_key == "hi":
+            puja_suffix = "(शुभ मुहूर्त):" if is_social else "(पूजा मुहूर्त):"
+            snan_suffix = "(स्नान व पूजा):"
+        else:
+            puja_suffix = "(Auspicious Timing):" if is_social else "(Puja Muhurta):"
+            snan_suffix = "(Snan & Puja):"
+
+        # ৫. Title এবং Time সম্পূর্ণ আলাদা করা
         p_time = ""
         p_title = ""
         
-        main_title = "শুভ মুহূর্ত:" if is_social else "পূজার মুহূর্ত:"
-        if lang_key == "hi":
-            main_title = "शुभ मुहूर्त:" if is_social else "पूजा मुहूर्त:"
-        elif lang_key == "en":
-            main_title = "Auspicious Timing:" if is_social else "Puja Muhurta:"
-
         if m_type == "nishita":
-            kaal_name = "নিশীথ কাল" if lang_key == "bn" else ("निशीथ काल" if lang_key == "hi" else "Nishita Kaal")
-            p_time = f"{kaal_name} ({nishita_timing})"
-            p_title = main_title
+            p_time = nishita_timing
+            p_title = f"নিশীথ কাল {puja_suffix}" if lang_key == "bn" else (f"निशीथ काल {puja_suffix}" if lang_key == "hi" else f"Nishita Kaal {puja_suffix}")
         elif m_type == "purvahna":
-            kaal_name = "পূর্বাহ্ণ কাল" if lang_key == "bn" else ("पूर्वाह्न काल" if lang_key == "hi" else "Purvahna Kaal")
-            p_time = f"{kaal_name} ({purvahna_timing})"
-            p_title = main_title
+            p_time = purvahna_timing
+            p_title = f"পূর্বাহ্ণ কাল {puja_suffix}" if lang_key == "bn" else (f"पूर्वाह्न काल {puja_suffix}" if lang_key == "hi" else f"Purvahna Kaal {puja_suffix}")
         elif m_type == "madhyahna":
-            kaal_name = "মধ্যাহ্ন কাল" if lang_key == "bn" else ("मध्याह्न काल" if lang_key == "hi" else "Madhyahna Kaal")
-            p_time = f"{kaal_name} ({madhyahna_timing})"
-            p_title = main_title
+            p_time = madhyahna_timing
+            p_title = f"মধ্যাহ্ন কাল {puja_suffix}" if lang_key == "bn" else (f"मध्याह्न काल {puja_suffix}" if lang_key == "hi" else f"Madhyahna Kaal {puja_suffix}")
         elif m_type == "pradosh":
-            kaal_name = "প্রদোষ কাল" if lang_key == "bn" else ("प्रदोष काल" if lang_key == "hi" else "Pradosh Kaal")
-            p_time = f"{kaal_name} ({pradosh_timing})"
-            p_title = main_title
+            p_time = pradosh_timing
+            p_title = f"প্রদোষ কাল {puja_suffix}" if lang_key == "bn" else (f"प्रदोष काल {puja_suffix}" if lang_key == "hi" else f"Pradosh Kaal {puja_suffix}")
         elif m_type == "sayankal":
-            kaal_name = "সায়ংকাল" if lang_key == "bn" else ("सायंकाल" if lang_key == "hi" else "Sayankal")
-            p_time = f"{kaal_name} ({sayankal_timing})"
-            p_title = main_title
+            p_time = sayankal_timing
+            p_title = f"সায়ংকাল {puja_suffix}" if lang_key == "bn" else (f"सायंकाल {puja_suffix}" if lang_key == "hi" else f"Sayankal {puja_suffix}")
         elif m_type == "sunrise_snan":
-            kaal_name = "প্রাতঃকাল" if lang_key == "bn" else ("प्रातःकाल" if lang_key == "hi" else "Pratah Kaal")
-            p_time = f"{kaal_name} ({sunrise_snan_timing})"
-            p_title = "স্নান মুহূর্ত:" if lang_key == "bn" else ("स्नान मुहूर्त:" if lang_key == "hi" else "Snan Muhurta:")
+            p_time = sunrise_snan_timing
+            p_title = f"প্রাতঃকাল {snan_suffix}" if lang_key == "bn" else (f"प्रातःकाल {snan_suffix}" if lang_key == "hi" else f"Pratah Kaal {snan_suffix}")
         elif m_type == "sandhi":
-            kaal_name = "সন্ধিপূজা" if lang_key == "bn" else ("संधि पूजा" if lang_key == "hi" else "Sandhi Puja")
-            p_time = f"{kaal_name} ({sandhi_timing})"
-            p_title = main_title
+            p_time = sandhi_timing
+            p_title = "সন্ধিপূজা মুহূর্ত:" if lang_key == "bn" else ("संधि पूजा मुहूर्त:" if lang_key == "hi" else "Sandhi Puja Muhurta:")
         elif m_type == "brahma":
-            kaal_name = "ব্রাহ্ম মুহূর্ত" if lang_key == "bn" else ("ब्रह्म मुहूर्त" if lang_key == "hi" else "Brahma Muhurta")
-            p_time = f"{kaal_name} ({brahma_timing})"
-            p_title = main_title
+            p_time = brahma_timing
+            p_title = f"ব্রাহ্ম মুহূর্ত {puja_suffix}" if lang_key == "bn" else (f"ब्रह्म मुहूर्त {puja_suffix}" if lang_key == "hi" else f"Brahma Muhurta {puja_suffix}")
         elif m_type == "aparahna":
-            kaal_name = "অপরাহ্ণ কাল" if lang_key == "bn" else ("अपराह्न काल" if lang_key == "hi" else "Aparahna Kaal")
-            p_time = f"{kaal_name} ({aparahna_timing})"
-            p_title = main_title
+            p_time = aparahna_timing
+            p_title = f"অপরাহ্ণ কাল {puja_suffix}" if lang_key == "bn" else (f"अपराह्न काल {puja_suffix}" if lang_key == "hi" else f"Aparahna Kaal {puja_suffix}")
         else:
-            kaal_name = "অভিজিৎ" if lang_key == "bn" else ("अभिजित" if lang_key == "hi" else "Abhijit")
-            p_time = f"{kaal_name} ({fmt_m(abhijit_s)} - {fmt_m(abhijit_e)})"
-            p_title = main_title
+            p_time = f"{fmt_m(abhijit_s)} - {fmt_m(abhijit_e)}"
+            p_title = f"শুভ মুহূর্ত (অভিজিৎ):" if lang_key == "bn" else (f"शुभ मुहूर्त (अभिजित):" if lang_key == "hi" else f"Auspicious Timing (Abhijit):")
 
-        # ৫. FORCE OVERRIDE ALL KEYS
+        # ৬. FORCE OVERRIDE ALL KEYS
         fest["tithi_span_title"] = "উৎসবের সময়সীমা / তিথি মান:" if lang_key == "bn" else ("पर्व / तिथि समय अवधि:" if lang_key == "hi" else "Festival / Tithi Span:")
         fest["tithi_span_time"] = tithi_str
         
-        # Override Title 
+        # Override Title
         fest["puja_muhurta_title"] = p_title
         fest["puja_muhurta_title_bn"] = p_title
         fest["puja_muhurta_title_hi"] = p_title
@@ -1543,7 +1538,7 @@ def compute_full_drik_panchang(
         fest["muhurta_label_bn"] = p_title
         fest["muhurta_label_hi"] = p_title
         
-        # Clean Time Value Overrides
+        # Override Time (শুধুমাত্র রেঞ্জ)
         fest["puja_muhurta_time"] = p_time
         fest["puja_muhurta_time_bn"] = p_time
         fest["puja_muhurta_time_hi"] = p_time
@@ -1555,20 +1550,55 @@ def compute_full_drik_panchang(
         fest["muhurta_start"] = p_time  
         fest["muhurta_end"] = ""
         
-        # সামাজিক উৎসব হলে প্রদীপের বদলে ঘড়ি/ফুলের আইকন দেখাবে
         fest["is_puja"] = not is_social
 
     # লাইভ ট্রানজিট আইডির সাথে মেটাডেটা ম্যাচিং
     tithi_num_key = (t_idx % 15) + 1
     
-    # মেটাডেটা এক্সট্রাক্ট করে ভাষা অনুযায়ী ফিল্টার করা
+    # মেটাডেটা এক্সট্রাক্ট করে ভাষা অনুযায়ী অন-দ্য-ফ্লাই ট্রান্সলেশন করা
     def process_meta(meta_dict):
         result = {}
+        
+        # English to Bengali Translation Dictionary
+        bn_trans = {
+            "Kshipra / Laghu": "ক্ষিপ্র / লঘু", "Ugra / Krura": "উগ্র / ক্রূর", "Misra / Sadharana": "মিশ্র / সাধারণ",
+            "Sthira / Dhruva": "স্থির / ধ্রুব", "Mridu": "মৃদু", "Tikshna / Daruna": "তীক্ষ্ণ / দারুণ",
+            "Chara / Chala": "চর / চল", "Kshipra and Laghu": "ক্ষিপ্র ও লঘু", "Tikshna": "তীক্ষ্ণ", "Ugra": "উগ্র",
+            "Horse Head": "অশ্ব মস্তক", "Yoni": "যোনি", "Razor / Knife": "ক্ষুর / ছুরি", "Cart / Chariot": "শকট / রথ",
+            "Deer Head": "মৃগ মস্তক", "Teardrop / Gem": "অশ্রুবিন্দু / মণি", "House / Bow": "গৃহ / ধনু",
+            "Arrow / Flower": "তীর / পুষ্প", "Coiled Serpent": "কুণ্ডলীকৃত সর্প", "Royal Throne": "রাজসিংহাসন",
+            "Tiryang Mukha": "তির্যগ মুখ (তির্যক)", "Adho Mukha": "অধো মুখ (নিম্নমুখী)", "Urdhwa Mukha": "ঊর্ধ্ব মুখ (ঊর্ধ্বমুখী)",
+            "Sulochana": "সুলোচনা (সুবৃষ্টি)", "Andhaksha": "অন্ধাক্ষ (অন্ধদৃষ্টি)", "Mandaksha": "মন্দাক্ষ (মৃদুদৃষ্টি)",
+            "Movable": "চলমান (চর)", "Fixed": "স্থির", "Saumya": "সৌম্য", "Malefic": "অশুভ (পাপ)", "Benefic": "শুভ (পুণ্য)",
+            "Vridhiprada": "বৃদ্ধিদায়ক", "Yashaprada": "যশোদায়ক", "Balaprada": "বলদায়ক", "Krodhaprada": "ক্রোধদায়ক",
+            "Lakshmiprada": "লক্ষ্মীপ্রদ", "Mitraprada": "মিত্রপ্রদ", "Dwandvaprada": "দ্বন্দ্বপ্রদ", "Akramaka": "আক্রমণাত্মক",
+            "Anandaprada": "আনন্দপ্রদ", "Vijayaprada": "বিজয়প্রদ", "Paushtika": "पौষ্টিক", "Pitruprada": "পিতৃপ্রদ"
+        }
+        
+        # English to Hindi Translation Dictionary
+        hi_trans = {
+            "Kshipra / Laghu": "क्षिप्र / लघु", "Ugra / Krura": "उग्र / क्रूर", "Misra / Sadharana": "मिश्र / साधारण",
+            "Sthira / Dhruva": "स्थिर / ध्रुव", "Mridu": "मृदु", "Tikshna / Daruna": "तीक्ष्ण / दारुण",
+            "Chara / Chala": "चर / चल", "Kshipra and Laghu": "क्षिप्र और लघु", "Tikshna": "तीक्ष्ण", "Ugra": "उग्र",
+            "Horse Head": "अश्व मस्तक", "Yoni": "योनि", "Razor / Knife": "क्षुर / चाकू", "Cart / Chariot": "गाड़ी / रथ",
+            "Deer Head": "मृग मस्तक", "Teardrop / Gem": "अश्रुबिंदु / मणि", "House / Bow": "घर / धनुष",
+            "Arrow / Flower": "तीर / पुष्प", "Coiled Serpent": "कुंडलीकृत सर्प", "Royal Throne": "राजसिंहासन",
+            "Tiryang Mukha": "तिर्यग मुख (तिरछा)", "Adho Mukha": "अधो मुख (नीचे की ओर)", "Urdhwa Mukha": "ऊर्ध्व मुख (ऊपर की ओर)",
+            "Sulochana": "सुलोचना", "Andhaksha": "अंधाक्ष", "Mandaksha": "मंदाक्ष",
+            "Movable": "चर (गतिशील)", "Fixed": "स्थिर", "Saumya": "सौम्य", "Malefic": "अशुभ (पाप)", "Benefic": "शुभ (पुण्य)"
+        }
+        
         for k, v in meta_dict.items():
             if isinstance(v, dict) and "en" in v:
                 result[k] = v.get(lang_key, v.get("en", ""))
             else:
-                result[k] = v
+                val_str = str(v)
+                if lang_key == "bn" and val_str in bn_trans:
+                    result[k] = bn_trans[val_str]
+                elif lang_key == "hi" and val_str in hi_trans:
+                    result[k] = hi_trans[val_str]
+                else:
+                    result[k] = v
         return result
 
     tithi_detail_info = process_meta(TITHI_METADATA.get(tithi_num_key, {}))
