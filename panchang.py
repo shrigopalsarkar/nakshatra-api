@@ -1350,16 +1350,30 @@ def compute_full_drik_panchang(
     rise_total_min = int(dt_rise.hour * 60 + dt_rise.minute)
     set_total_min = int(dt_set.hour * 60 + dt_set.minute)
 
-    # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি (100% Native Mapping)
+    # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি (100% Native Mapping with Multi-language)
     for fest in today_festivals:
+        # ভাষা অনুযায়ী ডিফল্ট টাইটেল সেট করা
+        if lang_key == "bn":
+            default_muhurta_label = "শুভ মুহূর্ত:"
+            tithi_span_title = "উৎসবের সময়সীমা / তিথি মান:"
+            ends_at_text = "সমাপ্তি:"
+        elif lang_key == "hi":
+            default_muhurta_label = "शुभ मुहूर्त:"
+            tithi_span_title = "पर्व / तिथि समय अवधि:"
+            ends_at_text = "समाप्ति:"
+        else:
+            default_muhurta_label = "Auspicious Timing:"
+            tithi_span_title = "Festival / Tithi Span:"
+            ends_at_text = "Ends at:"
+
         # festivals.py থেকে টাইপ ও লেবেল নিয়ে আসা
         m_type = fest.get("muhurta_type", "abhijit")
-        m_label = fest.get("muhurta_label", "শুভ মুহূর্ত:")
+        m_label = fest.get("muhurta_label", default_muhurta_label)
         
         # অ্যান্ড্রয়েড অ্যাপের DTO-এর জন্য ফিল্ড প্রস্তুত করা
-        fest["tithi_span_title"] = "উৎসবের সময়সীমা / তিথি মান:"
+        fest["tithi_span_title"] = tithi_span_title
         if t_end:
-            fest["tithi_span_time"] = f"সমাপ্তি: {fmt_m(jd_to_local(t_end))}"
+            fest["tithi_span_time"] = f"{ends_at_text} {fmt_m(jd_to_local(t_end))}"
         else:
             fest["tithi_span_time"] = ""
 
@@ -1387,7 +1401,7 @@ def compute_full_drik_panchang(
             fest["puja_muhurta_time"] = sandhi_timing
         else:
             # যদি স্পেসিফিক কোনো কাল না থাকে তবে শুভ অভিজিৎ মুহূর্ত বসবে
-            fest["puja_muhurta_title"] = "শুভ মুহূর্ত:"
+            fest["puja_muhurta_title"] = default_muhurta_label
             fest["puja_muhurta_time"] = f"{fmt_m(abhijit_s)} - {fmt_m(abhijit_e)}"
             fest["is_puja"] = False
             
