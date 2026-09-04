@@ -1764,15 +1764,10 @@ def compute_full_drik_panchang(
         "karana_type": "Fixed" if (k_idx % 60) in KARANA_FIXED else "Movable",
         "pada_timeline": pada_timeline,
         "nakshatra_pada_display": f"{NAKSHATRAS[n_idx]} (Pada {pada_timeline[0]['pada'] if pada_timeline else 1})",
+        
         # অহোরাত্র কাল বিভাজন (Day-Night Timeline)
         "day_timeline_periods": calculate_vedic_day_periods(dt_rise, dt_set, jd_to_local(jd_next_sunrise), lang=lang_key),
         
-        # রাশি ও সূর্য স্থিতি
-        "moonsign": RASHIS[m_rashi_idx],
-        "sunsign": RASHIS[s_rashi_idx],
-        "surya_nakshatra": NAKSHATRAS[sun_nak_idx],
-        "surya_pada": sun_pada,
-
         # অশুভ কাল ও শুভ মুহূর্ত
         "kaal_periods": {
             "rahu_kaal": {"start": fmt_time(rahu_s), "end": fmt_time(rahu_e)},
