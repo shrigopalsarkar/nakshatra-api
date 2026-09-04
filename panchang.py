@@ -1357,14 +1357,20 @@ def compute_full_drik_panchang(
             default_muhurta_label = "শুভ মুহূর্ত:"
             tithi_span_title = "উৎসবের সময়সীমা / তিথি মান:"
             ends_at_text = "সমাপ্তি:"
+            puja_suffix = "(পূজার মুহূর্ত):"
+            snan_suffix = "(স্নান ও পূজা):"
         elif lang_key == "hi":
             default_muhurta_label = "शुभ मुहूर्त:"
             tithi_span_title = "पर्व / तिथि समय अवधि:"
             ends_at_text = "समाप्ति:"
+            puja_suffix = "(पूजा मुहूर्त):"
+            snan_suffix = "(स्नान व पूजा):"
         else:
             default_muhurta_label = "Auspicious Timing:"
             tithi_span_title = "Festival / Tithi Span:"
             ends_at_text = "Ends at:"
+            puja_suffix = "(Puja Muhurta):"
+            snan_suffix = "(Snan & Puja):"
 
         m_type = fest.get("muhurta_type", "abhijit")
         
@@ -1406,32 +1412,40 @@ def compute_full_drik_panchang(
         fest["tithi_span_title"] = tithi_span_title
         fest["tithi_span_time"] = tithi_time_str
 
-        # ৩. মুহূতের সময় ও টাইটেল সেট করা
+        # ৩. মুহূতের সময় ও টাইটেল সেট করা (মূল নাম আগে, পূজার মুহূর্ত পরে)
         p_time = ""
+        p_title = ""
+        
         if m_type == "nishita":
             p_time = nishita_timing
-            p_title = "পূজার মুহূর্ত (নিশীথ কাল):" if lang_key == "bn" else ("पूजा मुहूर्त (निशीथ काल):" if lang_key == "hi" else "Puja Muhurta (Nishita Kaal):")
+            p_title = f"নিশীথ কাল {puja_suffix}" if lang_key == "bn" else (f"निशीथ काल {puja_suffix}" if lang_key == "hi" else f"Nishita Kaal {puja_suffix}")
         elif m_type == "purvahna":
             p_time = purvahna_timing
-            p_title = "পূজার মুহূর্ত (পূর্বাহ্ণ কাল):" if lang_key == "bn" else ("पूजा मुहूर्त (पूर्वाह्न काल):" if lang_key == "hi" else "Puja Muhurta (Purvahna):")
+            p_title = f"পূর্বাহ্ণ কাল {puja_suffix}" if lang_key == "bn" else (f"पूर्वाह्न काल {puja_suffix}" if lang_key == "hi" else f"Purvahna Kaal {puja_suffix}")
         elif m_type == "madhyahna":
             p_time = madhyahna_timing
-            p_title = "পূজার মুহূর্ত (মধ্যাহ্ন কাল):" if lang_key == "bn" else ("पूजा मुहूर्त (मध्याह्न काल):" if lang_key == "hi" else "Puja Muhurta (Madhyahna):")
+            p_title = f"মধ্যাহ্ন কাল {puja_suffix}" if lang_key == "bn" else (f"मध्याह्न काल {puja_suffix}" if lang_key == "hi" else f"Madhyahna Kaal {puja_suffix}")
         elif m_type == "pradosh":
             p_time = pradosh_timing
-            p_title = "পূজার মুহূর্ত (প্রদোষ কাল):" if lang_key == "bn" else ("पूजा मुहूर्त (प्रदोष काल):" if lang_key == "hi" else "Puja Muhurta (Pradosh Kaal):")
+            p_title = f"প্রদোষ কাল {puja_suffix}" if lang_key == "bn" else (f"प्रदोष काल {puja_suffix}" if lang_key == "hi" else f"Pradosh Kaal {puja_suffix}")
         elif m_type == "sayankal":
             p_time = sayankal_timing
-            p_title = "পূজার মুহূর্ত (সায়ংকাল):" if lang_key == "bn" else ("पूजा मुहूर्त (सायंकाल):" if lang_key == "hi" else "Puja Muhurta (Sayankal):")
+            p_title = f"সায়ংকাল {puja_suffix}" if lang_key == "bn" else (f"सायंकाल {puja_suffix}" if lang_key == "hi" else f"Sayankal {puja_suffix}")
         elif m_type == "sunrise_snan":
             p_time = sunrise_snan_timing
-            p_title = "স্নান ও পূজার মুহূর্ত:" if lang_key == "bn" else ("स्नान व पूजा मुहूर्त:" if lang_key == "hi" else "Snan & Puja Muhurta:")
+            p_title = f"প্রাতঃকাল {snan_suffix}" if lang_key == "bn" else (f"प्रातःकाल {snan_suffix}" if lang_key == "hi" else f"Pratah Kaal {snan_suffix}")
         elif m_type == "sandhi":
             p_time = sandhi_timing
             p_title = "সন্ধিপূজা মুহূর্ত:" if lang_key == "bn" else ("संधि पूजा मुहूर्त:" if lang_key == "hi" else "Sandhi Puja Muhurta:")
+        elif m_type == "brahma":
+            p_time = brahma_timing
+            p_title = f"ব্রাহ্ম মুহূর্ত {puja_suffix}" if lang_key == "bn" else (f"ब्रह्म मुहूर्त {puja_suffix}" if lang_key == "hi" else f"Brahma Muhurta {puja_suffix}")
+        elif m_type == "aparahna":
+            p_time = aparahna_timing
+            p_title = f"অপরাহ্ণ কাল {puja_suffix}" if lang_key == "bn" else (f"अपराह्न काल {puja_suffix}" if lang_key == "hi" else f"Aparahna Kaal {puja_suffix}")
         else:
             p_time = f"{fmt_m(abhijit_s)} - {fmt_m(abhijit_e)}"
-            p_title = "শুভ মুহূর্ত (অভিজিৎ):" if lang_key == "bn" else ("शुभ मुहूर्त (अभिजित):" if lang_key == "hi" else "Auspicious Timing (Abhijit):")
+            p_title = f"শুভ মুহূর্ত (অভিজিৎ):" if lang_key == "bn" else (f"शुभ मुहूर्त (अभिजित):" if lang_key == "hi" else f"Auspicious Timing (Abhijit):")
 
         # ৪. সব ভ্যারিয়েবলে ডেটা পুশ করা (পুরো রেঞ্জ দেখানোর জন্য)
         fest["puja_muhurta_title"] = p_title
