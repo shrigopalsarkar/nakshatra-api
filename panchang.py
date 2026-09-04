@@ -1447,7 +1447,7 @@ def compute_full_drik_panchang(
     rise_total_min = int(dt_rise.hour * 60 + dt_rise.minute)
     set_total_min = int(dt_set.hour * 60 + dt_set.minute)
 
-    # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি (100% Perfect Title & Time Split)
+    # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি
     for fest in today_festivals:
         # ১. পুরনো ফাংশন কল (তিথির শুরুর সময়ের জন্য)
         try:
@@ -1500,57 +1500,62 @@ def compute_full_drik_panchang(
         ]
         is_social = any(k in fest_name.lower() for k in social_keywords)
 
-        # ৪. সাফিক্স (ব্র্যাকেটের ভেতরের লেখা)
-        if lang_key == "bn":
-            puja_suffix = "(শুভ মুহূর্ত):" if is_social else "(পূজার মুহূর্ত):"
-            snan_suffix = "(স্নান ও পূজা):"
-        elif lang_key == "hi":
-            puja_suffix = "(शुभ मुहूर्त):" if is_social else "(पूजा मुहूर्त):"
-            snan_suffix = "(स्नान व पूजा):"
-        else:
-            puja_suffix = "(Auspicious Timing):" if is_social else "(Puja Muhurta):"
-            snan_suffix = "(Snan & Puja):"
-
-        # ৫. Title এবং Time সম্পূর্ণ আলাদা করা
+        # ৪. মূল নাম ও সময়কে একসঙ্গে মার্জ করা (যাতে অ্যান্ড্রয়েড অ্যাপ টাইম পার্স করতে গিয়ে রেঞ্জ ভেঙে না দেয়!)
         p_time = ""
         p_title = ""
         
-        if m_type == "nishita":
-            p_time = nishita_timing
-            p_title = f"নিশীথ কাল {puja_suffix}" if lang_key == "bn" else (f"निशीथ काल {puja_suffix}" if lang_key == "hi" else f"Nishita Kaal {puja_suffix}")
-        elif m_type == "purvahna":
-            p_time = purvahna_timing
-            p_title = f"পূর্বাহ্ণ কাল {puja_suffix}" if lang_key == "bn" else (f"पूर्वाह्न काल {puja_suffix}" if lang_key == "hi" else f"Purvahna Kaal {puja_suffix}")
-        elif m_type == "madhyahna":
-            p_time = madhyahna_timing
-            p_title = f"মধ্যাহ্ন কাল {puja_suffix}" if lang_key == "bn" else (f"मध्याह्न काल {puja_suffix}" if lang_key == "hi" else f"Madhyahna Kaal {puja_suffix}")
-        elif m_type == "pradosh":
-            p_time = pradosh_timing
-            p_title = f"প্রদোষ কাল {puja_suffix}" if lang_key == "bn" else (f"प्रदोष काल {puja_suffix}" if lang_key == "hi" else f"Pradosh Kaal {puja_suffix}")
-        elif m_type == "sayankal":
-            p_time = sayankal_timing
-            p_title = f"সায়ংকাল {puja_suffix}" if lang_key == "bn" else (f"सायंकाल {puja_suffix}" if lang_key == "hi" else f"Sayankal {puja_suffix}")
-        elif m_type == "sunrise_snan":
-            p_time = sunrise_snan_timing
-            p_title = f"প্রাতঃকাল {snan_suffix}" if lang_key == "bn" else (f"प्रातःकाल {snan_suffix}" if lang_key == "hi" else f"Pratah Kaal {snan_suffix}")
-        elif m_type == "sandhi":
-            p_time = sandhi_timing
-            p_title = "সন্ধিপূজা মুহূর্ত:" if lang_key == "bn" else ("संधि पूजा मुहूर्त:" if lang_key == "hi" else "Sandhi Puja Muhurta:")
-        elif m_type == "brahma":
-            p_time = brahma_timing
-            p_title = f"ব্রাহ্ম মুহূর্ত {puja_suffix}" if lang_key == "bn" else (f"ब्रह्म मुहूर्त {puja_suffix}" if lang_key == "hi" else f"Brahma Muhurta {puja_suffix}")
-        elif m_type == "aparahna":
-            p_time = aparahna_timing
-            p_title = f"অপরাহ্ণ কাল {puja_suffix}" if lang_key == "bn" else (f"अपराह्न काल {puja_suffix}" if lang_key == "hi" else f"Aparahna Kaal {puja_suffix}")
-        else:
-            p_time = f"{fmt_m(abhijit_s)} - {fmt_m(abhijit_e)}"
-            p_title = f"শুভ মুহূর্ত (অভিজিৎ):" if lang_key == "bn" else (f"शुभ मुहूर्त (अभिजित):" if lang_key == "hi" else f"Auspicious Timing (Abhijit):")
+        main_title = "শুভ মুহূর্ত:" if is_social else "পূজার মুহূর্ত:"
+        if lang_key == "hi":
+            main_title = "शुभ मुहूर्त:" if is_social else "पूजा मुहूर्त:"
+        elif lang_key == "en":
+            main_title = "Auspicious Timing:" if is_social else "Puja Muhurta:"
 
-        # ৬. FORCE OVERRIDE ALL KEYS
+        if m_type == "nishita":
+            kaal_name = "নিশীথ কাল" if lang_key == "bn" else ("निशीथ काल" if lang_key == "hi" else "Nishita Kaal")
+            p_time = f"{kaal_name} ({nishita_timing})"
+            p_title = main_title
+        elif m_type == "purvahna":
+            kaal_name = "পূর্বাহ্ণ কাল" if lang_key == "bn" else ("पूर्वाह्न काल" if lang_key == "hi" else "Purvahna Kaal")
+            p_time = f"{kaal_name} ({purvahna_timing})"
+            p_title = main_title
+        elif m_type == "madhyahna":
+            kaal_name = "মধ্যাহ্ন কাল" if lang_key == "bn" else ("मध्याह्न काल" if lang_key == "hi" else "Madhyahna Kaal")
+            p_time = f"{kaal_name} ({madhyahna_timing})"
+            p_title = main_title
+        elif m_type == "pradosh":
+            kaal_name = "প্রদোষ কাল" if lang_key == "bn" else ("प्रदोष काल" if lang_key == "hi" else "Pradosh Kaal")
+            p_time = f"{kaal_name} ({pradosh_timing})"
+            p_title = main_title
+        elif m_type == "sayankal":
+            kaal_name = "সায়ংকাল" if lang_key == "bn" else ("सायंकाल" if lang_key == "hi" else "Sayankal")
+            p_time = f"{kaal_name} ({sayankal_timing})"
+            p_title = main_title
+        elif m_type == "sunrise_snan":
+            kaal_name = "প্রাতঃকাল" if lang_key == "bn" else ("प्रातःकाल" if lang_key == "hi" else "Pratah Kaal")
+            p_time = f"{kaal_name} ({sunrise_snan_timing})"
+            p_title = "স্নান মুহূর্ত:" if lang_key == "bn" else ("स्नान मुहूर्त:" if lang_key == "hi" else "Snan Muhurta:")
+        elif m_type == "sandhi":
+            kaal_name = "সন্ধিপূজা" if lang_key == "bn" else ("संधि पूजा" if lang_key == "hi" else "Sandhi Puja")
+            p_time = f"{kaal_name} ({sandhi_timing})"
+            p_title = main_title
+        elif m_type == "brahma":
+            kaal_name = "ব্রাহ্ম মুহূর্ত" if lang_key == "bn" else ("ब्रह्म मुहूर्त" if lang_key == "hi" else "Brahma Muhurta")
+            p_time = f"{kaal_name} ({brahma_timing})"
+            p_title = main_title
+        elif m_type == "aparahna":
+            kaal_name = "অপরাহ্ণ কাল" if lang_key == "bn" else ("अपराह्न काल" if lang_key == "hi" else "Aparahna Kaal")
+            p_time = f"{kaal_name} ({aparahna_timing})"
+            p_title = main_title
+        else:
+            kaal_name = "অভিজিৎ" if lang_key == "bn" else ("अभिजित" if lang_key == "hi" else "Abhijit")
+            p_time = f"{kaal_name} ({fmt_m(abhijit_s)} - {fmt_m(abhijit_e)})"
+            p_title = main_title
+
+        # ৫. FORCE OVERRIDE ALL KEYS
         fest["tithi_span_title"] = "উৎসবের সময়সীমা / তিথি মান:" if lang_key == "bn" else ("पर्व / तिथि समय अवधि:" if lang_key == "hi" else "Festival / Tithi Span:")
         fest["tithi_span_time"] = tithi_str
         
-        # Override Title
+        # Override Title 
         fest["puja_muhurta_title"] = p_title
         fest["puja_muhurta_title_bn"] = p_title
         fest["puja_muhurta_title_hi"] = p_title
@@ -1558,7 +1563,7 @@ def compute_full_drik_panchang(
         fest["muhurta_label_bn"] = p_title
         fest["muhurta_label_hi"] = p_title
         
-        # Override Time (শুধুমাত্র রেঞ্জ)
+        # Clean Time Value Overrides
         fest["puja_muhurta_time"] = p_time
         fest["puja_muhurta_time_bn"] = p_time
         fest["puja_muhurta_time_hi"] = p_time
