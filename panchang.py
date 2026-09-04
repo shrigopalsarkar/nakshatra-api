@@ -1472,31 +1472,29 @@ def compute_full_drik_panchang(
 
         from festivals import compute_dynamic_festival_muhurta
 
-    # সূর্যোদয় ও সূর্যাস্তের মোট মিনিট
+    # সূর্যোদয় ও সূর্যাস্তের মোট মিনিট
     rise_total_min = int(dt_rise.hour * 60 + dt_rise.minute)
     set_total_min = int(dt_set.hour * 60 + dt_set.minute)
 
+    # ==========================================================
+    # --- তিথির শুরুর সময় নির্ণয় (Live Astronomical Start Time) ---
+    # ==========================================================
+    jd_search = jd_sunrise
+    while tithi_index(jd_search) == t_idx:
+        jd_search -= 0.1
+    t_start = find_transition(jd_search, tithi_index)
+
     # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি
     for fest in today_festivals:
-        # ১. পুরনো ফাংশন কল (তিথির শুরুর সময়ের জন্য)
-        try:
-            from festivals import compute_dynamic_festival_muhurta
-            m_res = compute_dynamic_festival_muhurta(
-                festival_name=str(fest.get("name", "")),
-                festival_type=str(fest.get("category", "hindu")),
-                sunrise_min=rise_total_min, sunset_min=set_total_min, lang=lang_key
-            )
-            # fest["tithi_span_time"] = m_res.get("formatted_display", "")
-        except Exception:
-            pass
-
+        
         m_type = fest.get("muhurta_type", "abhijit")
         fest_name = str(fest.get("name", ""))
 
-        # ২. তিথির সমাপ্তি ও পরের দিনের লজিক 
-        tithi_str = fest.get("tithi_span_time", "") 
-        if t_end:
+        # ২. তিথির শুরু, সমাপ্তি ও পরের দিনের লজিক (100% Dynamic Drik Standard)
+        if t_start and t_end:
+            t_start_dt = jd_to_local(t_start)
             t_end_dt = jd_to_local(t_end)
+            
             diff_days = (t_end_dt.date() - local_date).days
             m_idx = t_end_dt.month - 1
             d_str = str(t_end_dt.day)
@@ -1509,16 +1507,20 @@ def compute_full_drik_panchang(
                 d_bn = d_str.translate(str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯'))
                 date_text = f"{d_bn} {bn_m[m_idx]}"
                 extra = f" (পরের দিন, {date_text})" if diff_days == 1 else (f" ({str(diff_days).translate(str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯'))} দিন পর, {date_text})" if diff_days > 1 else "")
-                tithi_str = f"সমাপ্তি: {fmt_m(t_end_dt)}{extra}" if not (" - " in tithi_str or " – " in tithi_str) else f"{tithi_str.split(' (')[0]}{extra}"
+                tithi_str = f"{fmt_m(t_start_dt)} - {fmt_m(t_end_dt)}{extra}"
+                
             elif lang_key == "hi":
                 d_hi = d_str.translate(str.maketrans('0123456789', '०१२३४५६७८९'))
                 date_text = f"{d_hi} {hi_m[m_idx]}"
                 extra = f" (अगले दिन, {date_text})" if diff_days == 1 else (f" ({d_hi} दिन बाद, {date_text})" if diff_days > 1 else "")
-                tithi_str = f"समाप्ति: {fmt_m(t_end_dt)}{extra}" if not (" - " in tithi_str or " – " in tithi_str) else f"{tithi_str.split(' (')[0]}{extra}"
+                tithi_str = f"{fmt_m(t_start_dt)} - {fmt_m(t_end_dt)}{extra}"
+                
             else:
                 date_text = f"{en_m[m_idx]} {d_str}"
                 extra = f" (Next Day, {date_text})" if diff_days == 1 else (f" ({diff_days} Days Later, {date_text})" if diff_days > 1 else "")
-                tithi_str = f"Ends at: {fmt_m(t_end_dt)}{extra}" if not (" - " in tithi_str or " – " in tithi_str) else f"{tithi_str.split(' (')[0]}{extra}"
+                tithi_str = f"{fmt_m(t_start_dt)} - {fmt_m(t_end_dt)}{extra}"
+        else:
+            tithi_str = ""
         
         # ৩. "পূজা" বনাম "শুভ মুহূর্ত" নির্ণয়
         social_keywords = [
