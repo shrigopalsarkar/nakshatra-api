@@ -1098,9 +1098,56 @@ def compute_full_drik_panchang(
     sun_nak_idx = int(sun_lon / (360.0 / 27.0)) % 27
     sun_pada = int((sun_lon % (360.0 / 27.0)) / (360.0 / 108.0)) + 1
 
-    # নতুন অ্যাডভান্সড ফিচার গণনা
+    # --------------------------------------------------------------------------
+    # নতুন অ্যাডভান্সড ফিচার গণনা (DYNAMIC TIME TRANSITIONS - Drik Standard)
+    # --------------------------------------------------------------------------
+    # সময়কে "পর্যন্ত" (upto) ফরম্যাটে রূপান্তর করার সহায়ক ফাংশন
+    def get_upto_str(jd_val):
+        if not jd_val: return ""
+        dt_val = jd_to_local(jd_val)
+        time_str = fmt_m(dt_val)
+        diff_days = (dt_val.date() - local_date).days
+        if diff_days >= 1:
+            if lang_key == "bn": return f" (পরের দিন {time_str} পর্যন্ত)"
+            elif lang_key == "hi": return f" (अगले दिन {time_str} तक)"
+            else: return f" (upto {time_str} Next Day)"
+        else:
+            if lang_key == "bn": return f" ({time_str} পর্যন্ত)"
+            elif lang_key == "hi": return f" ({time_str} तक)"
+            else: return f" (upto {time_str})"
+
+    then_str = "তারপর" if lang_key == "bn" else ("तदुपरांत" if lang_key == "hi" else "then")
+
+    # বর্তমান (Sunrise) ও পরবর্তী (Next) স্টেটের ডেটা বের করা
     niwas_shool = compute_niwas_and_shool(weekday, t_idx, m_rashi_idx, lang_key=lang_key)
+    niwas_shool_next = compute_niwas_and_shool(weekday, (t_idx + 1) % 30, m_rashi_idx, lang_key=lang_key)
+    
     special_yogas = compute_special_yogas(weekday, n_idx, sun_nak_idx, lang_key=lang_key)
+    special_yogas_next = compute_special_yogas(weekday, (n_idx + 1) % 27, sun_nak_idx, lang_key=lang_key)
+
+    # ১. Tithi Transition (অগ্নিবাস ও শিববাস তিথির উপর নির্ভর করে)
+    t_end_str = get_upto_str(t_end)
+    if t_end_str:
+        current_agni = niwas_shool['agnivasa'].split('(')[0].split('-')[0].strip()
+        next_agni = niwas_shool_next['agnivasa'].split('(')[0].split('-')[0].strip()
+        niwas_shool["agnivasa"] = f"{current_agni}{t_end_str}, {then_str} {next_agni}"
+        
+        current_shiva = niwas_shool['shivavasa'].split('(')[0].split('-')[0].strip()
+        next_shiva = niwas_shool_next['shivavasa'].split('(')[0].split('-')[0].strip()
+        niwas_shool["shivavasa"] = f"{current_shiva}{t_end_str}, {then_str} {next_shiva}"
+
+    # ২. Nakshatra Transition (আনন্দাদি ও তামিল যোগ নক্ষত্রের উপর নির্ভর করে)
+    n_end_str = get_upto_str(n_end)
+    if n_end_str:
+        current_anandadi = special_yogas['anandadi_yoga']
+        next_anandadi = special_yogas_next['anandadi_yoga']
+        special_yogas["anandadi_yoga"] = f"{current_anandadi}{n_end_str}, {then_str} {next_anandadi}"
+        
+        current_tamil = special_yogas['tamil_yoga'].split('(')[0].strip()
+        next_tamil = special_yogas_next['tamil_yoga'].split('(')[0].strip()
+        special_yogas["tamil_yoga"] = f"{current_tamil}{n_end_str}, {then_str} {next_tamil}"
+
+    # বাকি জেনারেল ক্যালকুলেশন
     chandra_tarabalam = compute_chandra_and_tarabalam(m_rashi_idx, n_idx, lang_key=lang_key)
     dur_varjyam = compute_dur_muhurtam_and_varjyam(dt_rise, dt_set, weekday, n_idx)
     epochs = compute_epochs_and_calendars(local_date, jd_sunrise)
