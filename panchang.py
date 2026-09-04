@@ -1714,6 +1714,103 @@ def compute_full_drik_panchang(
     curr_pada = (moon_pada_index(jd_sunrise) % 4) + 1
     next_pada = (curr_pada % 4) + 1
     dynamic_nakshatra_pada = f"{loc_nak(n_idx)} ({pada_word} {curr_pada}){pada_end_str}, {then_str} {pada_word} {next_pada}"
+
+    # ==========================================================
+    # ৫টি মিসিং অ্যাডভান্সড ফিল্ড (Jeevana, Netra, Homahuti, Bhadravasa, Kumbha) + Descriptions
+    # ==========================================================
+    
+    # ১. জীবমান ও নেত্রমান (Jeevana & Netra Mana)
+    jeeva_list = [
+        {
+            "en": "2 Jeeva (Full Life Energy)", "hi": "२ जीव (पूर्ण प्राण)", "bn": "২ জীব (পরম শুভ / পূর্ণ প্রাণশক্তি)",
+            "desc_en": "Supreme vitality; exceptionally fruitful day.",
+            "desc_hi": "परम शुभ, कार्य में अपार सफलता।",
+            "desc_bn": "পরম শুভ প্রাপ্তি, কার্যে অসাধারণ শুভফলদায়ী।"
+        },
+        {
+            "en": "1 Jeeva (Moderate)", "hi": "१ जीव (मध्यम)", "bn": "১ জীব (মধ্যম)",
+            "desc_en": "Moderate energy; steady progress.",
+            "desc_hi": "मध्यम शुभ, सामान्य फलदायी।",
+            "desc_bn": "মধ্যম ফলপ্রাপ্তি, সাধারণ কার্যে শুভ।"
+        },
+        {
+            "en": "1/2 Jeeva (Half Life)", "hi": "१/२ जीव (अर्ध)", "bn": "১/২ জীব (অর্ধ প্রাণ)",
+            "desc_en": "Low energy; requires effort.",
+            "desc_hi": "अल्प शुभ, अधिक परिश्रम आवश्यक।",
+            "desc_bn": "স্বল্প ফল, অতিরিক্ত পরিশ্রমে সিদ্ধি।"
+        },
+        {
+            "en": "0 Jeeva (Lifeless / Inauspicious)", "hi": "० जीव (प्राणहीन)", "bn": "০ জীব (প্রাণहीन / অশুভ)",
+            "desc_en": "Lifeless; strictly avoid major activities.",
+            "desc_hi": "प्राणहीन, सभी शुभ कार्यों के लिए वर्जित।",
+            "desc_bn": "প্রাণহীন, সমস্ত শুভকার্যে বর্জনীয়।"
+        }
+    ]
+    netra_list = [
+        {
+            "en": "2 Netra (Clear Sight / Auspicious)", "hi": "२ नेत्र (पूर्ण दृष्टि / शुभ)", "bn": "২ নেত্র (সুনৈত্র / পূর্ণ দৃষ্টি)",
+            "desc_en": "Highly propitious for journeys, purchases & agreements.",
+            "desc_hi": "यात्रा, खरीदारी और नए कार्यों के लिए अत्यंत शुभ।",
+            "desc_bn": "ভ্রমণ, কেনাকাটা, চুক্তি ও শুভকর্মে অত্যন্ত প্রশস্ত।"
+        },
+        {
+            "en": "1 Netra (One Eye)", "hi": "१ नेत्र (एक दृष्टि)", "bn": "১ নেত্র (এক দৃষ্টি / মধ্যম)",
+            "desc_en": "Fair visibility; proceed with caution.",
+            "desc_hi": "मध्यम दृष्टि; सावधानी से कार्य करें।",
+            "desc_bn": "মধ্যম দৃষ্টি, সতর্কতার সাথে কাজ করুন।"
+        },
+        {
+            "en": "0 Netra (Blind / Inauspicious)", "hi": "० नेत्र (नेत्रहीन / अशुभ)", "bn": "০ নেত্র (দৃষ্টিহীন / অশুভ / বর্জনীয়)",
+            "desc_en": "Blind; strictly avoid new ventures and travels.",
+            "desc_hi": "अंध दृष्टि; यात्रा और नए कार्यों से पूरी तरह बचें।",
+            "desc_bn": "অন্ধ দৃষ্টি, নতুন কাজ ও ভ্রমণ সম্পূর্ণ নিষিদ্ধ।"
+        }
+    ]
+    
+    special_yogas["jeevana_mana"] = jeeva_list[n_idx % 4].get(lang_key, jeeva_list[n_idx % 4]["en"])
+    special_yogas["jeevana_mana_desc"] = jeeva_list[n_idx % 4].get(f"desc_{lang_key}", jeeva_list[n_idx % 4]["desc_en"])
+    
+    special_yogas["netra_mana"] = netra_list[n_idx % 3].get(lang_key, netra_list[n_idx % 3]["en"])
+    special_yogas["netra_mana_desc"] = netra_list[n_idx % 3].get(f"desc_{lang_key}", netra_list[n_idx % 3]["desc_en"])
+
+    # ২. হোমাহুতি (Homahuti)
+    homa_deities = [
+        {"en": "Sun (Planet)", "bn": "সূর্য গ্রহ", "hi": "सूर्य ग्रह", "desc_en": "Grants health, fame, and power in fire oblations.", "desc_hi": "हवन में आरोग्य, यश और शक्ति प्रदाता।", "desc_bn": "যজ্ঞকর্মে হোমাহুতি আরোগ্য, যশ ও সম্মান বৃদ্ধিকারী।"},
+        {"en": "Chandra (Planet)", "bn": "চন্দ্র গ্রহ", "hi": "चंद्र ग्रह", "desc_en": "Daily planetary fire oblation deity, favorable for pacification rituals.", "desc_hi": "दैनिक हवन में शांति और कल्याणकारी फल प्रदाता।", "desc_bn": "দৈনিক যজ্ঞকর্মে হোমাহুতি অধিপতি গ্রহ, শান্তি ও কল্যাণদায়ী।"},
+        {"en": "Mangal (Planet)", "bn": "মঙ্গল গ্রহ", "hi": "मंगल ग्रह", "desc_en": "Grants courage, victory, and removes debts.", "desc_hi": "हवन से साहस, विजय और ऋण मुक्ति मिलती है।", "desc_bn": "যজ্ঞকর্মে সাহস বৃদ্ধি, বিজয় ও ঋণমুক্তিকারী।"},
+        {"en": "Budha (Planet)", "bn": "বুধ গ্রহ", "hi": "बुध ग्रह", "desc_en": "Enhances intellect, business, and communication.", "desc_hi": "हवन से बुद्धि, व्यापार और संचार में लाभ मिलता है।", "desc_bn": "যজ্ঞকর্মে বুদ্ধি, ব্যবসা ও যোগাযোগের উন্নতিদায়ক।"},
+        {"en": "Guru (Planet)", "bn": "গুরু গ্রহ", "hi": "गुरु ग्रह", "desc_en": "Bestows wisdom, wealth, and divine blessings.", "desc_hi": "हवन से ज्ञान, धन और ईश्वरीय कृपा प्राप्त होती है।", "desc_bn": "যজ্ঞকর্মে জ্ঞান, ধন ও ঐশ্বরিক কৃপা প্রদানকারী।"},
+        {"en": "Shukra (Planet)", "bn": "শুক্র গ্রহ", "hi": "शुक्र ग्रह", "desc_en": "Bestows luxury, harmony, and material comforts.", "desc_hi": "हवन से सुख, शांति और भौतिक समृद्धि मिलती है।", "desc_bn": "যজ্ঞকর্মে সুখ, শান্তি ও জাগতিক সমৃদ্ধিদায়ক।"},
+        {"en": "Shani (Planet)", "bn": "শনি গ্রহ", "hi": "शनि ग्रह", "desc_en": "Alleviates sorrow and grants long-term stability.", "desc_hi": "हवन से दुःख दूर होते हैं और स्थिरता मिलती है।", "desc_bn": "যজ্ঞকর্মে দুঃখ নিবারক ও দীর্ঘস্থায়ী স্থায়িত্বদায়ক।"},
+        {"en": "Rahu", "bn": "রাহু", "hi": "राहु", "desc_en": "Favorable for overcoming sudden obstacles.", "desc_hi": "अचानक आने वाली बाधाओं को दूर करने में सहायक।", "desc_bn": "যজ্ঞকর্মে আকস্মিক বাধা বিপত্তি দূর করতে সহায়ক।"},
+        {"en": "Ketu", "bn": "কেতু", "hi": "केतु", "desc_en": "Grants spiritual growth and liberation (Moksha).", "desc_hi": "हवन से आध्यात्मिक उन्नति और मोक्ष की प्राप्ति होती है।", "desc_bn": "যজ্ঞকর্মে আধ্যাত্মিক উন্নতি ও মুক্তি (মোক্ষ) দায়ক।"}
+    ]
+    niwas_shool["homahuti"] = homa_deities[(n_idx + weekday + 1) % 9].get(lang_key, homa_deities[(n_idx + weekday + 1) % 9]["en"])
+    niwas_shool["homahuti_desc"] = homa_deities[(n_idx + weekday + 1) % 9].get(f"desc_{lang_key}", homa_deities[(n_idx + weekday + 1) % 9]["desc_en"])
+
+    # ৩. ভদ্রাবাস (Bhadravasa)
+    if "Vishti" in karana_name or "Bhadra" in karana_name:
+        if m_rashi_idx in [0, 1, 2, 7]:
+            b_vasa = {"en": "Swarga (Heaven) - Auspicious", "hi": "स्वर्ग (शुभ)", "bn": "স্বর্গ (शुभफलপ্রদ)", "desc_en": "Bhadra resides in Heaven; brings success and happiness.", "desc_hi": "भद्रा स्वर्ग में है; सफलता और सुख लाती है।", "desc_bn": "ভদ্রা স্বর্গে বিরাজমান; কল্যাণ ও সাফল্য প্রদানকারী।"}
+        elif m_rashi_idx in [5, 6, 8, 9]:
+            b_vasa = {"en": "Patala (Underworld) - Wealth gain", "hi": "पाताल (धन लाभ)", "bn": "পাতাল (धन লাভ)", "desc_en": "Bhadra resides in the Underworld; brings financial gains.", "desc_hi": "भद्रा पाताल में है; धन लाभ और भौतिक सुख लाती है।", "desc_bn": "ভদ্রা পাতালে বিরাজমান; ধনসম্পত্তি লাভ ও জাগতিক সুখ প্রদানকারী।"}
+        else:
+            b_vasa = {"en": "Mrityu/Prithvi (Earth) - Inauspicious", "hi": "मृत्यु/पृथ्वी (अशुभ)", "bn": "মর্ত্য/পৃথিবী (সর্বনাশ / অशुभ)", "desc_en": "Bhadra resides on Earth; strictly avoid all auspicious work.", "desc_hi": "भद्रा पृथ्वी पर है; अत्यंत अशुभ, सभी शुभ कार्यों से बचें।", "desc_bn": "ভদ্রা মর্ত্যে (পৃথিবীতে) বিরাজমান; अत्यंत अशुभ, সমস্ত মাঙ্গলিক কাজ বর্জনীয়।"}
+    else:
+        b_vasa = {"en": "None (Inactive)", "hi": "कोई नहीं (निष्क्रिय)", "bn": "অনুপস্থিত (নিষ্ক্রিয়)", "desc_en": "Bhadra is absent; all auspicious and worldly endeavors proceed unobstructed.", "desc_hi": "भद्रा अनुपस्थित है; सभी शुभ कार्य बाधारहित संपन्न होंगे।", "desc_bn": "ভদ্রা অনুপস্থিত; সর্বপ্রকার শুভ ও মাঙ্গলিক কার্য বাধাহীনভাবে সম্পন্ন হবে।"}
+    
+    niwas_shool["bhadravasa"] = b_vasa.get(lang_key, b_vasa["en"])
+    niwas_shool["bhadravasa_desc"] = b_vasa.get(f"desc_{lang_key}", b_vasa["desc_en"])
+
+    # ৪. কুম্ভ চক্র (Kumbha Chakra)
+    kumbha_dirs = [
+        {"en": "East (Purva)", "hi": "पूर्व दिशा", "bn": "পূর্ব দিক", "desc_en": "Auspicious: Kumbha faces East; brings wealth and prosperity.", "desc_hi": "शुभ: कुंभ पूर्वमुखी है; धन और समृद्धि प्रदाता।", "desc_bn": "শুভ: কুম্ভ পূর্বমুখী; ধন ও সমৃদ্ধি প্রদানকারী।"},
+        {"en": "South (Dakshina)", "hi": "दक्षिण दिशा", "bn": "দক্ষিণ দিক", "desc_en": "Auspicious: Kumbha faces South; fulfills desires and bestows victory.", "desc_hi": "शुभ: कुंभ दक्षिणमुखी है; मनोकामना पूर्ण और विजय प्रदाता।", "desc_bn": "শুভ: কুম্ভ দক্ষিণমুখী; মনস্কামনা পূর্ণ ও বিজয় প্রদানকারী।"},
+        {"en": "West (Pashchima)", "hi": "पश्चिम दिशा", "bn": "পশ্চিম দিক", "desc_en": "Auspicious: Kumbha faces West; brings peace and stability.", "desc_hi": "शुभ: कुंभ पश्चिममुखी है; शांति और स्थिरता लाता है।", "desc_bn": "শুভ: কুম্ভ পশ্চিমমুখী; শান্তি ও স্থায়িত্ব প্রদানকারী।"},
+        {"en": "North (Uttara)", "hi": "उत्तर दिशा", "bn": "উত্তর দিক", "desc_en": "Auspicious: Kumbha faces North; bestows health and knowledge.", "desc_hi": "शुभ: कुंभ उत्तरमुखी है; स्वास्थ्य और ज्ञान प्रदाता।", "desc_bn": "শুভ: কুম্ভ উত্তরমুখী; জ্ঞান ও সুস্বাস্থ্য প্রদানকারী।"}
+    ]
+    niwas_shool["kumbha_chakra"] = kumbha_dirs[s_rashi_idx % 4].get(lang_key, kumbha_dirs[s_rashi_idx % 4]["en"])
+    niwas_shool["kumbha_chakra_desc"] = kumbha_dirs[s_rashi_idx % 4].get(f"desc_{lang_key}", kumbha_dirs[s_rashi_idx % 4]["desc_en"])
     # ==========================================================
 
     return {
