@@ -1660,10 +1660,67 @@ def compute_full_drik_panchang(
     yoga_detail_info = process_meta(YOGA_METADATA.get(y_idx + 1, {}))
     karana_detail_info = process_meta(KARANA_METADATA.get(karana_name, {}))
 
+    # ==========================================================
+    # সূর্য রাশি, সূর্য নক্ষত্র এবং চন্দ্র নক্ষত্র পদের ডাইনামিক ট্রানজিশন
+    # (Swiss Ephemeris Live Planetary Movement)
+    # ==========================================================
+    
+    # লোকাল ডিকশনারি (যাতে বাংলা ও হিন্দিতে নিখুঁত নাম আসে)
+    rashi_bn = ["মেষ", "বৃষ", "মিথুন", "কর্কট", "সিংহ", "কন্যা", "তুলা", "বৃশ্চিক", "ধনু", "মকর", "কুম্ভ", "মীন"]
+    rashi_hi = ["मेष", "वृषभ", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुंभ", "मीन"]
+    nak_bn = ["অশ্বিনী", "ভরণী", "কৃত্তিকা", "রোহিণী", "মৃগশিরা", "আর্দ্রা", "পুনর্বসু", "পুষ্যা", "অশ্লেষা", "মঘা", "পূর্ব ফাল্গুনী", "উত্তর ফাল্গুনী", "হস্তা", "চিত্রা", "স্বাতী", "বিশাখা", "অনুরাধা", "জ্যেষ্ঠা", "মূলা", "পূর্বাষাঢ়া", "উত্তরাষাঢ়া", "শ্রবণা", "ধনিষ্ঠা", "শতভিষা", "পূর্ব ভাদ্রপদ", "উত্তর ভাদ্রপদ", "রেবতী"]
+    nak_hi = ["अश्विनी", "भरणी", "कृत्तिका", "रोहिणी", "मृगशिरा", "आर्द्रा", "पुनर्वसु", "पुष्य", "आश्लेषा", "मघा", "पूर्वाफाल्गुनी", "उत्तराफाल्गुनी", "हस्त", "चित्रा", "स्वाती", "विशाखा", "अनुराधा", "ज्येष्ठा", "मूल", "पूर्वाषाढ़ा", "उत्तराषाढ़ा", "श्रवण", "धनिष्ठा", "शतभिषा", "पूर्वाभाद्रपद", "उत्तराभाद्रपद", "रेवती"]
+
+    def loc_rashi(idx):
+        if lang_key == "bn": return rashi_bn[idx]
+        elif lang_key == "hi": return rashi_hi[idx]
+        return RASHIS[idx]
+        
+    def loc_nak(idx):
+        if lang_key == "bn": return nak_bn[idx]
+        elif lang_key == "hi": return nak_hi[idx]
+        return NAKSHATRAS[idx]
+
+    pada_word = "পদ" if lang_key in ["bn", "hi"] else "Pada"
+
+    # ১. ডাইনামিক চন্দ্র রাশি
+    moon_end_str_final = get_upto_str(moon_rashi_end)
+    if moon_end_str_final:
+        dynamic_moonsign = f"{loc_rashi(m_rashi_idx)}{moon_end_str_final}, {then_str} {loc_rashi((m_rashi_idx + 1) % 12)}"
+    else:
+        dynamic_moonsign = loc_rashi(m_rashi_idx)
+
+    # ২. ডাইনামিক সূর্য রাশি (Sankranti Tracking - Live)
+    next_sun_rashi_deg = (s_rashi_idx + 1) * 30.0
+    sun_rashi_dt = find_solar_ingress_forward(jd_sunrise, next_sun_rashi_deg % 360.0, max_days=35.0)
+    sun_rashi_end_str = get_upto_str(to_jd_ut(sun_rashi_dt))
+    dynamic_sunsign = f"{loc_rashi(s_rashi_idx)}{sun_rashi_end_str}, {then_str} {loc_rashi((s_rashi_idx + 1) % 12)}"
+
+    # ৩. ডাইনামিক সূর্য নক্ষত্র (Live)
+    next_sun_nak_deg = (sun_nak_idx + 1) * (360.0 / 27.0)
+    sun_nak_dt = find_solar_ingress_forward(jd_sunrise, next_sun_nak_deg % 360.0, max_days=15.0)
+    sun_nak_end_str = get_upto_str(to_jd_ut(sun_nak_dt))
+    dynamic_surya_nakshatra = f"{loc_nak(sun_nak_idx)} ({pada_word} {sun_pada}){sun_nak_end_str}, {then_str} {loc_nak((sun_nak_idx + 1) % 27)}"
+
+    # ৪. ডাইনামিক চন্দ্র নক্ষত্র পদ (Navamsha Tracking - Live)
+    def moon_pada_index(jd):
+        _, m = sidereal_longitudes(jd)
+        return int((m % 360.0) / (360.0 / 108.0))
+        
+    moon_pada_end_jd = find_transition(jd_sunrise, moon_pada_index, step_hours=0.15, max_hours=12.0)
+    pada_end_str = get_upto_str(moon_pada_end_jd)
+    curr_pada = (moon_pada_index(jd_sunrise) % 4) + 1
+    next_pada = (curr_pada % 4) + 1
+    dynamic_nakshatra_pada = f"{loc_nak(n_idx)} ({pada_word} {curr_pada}){pada_end_str}, {then_str} {pada_word} {next_pada}"
+    # ==========================================================
+
     return {
-        # মূল পঞ্চাঙ্গ ও রেট্রোফিট ডিটিও
-        # ডানপাশের ইংরেজি ও বামপাশের হিন্দু ক্যালেন্ডার ফিল্ড:
-        # পপআপ উইন্ডোর জন্য বিস্তারিত শাস্ত্রীয় মেটাডেটা
+        # রাশি ও সূর্য স্থিতি
+        "moonsign": dynamic_moonsign,
+        "sunsign": dynamic_sunsign,
+        "surya_nakshatra": dynamic_surya_nakshatra,
+        "surya_pada": sun_pada,
+        "nakshatra_pada_display": dynamic_nakshatra_pada,
         "tithi_detail": tithi_detail_info,
         "nakshatra_detail": nakshatra_detail_info,
         "yoga_detail": yoga_detail_info,
