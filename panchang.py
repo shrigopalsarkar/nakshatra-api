@@ -1042,7 +1042,37 @@ def compute_full_drik_panchang(
 
     karana_name = KARANA_NAMES_MOVABLE[(k_idx - 1) % 7] if (k_idx % 60) not in KARANA_FIXED else KARANA_FIXED[k_idx % 60]
 
-    def fmt_dt(jd): return jd_to_local(jd).strftime("%Y-%m-%dT%H:%M:%S") if jd else f"{local_date.isoformat()}T23:59:59"
+    def fmt_dt(jd): 
+        if not jd:
+            return ""
+        dt_val = jd_to_local(jd)
+        time_str = format_time_mode(dt_val, local_date, time_format)
+        diff_days = (dt_val.date() - local_date).days
+        
+        def format_short_date(dt_obj, l_key):
+            en_m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            bn_m = ["জানু", "ফেব্রু", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টে", "অক্টো", "নভে", "ডিসে"]
+            hi_m = ["जन", "फर", "मार्च", "अप्रैल", "मई", "जून", "जुला", "अग", "सितं", "अक्टू", "नवं", "दिसं"]
+            m_idx = dt_obj.month - 1
+            d_str = str(dt_obj.day)
+            if l_key == "bn": return f"{d_str.translate(str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯'))} {bn_m[m_idx]}"
+            elif l_key == "hi": return f"{d_str.translate(str.maketrans('0123456789', '०१२३४५६७८९'))} {hi_m[m_idx]}"
+            return f"{en_m[m_idx]} {d_str}"
+
+        if diff_days == 1:
+            if lang_key == "bn": return f"{time_str} (পরের দিন, {format_short_date(dt_val, lang_key)})"
+            elif lang_key == "hi": return f"{time_str} (अगले दिन, {format_short_date(dt_val, lang_key)})"
+            else: return f"{time_str} (Next Day, {format_short_date(dt_val, lang_key)})"
+        elif diff_days >= 2:
+            if lang_key == "bn":
+                day_str = str(diff_days).translate(str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯'))
+                return f"{time_str} ({day_str} দিন পর, {format_short_date(dt_val, lang_key)})"
+            elif lang_key == "hi":
+                day_str = str(diff_days).translate(str.maketrans('0123456789', '०१२३४५६७८९'))
+                return f"{time_str} ({day_str} दिन बाद, {format_short_date(dt_val, lang_key)})"
+            else: return f"{time_str} ({diff_days} Days Later, {format_short_date(dt_val, lang_key)})"
+        
+        return time_str
     def fmt_time(dt): return dt.strftime("%H:%M:%S")
 
     # Pada Timeline
