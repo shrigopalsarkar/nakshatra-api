@@ -1486,7 +1486,7 @@ def compute_full_drik_panchang(
                 festival_type=str(fest.get("category", "hindu")),
                 sunrise_min=rise_total_min, sunset_min=set_total_min, lang=lang_key
             )
-            fest["tithi_span_time"] = m_res.get("formatted_display", "")
+            # fest["tithi_span_time"] = m_res.get("formatted_display", "")
         except Exception:
             pass
 
