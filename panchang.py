@@ -1350,108 +1350,117 @@ def compute_full_drik_panchang(
     rise_total_min = int(dt_rise.hour * 60 + dt_rise.minute)
     set_total_min = int(dt_set.hour * 60 + dt_set.minute)
 
-    # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি (100% Native Mapping & Smart Next Day Logic)
+    # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি
     for fest in today_festivals:
-        # ১. ভাষা অনুযায়ী ডিফল্ট টাইটেল সেট করা
-        if lang_key == "bn":
-            default_muhurta_label = "শুভ মুহূর্ত:"
-            tithi_span_title = "উৎসবের সময়সীমা / তিথি মান:"
-            ends_at_text = "সমাপ্তি:"
-            puja_suffix = "(পূজার মুহূর্ত):"
-            snan_suffix = "(স্নান ও পূজা):"
-        elif lang_key == "hi":
-            default_muhurta_label = "शुभ मुहूर्त:"
-            tithi_span_title = "पर्व / तिथि समय अवधि:"
-            ends_at_text = "समाप्ति:"
-            puja_suffix = "(पूजा मुहूर्त):"
-            snan_suffix = "(स्नान व पूजा):"
-        else:
-            default_muhurta_label = "Auspicious Timing:"
-            tithi_span_title = "Festival / Tithi Span:"
-            ends_at_text = "Ends at:"
-            puja_suffix = "(Puja Muhurta):"
-            snan_suffix = "(Snan & Puja):"
+        # ১. পুরনো ফাংশন কল (শুধুমাত্র তিথির শুরুর সময়টা "03:09 AM -" পাওয়ার জন্য)
+        try:
+            from festivals import compute_dynamic_festival_muhurta
+            m_res = compute_dynamic_festival_muhurta(
+                festival_name=str(fest.get("name", "")),
+                festival_type=str(fest.get("category", "hindu")),
+                sunrise_min=rise_total_min, sunset_min=set_total_min, lang=lang_key
+            )
+            fest["tithi_span_time"] = m_res.get("formatted_display", "")
+        except Exception:
+            pass
 
         m_type = fest.get("muhurta_type", "abhijit")
-        
-        # ২. Smart Date Difference Logic (পরের দিন নাকি ২ দিন পর তা নির্ধারণ)
-        tithi_time_str = ""
+
+        # ২. তিথির সমাপ্তি ও পরের দিনের লজিক
+        tithi_str = fest.get("tithi_span_time", "") 
         if t_end:
             t_end_dt = jd_to_local(t_end)
             diff_days = (t_end_dt.date() - local_date).days
+            m_idx = t_end_dt.month - 1
+            d_str = str(t_end_dt.day)
             
-            # মাসের নাম ও সংখ্যা অনুবাদ করার ফাংশন
-            def format_short_date(dt_obj, l_key):
-                en_m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-                bn_m = ["জানু", "ফেব্রু", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টে", "অক্টো", "নভে", "ডিসে"]
-                hi_m = ["जन", "फर", "मार्च", "अप्रैल", "मई", "जून", "जुला", "अग", "सितं", "अक्टू", "नवं", "दिसं"]
-                m_idx = dt_obj.month - 1
-                d_str = str(dt_obj.day)
-                if l_key == "bn":
-                    return f"{d_str.translate(str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯'))} {bn_m[m_idx]}"
-                elif l_key == "hi":
-                    return f"{d_str.translate(str.maketrans('0123456789', '०१२३४५६७८९'))} {hi_m[m_idx]}"
-                return f"{en_m[m_idx]} {d_str}"
-
-            extra_str = ""
-            if diff_days == 1:
-                if lang_key == "bn": extra_str = f" (পরের দিন, {format_short_date(t_end_dt, lang_key)})"
-                elif lang_key == "hi": extra_str = f" (अगले दिन, {format_short_date(t_end_dt, lang_key)})"
-                else: extra_str = f" (Next Day, {format_short_date(t_end_dt, lang_key)})"
-            elif diff_days >= 2:
-                if lang_key == "bn":
-                    day_str = str(diff_days).translate(str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯'))
-                    extra_str = f" ({day_str} দিন পর, {format_short_date(t_end_dt, lang_key)})"
-                elif lang_key == "hi":
-                    day_str = str(diff_days).translate(str.maketrans('0123456789', '०१२३४५६७८९'))
-                    extra_str = f" ({day_str} दिन बाद, {format_short_date(t_end_dt, lang_key)})"
-                else: extra_str = f" ({diff_days} Days Later, {format_short_date(t_end_dt, lang_key)})"
-
-            tithi_time_str = f"{ends_at_text} {fmt_m(t_end_dt)}{extra_str}"
-
-        fest["tithi_span_title"] = tithi_span_title
-        fest["tithi_span_time"] = tithi_time_str
-
-        # ৩. মুহূতের সময় ও টাইটেল সেট করা (মূল নাম আগে, পূজার মুহূর্ত পরে)
+            bn_m = ["জানু", "ফেব্রু", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টে", "অক্টো", "নভে", "ডিসে"]
+            hi_m = ["जन", "फर", "मार्च", "अप्रैल", "मई", "जून", "जुला", "अग", "सितं", "अक्टू", "नवं", "दिसं"]
+            en_m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            
+            if lang_key == "bn":
+                d_bn = d_str.translate(str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯'))
+                date_text = f"{d_bn} {bn_m[m_idx]}"
+                extra = f" (পরের দিন, {date_text})" if diff_days == 1 else (f" ({str(diff_days).translate(str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯'))} দিন পর, {date_text})" if diff_days > 1 else "")
+                
+                if " - " in tithi_str or " – " in tithi_str:
+                    tithi_str = f"{tithi_str.split(' (')[0]}{extra}"
+                else:
+                    tithi_str = f"সমাপ্তি: {fmt_m(t_end_dt)}{extra}"
+                    
+            elif lang_key == "hi":
+                d_hi = d_str.translate(str.maketrans('0123456789', '०१२३४५६७८९'))
+                date_text = f"{d_hi} {hi_m[m_idx]}"
+                extra = f" (अगले दिन, {date_text})" if diff_days == 1 else (f" ({d_hi} दिन बाद, {date_text})" if diff_days > 1 else "")
+                
+                if " - " in tithi_str or " – " in tithi_str:
+                    tithi_str = f"{tithi_str.split(' (')[0]}{extra}"
+                else:
+                    tithi_str = f"समाप्ति: {fmt_m(t_end_dt)}{extra}"
+            else:
+                date_text = f"{en_m[m_idx]} {d_str}"
+                extra = f" (Next Day, {date_text})" if diff_days == 1 else (f" ({diff_days} Days Later, {date_text})" if diff_days > 1 else "")
+                
+                if " - " in tithi_str or " – " in tithi_str:
+                    tithi_str = f"{tithi_str.split(' (')[0]}{extra}"
+                else:
+                    tithi_str = f"Ends at: {fmt_m(t_end_dt)}{extra}"
+        
+        # ৩. পূজার টাইটেল এবং রেঞ্জ (Start to End Time)
         p_time = ""
         p_title = ""
         
         if m_type == "nishita":
             p_time = nishita_timing
-            p_title = f"নিশীথ কাল {puja_suffix}" if lang_key == "bn" else (f"निशीथ काल {puja_suffix}" if lang_key == "hi" else f"Nishita Kaal {puja_suffix}")
+            p_title = "নিশীথ কাল (পূজার মুহূর্ত):" if lang_key == "bn" else ("निशीथ काल (पूजा मुहूर्त):" if lang_key == "hi" else "Nishita Kaal (Puja Muhurta):")
         elif m_type == "purvahna":
             p_time = purvahna_timing
-            p_title = f"পূর্বাহ্ণ কাল {puja_suffix}" if lang_key == "bn" else (f"पूर्वाह्न काल {puja_suffix}" if lang_key == "hi" else f"Purvahna Kaal {puja_suffix}")
+            p_title = "পূর্বাহ্ণ কাল (পূজার মুহূর্ত):" if lang_key == "bn" else ("पूर्वाह्न काल (पूजा मुहूर्त):" if lang_key == "hi" else "Purvahna Kaal (Puja Muhurta):")
         elif m_type == "madhyahna":
             p_time = madhyahna_timing
-            p_title = f"মধ্যাহ্ন কাল {puja_suffix}" if lang_key == "bn" else (f"मध्याह्न काल {puja_suffix}" if lang_key == "hi" else f"Madhyahna Kaal {puja_suffix}")
+            p_title = "মধ্যাহ্ন কাল (পূজার মুহূর্ত):" if lang_key == "bn" else ("मध्याह्न काल (पूजा मुहूर्त):" if lang_key == "hi" else "Madhyahna Kaal (Puja Muhurta):")
         elif m_type == "pradosh":
             p_time = pradosh_timing
-            p_title = f"প্রদোষ কাল {puja_suffix}" if lang_key == "bn" else (f"प्रदोष काल {puja_suffix}" if lang_key == "hi" else f"Pradosh Kaal {puja_suffix}")
+            p_title = "প্রদোষ কাল (পূজার মুহূর্ত):" if lang_key == "bn" else ("प्रदोष काल (पूजा मुहूर्त):" if lang_key == "hi" else "Pradosh Kaal (Puja Muhurta):")
         elif m_type == "sayankal":
             p_time = sayankal_timing
-            p_title = f"সায়ংকাল {puja_suffix}" if lang_key == "bn" else (f"सायंकाल {puja_suffix}" if lang_key == "hi" else f"Sayankal {puja_suffix}")
+            p_title = "সায়ংকাল (পূজার মুহূর্ত):" if lang_key == "bn" else ("सायंकाल (पूजा मुहूर्त):" if lang_key == "hi" else "Sayankal (Puja Muhurta):")
         elif m_type == "sunrise_snan":
             p_time = sunrise_snan_timing
-            p_title = f"প্রাতঃকাল {snan_suffix}" if lang_key == "bn" else (f"प्रातःकाल {snan_suffix}" if lang_key == "hi" else f"Pratah Kaal {snan_suffix}")
+            p_title = "প্রাতঃকাল (স্নান ও পূজা):" if lang_key == "bn" else ("प्रातःकाल (स्नान व पूजा):" if lang_key == "hi" else "Pratah Kaal (Snan & Puja):")
         elif m_type == "sandhi":
             p_time = sandhi_timing
             p_title = "সন্ধিপূজা মুহূর্ত:" if lang_key == "bn" else ("संधि पूजा मुहूर्त:" if lang_key == "hi" else "Sandhi Puja Muhurta:")
         elif m_type == "brahma":
             p_time = brahma_timing
-            p_title = f"ব্রাহ্ম মুহূর্ত {puja_suffix}" if lang_key == "bn" else (f"ब्रह्म मुहूर्त {puja_suffix}" if lang_key == "hi" else f"Brahma Muhurta {puja_suffix}")
+            p_title = "ব্রাহ্ম মুহূর্ত (পূজার মুহূর্ত):" if lang_key == "bn" else ("ब्रह्म मुहूर्त (पूजा मुहूर्त):" if lang_key == "hi" else "Brahma Muhurta (Puja Muhurta):")
         elif m_type == "aparahna":
             p_time = aparahna_timing
-            p_title = f"অপরাহ্ণ কাল {puja_suffix}" if lang_key == "bn" else (f"अपराह्न काल {puja_suffix}" if lang_key == "hi" else f"Aparahna Kaal {puja_suffix}")
+            p_title = "অপরাহ্ণ কাল (পূজার মুহূর্ত):" if lang_key == "bn" else ("अपराह्न काल (पूजा मुहूर्त):" if lang_key == "hi" else "Aparahna Kaal (Puja Muhurta):")
         else:
             p_time = f"{fmt_m(abhijit_s)} - {fmt_m(abhijit_e)}"
-            p_title = f"শুভ মুহূর্ত (অভিজিৎ):" if lang_key == "bn" else (f"शुभ मुहूर्त (अभिजित):" if lang_key == "hi" else f"Auspicious Timing (Abhijit):")
+            p_title = "শুভ মুহূর্ত (অভিজিৎ):" if lang_key == "bn" else ("शुभ मुहूर्त (अभिजित):" if lang_key == "hi" else "Auspicious Timing (Abhijit):")
 
-        # ৪. সব ভ্যারিয়েবলে ডেটা পুশ করা (পুরো রেঞ্জ দেখানোর জন্য)
+        # ৪. Force Override ALL Variables (যাতে অ্যাপ পুরনো ডেটা না পায়)
+        fest["tithi_span_title"] = "উৎসবের সময়সীমা / তিথি মান:" if lang_key == "bn" else ("पर्व / तिथि समय अवधि:" if lang_key == "hi" else "Festival / Tithi Span:")
+        fest["tithi_span_time"] = tithi_str
+        
+        # Title Override
         fest["puja_muhurta_title"] = p_title
-        fest["puja_muhurta_time"] = p_time
+        fest["puja_muhurta_title_bn"] = p_title
+        fest["puja_muhurta_title_hi"] = p_title
         fest["muhurta_label"] = p_title
+        fest["muhurta_label_bn"] = p_title
+        fest["muhurta_label_hi"] = p_title
+        
+        # Time Override (Start to End)
+        fest["puja_muhurta_time"] = p_time
+        fest["puja_muhurta_time_bn"] = p_time
+        fest["puja_muhurta_time_hi"] = p_time
         fest["muhurta"] = p_time
+        fest["muhurta_bn"] = p_time
+        fest["muhurta_hi"] = p_time
+        
         fest["muhurta_start"] = p_time  
         fest["muhurta_end"] = ""
         fest["is_puja"] = True
