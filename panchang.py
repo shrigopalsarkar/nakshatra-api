@@ -1139,14 +1139,12 @@ def compute_full_drik_panchang(
     sun_pada = int((sun_lon % (360.0 / 27.0)) / (360.0 / 108.0)) + 1
 
     # --------------------------------------------------------------------------
-    # নতুন অ্যাডভান্সড ফিচার গণনা (DYNAMIC TIME TRANSITIONS - Drik Standard)
+    # সমস্ত অ্যাডভান্সড সেকশনের জন্য ডাইনামিক টাইম ট্রানজিশন ইঞ্জিন (Drik Standard)
     # --------------------------------------------------------------------------
-    # সময়কে "পর্যন্ত" (upto) ফরম্যাটে রূপান্তর করার সহায়ক ফাংশন
     def get_upto_str(jd_val):
         if not jd_val: return ""
         dt_val = jd_to_local(jd_val)
         
-        # সার্ভার ক্র্যাশ এড়াতে সেফ ইনলাইন টাইম ফরম্যাটার
         m_format = str(time_format).lower().replace(" ", "").replace("-", "")
         if "24+" in m_format or "plus" in m_format:
             h = dt_val.hour + 24 if dt_val.date() > local_date else dt_val.hour
@@ -1157,10 +1155,22 @@ def compute_full_drik_panchang(
             time_str = dt_val.strftime("%I:%M %p")
             
         diff_days = (dt_val.date() - local_date).days
+        
+        def format_short_date(dt_obj, l_key):
+            en_m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            bn_m = ["জানু", "ফেব্রু", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টে", "অক্টো", "নভে", "ডিসে"]
+            hi_m = ["जन", "फर", "मार्च", "अप्रैल", "मई", "जून", "जुला", "अग", "सितं", "अक्टू", "नवं", "दिसं"]
+            m_idx = dt_obj.month - 1
+            d_str = str(dt_obj.day)
+            if l_key == "bn": return f"{d_str.translate(str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯'))} {bn_m[m_idx]}"
+            elif l_key == "hi": return f"{d_str.translate(str.maketrans('0123456789', '०१२३४५६७८९'))} {hi_m[m_idx]}"
+            return f"{en_m[m_idx]} {d_str}"
+
         if diff_days >= 1:
-            if lang_key == "bn": return f" (পরের দিন {time_str} পর্যন্ত)"
-            elif lang_key == "hi": return f" (अगले दिन {time_str} तक)"
-            else: return f" (upto {time_str} Next Day)"
+            date_txt = format_short_date(dt_val, lang_key)
+            if lang_key == "bn": return f" ({time_str}, {date_txt} পর্যন্ত)"
+            elif lang_key == "hi": return f" ({time_str}, {date_txt} तक)"
+            else: return f" (upto {time_str}, {date_txt})"
         else:
             if lang_key == "bn": return f" ({time_str} পর্যন্ত)"
             elif lang_key == "hi": return f" ({time_str} तक)"
@@ -1168,34 +1178,55 @@ def compute_full_drik_panchang(
 
     then_str = "তারপর" if lang_key == "bn" else ("तदुपरांत" if lang_key == "hi" else "then")
 
-    # বর্তমান (Sunrise) ও পরবর্তী (Next) স্টেটের ডেটা বের করা
+    # বর্তমান ও পরবর্তী স্টেটের ডেটা ক্যালকুলেশন
     niwas_shool = compute_niwas_and_shool(weekday, t_idx, m_rashi_idx, lang_key=lang_key)
-    niwas_shool_next = compute_niwas_and_shool(weekday, (t_idx + 1) % 30, m_rashi_idx, lang_key=lang_key)
+    niwas_shool_next_tithi = compute_niwas_and_shool(weekday, (t_idx + 1) % 30, m_rashi_idx, lang_key=lang_key)
+    niwas_shool_next_nak = compute_niwas_and_shool(weekday, t_idx, (m_rashi_idx + 1) % 12, lang_key=lang_key)
     
     special_yogas = compute_special_yogas(weekday, n_idx, sun_nak_idx, lang_key=lang_key)
     special_yogas_next = compute_special_yogas(weekday, (n_idx + 1) % 27, sun_nak_idx, lang_key=lang_key)
 
-    # ১. Tithi Transition (অগ্নিবাস ও শিববাস তিথির উপর নির্ভর করে)
+    # ১. Tithi based transitions (Agnivasa & Shivavasa)
     t_end_str = get_upto_str(t_end)
     if t_end_str:
-        current_agni = niwas_shool['agnivasa'].split('(')[0].split('-')[0].strip()
-        next_agni = niwas_shool_next['agnivasa'].split('(')[0].split('-')[0].strip()
-        niwas_shool["agnivasa"] = f"{current_agni}{t_end_str}, {then_str} {next_agni}"
+        curr_agni = niwas_shool['agnivasa'].split('(')[0].split('-')[0].strip()
+        next_agni = niwas_shool_next_tithi['agnivasa'].split('(')[0].split('-')[0].strip()
+        niwas_shool["agnivasa"] = f"{curr_agni}{t_end_str}, {then_str} {next_agni}"
         
-        current_shiva = niwas_shool['shivavasa'].split('(')[0].split('-')[0].strip()
-        next_shiva = niwas_shool_next['shivavasa'].split('(')[0].split('-')[0].strip()
-        niwas_shool["shivavasa"] = f"{current_shiva}{t_end_str}, {then_str} {next_shiva}"
+        curr_shiva = niwas_shool['shivavasa'].split('(')[0].split('-')[0].strip()
+        next_shiva = niwas_shool_next_tithi['shivavasa'].split('(')[0].split('-')[0].strip()
+        niwas_shool["shivavasa"] = f"{curr_shiva}{t_end_str}, {then_str} {next_shiva}"
 
-    # ২. Nakshatra Transition (আনন্দাদি ও তামিল যোগ নক্ষত্রের উপর নির্ভর করে)
+    # ২. Nakshatra based transitions (Anandadi & Tamil Yoga)
     n_end_str = get_upto_str(n_end)
     if n_end_str:
-        current_anandadi = special_yogas['anandadi_yoga']
+        curr_anandadi = special_yogas['anandadi_yoga']
         next_anandadi = special_yogas_next['anandadi_yoga']
-        special_yogas["anandadi_yoga"] = f"{current_anandadi}{n_end_str}, {then_str} {next_anandadi}"
+        special_yogas["anandadi_yoga"] = f"{curr_anandadi}{n_end_str}, {then_str} {next_anandadi}"
         
-        current_tamil = special_yogas['tamil_yoga'].split('(')[0].strip()
+        curr_tamil = special_yogas['tamil_yoga'].split('(')[0].strip()
         next_tamil = special_yogas_next['tamil_yoga'].split('(')[0].strip()
-        special_yogas["tamil_yoga"] = f"{current_tamil}{n_end_str}, {then_str} {next_tamil}"
+        special_yogas["tamil_yoga"] = f"{curr_tamil}{n_end_str}, {then_str} {next_tamil}"
+
+    # ৩. Moon/Rashi based transitions (Chandra Vasa)
+    def moon_transition_index(jd):
+        _, m = sidereal_longitudes(jd)
+        return int((m % 360.0) / 30.0)
+
+    moon_rashi_end = find_transition(jd_sunrise, moon_transition_index, step_hours=1.0, max_hours=30.0)
+    moon_end_str = get_upto_str(moon_rashi_end)
+    if moon_end_str:
+        curr_chandra = niwas_shool.get('chandra_vasa', '')
+        next_rashi_idx = (m_rashi_idx + 1) % 12
+        
+        # তিন ভাষার জন্য সঠিক দিক নির্ধারণ
+        rashi_dirs_dict = {
+            "bn": ["পূর্ব", "দক্ষিণ", "পশ্চিম", "উত্তর", "পূর্ব", "দক্ষিণ", "পশ্চিম", "উত্তর", "পূর্ব", "দক্ষিণ", "পশ্চিম", "উত্তর"],
+            "hi": ["पूर्व", "दक्षिण", "पश्चिम", "उत्तर", "पूर्व", "दक्षिण", "पश्चिम", "উত্তর", "पूर्व", "दक्षिण", "पश्चिम", "उत्तर"],
+            "en": ["East", "South", "West", "North", "East", "South", "West", "North", "East", "South", "West", "North"]
+        }
+        next_chandra_localized = rashi_dirs_dict.get(lang_key, rashi_dirs_dict["en"])[next_rashi_idx]
+        niwas_shool["chandra_vasa"] = f"{curr_chandra}{moon_end_str}, {then_str} {next_chandra_localized}"
 
     # বাকি জেনারেল ক্যালকুলেশন
     chandra_tarabalam = compute_chandra_and_tarabalam(m_rashi_idx, n_idx, lang_key=lang_key)
