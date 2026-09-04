@@ -1218,11 +1218,9 @@ def compute_full_drik_panchang(
     if moon_end_str:
         curr_chandra = niwas_shool.get('chandra_vasa', '')
         next_rashi_idx = (m_rashi_idx + 1) % 12
-        
-        # তিন ভাষার জন্য সঠিক দিক নির্ধারণ
         rashi_dirs_dict = {
             "bn": ["পূর্ব", "দক্ষিণ", "পশ্চিম", "উত্তর", "পূর্ব", "দক্ষিণ", "পশ্চিম", "উত্তর", "পূর্ব", "দক্ষিণ", "পশ্চিম", "উত্তর"],
-            "hi": ["पूर्व", "दक्षिण", "पश्चिम", "उत्तर", "पूर्व", "दक्षिण", "पश्चिम", "উত্তর", "पूर्व", "दक्षिण", "पश्चिम", "उत्तर"],
+            "hi": ["पूर्व", "दक्षिण", "पश्चिम", "उत्तर", "पूर्व", "दक्षिण", "पश्चिम", "उत्तर", "पूर्व", "दक्षिण", "पश्चिम", "उत्तर"],
             "en": ["East", "South", "West", "North", "East", "South", "West", "North", "East", "South", "West", "North"]
         }
         next_chandra_localized = rashi_dirs_dict.get(lang_key, rashi_dirs_dict["en"])[next_rashi_idx]
