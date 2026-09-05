@@ -1475,17 +1475,19 @@ def compute_full_drik_panchang(
     # সূর্যোদয় ও সূর্যাস্তের মোট মিনিট
     rise_total_min = int(dt_rise.hour * 60 + dt_rise.minute)
     set_total_min = int(dt_set.hour * 60 + dt_set.minute)
-    jd_midnight = (jd_sunset + jd_next_sunrise) / 2.0
+    
+    # === আপনি ঠিক এই লাইনটিই মিসিং ধরেছিলেন, এটি ফিরিয়ে আনা হলো ===
+    jd_midnight = (jd_sunset + jd_next_sunrise) / 2.0 
 
     # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি
     for fest in today_festivals:
         
         m_type = fest.get("muhurta_type", "abhijit")
         fest_name = str(fest.get("name", ""))
-        fest_cat = str(fest.get("category", "hindu")).lower()
+        fest_cat = str(fest.get("category", "")).lower()
 
         # ==========================================================
-        # ১. সঠিক উৎসব তিথি নির্ণয় (Location & Time Specific)
+        # ১. সঠিক উৎসব তিথি নির্ণয় (Location & Time Specific) - RESTORED
         # ==========================================================
         if m_type == "nishita":
             jd_target = jd_midnight
@@ -1505,8 +1507,8 @@ def compute_full_drik_panchang(
         t_start = find_transition(jd_search_start, tithi_index, max_hours=36.0)
         t_end = find_transition(jd_target, tithi_index, max_hours=36.0)
 
-        # ২. তিথির শুরু, সমাপ্তি ও পরের দিনের লজিক (শুধুমাত্র হিন্দু উৎসবের জন্য)
-        if t_start and t_end and fest_cat in ["hindu", "hindufestival"]:
+        # ২. তিথির শুরু, সমাপ্তি ও পরের দিনের লজিক 
+        if t_start and t_end:
             t_start_dt = jd_to_local(t_start)
             t_end_dt = jd_to_local(t_end)
             
@@ -1523,13 +1525,11 @@ def compute_full_drik_panchang(
                 date_text = f"{d_bn} {bn_m[m_idx]}"
                 extra = f" (পরের দিন, {date_text})" if diff_days == 1 else (f" ({str(diff_days).translate(str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯'))} দিন পর, {date_text})" if diff_days > 1 else "")
                 tithi_str = f"{fmt_m(t_start_dt)} - {fmt_m(t_end_dt)}{extra}"
-                
             elif lang_key == "hi":
                 d_hi = d_str.translate(str.maketrans('0123456789', '०१२३४५६७८९'))
                 date_text = f"{d_hi} {hi_m[m_idx]}"
                 extra = f" (अगले दिन, {date_text})" if diff_days == 1 else (f" ({d_hi} दिन बाद, {date_text})" if diff_days > 1 else "")
                 tithi_str = f"{fmt_m(t_start_dt)} - {fmt_m(t_end_dt)}{extra}"
-                
             else:
                 date_text = f"{en_m[m_idx]} {d_str}"
                 extra = f" (Next Day, {date_text})" if diff_days == 1 else (f" ({diff_days} Days Later, {date_text})" if diff_days > 1 else "")
@@ -1537,7 +1537,7 @@ def compute_full_drik_panchang(
         else:
             tithi_str = ""
 
-        # ৩. "পূজা" বনাম "শুভ মুহূর্ত" নির্ণয় ("bhai" বাগ ফিক্সড)
+        # ৩. "পূজা" বনাম "শুভ মুহূর্ত" নির্ণয়
         social_keywords = [
             "rakhi", "bhai dooj", "bhai phonta", "bhai tika", "bhaidooj", "phonta", "dooj", 
             "new year", "labh pancham", "jamai", "aranya sasthi", 
@@ -1547,10 +1547,6 @@ def compute_full_drik_panchang(
         ]
         is_social = any(k in fest_name.lower() for k in social_keywords)
 
-        # ৪. মূল নাম ও সময়কে একসঙ্গে মার্জ করা 
-        p_time = ""
-        p_title = ""
-        
         main_title = "শুভ মুহূর্ত:" if is_social else "পূজার মুহূর্ত:"
         if lang_key == "hi":
             main_title = "शुभ मुहूर्त:" if is_social else "पूजा मुहूर्त:"
@@ -1598,8 +1594,18 @@ def compute_full_drik_panchang(
             p_time = f"{kaal_name} ({fmt_m(abhijit_s)} - {fmt_m(abhijit_e)})"
             p_title = main_title
 
-        # ৫. Non-Hindu / National Festivals Safety (Remove Puja Muhurta entirely)
-        if fest_cat not in ["hindu", "hindufestival"]:
+        # ৪. Non-Hindu / National Festivals Safety (Smart Keyword Check)
+        non_hindu_kws = [
+            "jayanti", "gandhi", "bose", "netaji", "bhagat", "eid", "al-fitr", "al-adha", 
+            "muharram", "christmas", "good friday", "republic", "independence", "international", 
+            "national", "day", "জয়ন্তী", "গান্ধী", "নেতাজি", "বোস", "ভগত", "ঈদ", "রমজান", 
+            "মহরম", "খ্রিস্টমাস", "গুড ফ্রাইডে", "জাতীয়", "দিবস", "আন্তর্জাতিক", "जयंती", 
+            "गांधी", "बोस", "भगत", "ईद", "मुहर्रम", "क्रिसमस", "राष्ट्रीय", "दिवस", "अंतर्राष्ट्रीय"
+        ]
+        is_non_hindu = any(kw in fest_name.lower() for kw in non_hindu_kws)
+        
+        # যদি উৎসবটি নন-হিন্দু হয় বা ক্যাটাগরি ন্যাশনাল/ইসলামিক হয়, তবেই পূজার সময় লুকাবে
+        if is_non_hindu or fest_cat in ["national", "islamic", "christian", "observance", "bank holiday"]:
             p_title = ""
             p_time = ""
             tithi_str = ""  
@@ -1607,7 +1613,7 @@ def compute_full_drik_panchang(
         else:
             fest["tithi_span_title"] = "উৎসবের সময়সীমা / তিথি মান:" if lang_key == "bn" else ("पर्व / तिथि समय अवधि:" if lang_key == "hi" else "Festival / Tithi Span:")
         
-        # ৬. FORCE OVERRIDE ALL KEYS
+        # ৫. সমস্ত ফিল্ড আপডেট করা
         fest["tithi_span_time"] = tithi_str
         
         fest["puja_muhurta_title"] = p_title
@@ -1628,8 +1634,8 @@ def compute_full_drik_panchang(
         fest["muhurta_start"] = p_time  
         fest["muhurta_end"] = ""
         
-        fest["is_puja"] = not is_social and (fest_cat in ["hindu", "hindufestival"])
-
+        fest["is_puja"] = not is_social and not is_non_hindu
+        
     # লাইভ ট্রানজিট আইডির সাথে মেটাডেটা ম্যাচিং
     tithi_num_key = (t_idx % 15) + 1
     
