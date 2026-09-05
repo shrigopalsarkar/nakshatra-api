@@ -1475,23 +1475,38 @@ def compute_full_drik_panchang(
     # সূর্যোদয় ও সূর্যাস্তের মোট মিনিট
     rise_total_min = int(dt_rise.hour * 60 + dt_rise.minute)
     set_total_min = int(dt_set.hour * 60 + dt_set.minute)
-
-    # ==========================================================
-    # --- তিথির শুরুর সময় নির্ণয় (Live Astronomical Start Time) ---
-    # ==========================================================
-    jd_search = jd_sunrise
-    while tithi_index(jd_search) == t_idx:
-        jd_search -= 0.1
-    t_start = find_transition(jd_search, tithi_index)
+    jd_midnight = (jd_sunset + jd_next_sunrise) / 2.0
 
     # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি
     for fest in today_festivals:
         
         m_type = fest.get("muhurta_type", "abhijit")
         fest_name = str(fest.get("name", ""))
+        fest_cat = str(fest.get("category", "hindu")).lower()
 
-        # ২. তিথির শুরু, সমাপ্তি ও পরের দিনের লজিক (100% Dynamic Drik Standard)
-        if t_start and t_end:
+        # ==========================================================
+        # ১. সঠিক উৎসব তিথি নির্ণয় (Location & Time Specific)
+        # ==========================================================
+        if m_type == "nishita":
+            jd_target = jd_midnight
+        elif m_type in ["pradosh", "sayankal"]:
+            jd_target = jd_sunset
+        else:
+            jd_target = jd_sunrise
+
+        target_tithi_idx = tithi_index(jd_target)
+
+        jd_search_start = jd_target
+        guard_start = 0
+        while tithi_index(jd_search_start) == target_tithi_idx and guard_start < 40:
+            jd_search_start -= 0.1
+            guard_start += 1
+            
+        t_start = find_transition(jd_search_start, tithi_index, max_hours=36.0)
+        t_end = find_transition(jd_target, tithi_index, max_hours=36.0)
+
+        # ২. তিথির শুরু, সমাপ্তি ও পরের দিনের লজিক (শুধুমাত্র হিন্দু উৎসবের জন্য)
+        if t_start and t_end and fest_cat in ["hindu", "hindufestival"]:
             t_start_dt = jd_to_local(t_start)
             t_end_dt = jd_to_local(t_end)
             
@@ -1521,17 +1536,18 @@ def compute_full_drik_panchang(
                 tithi_str = f"{fmt_m(t_start_dt)} - {fmt_m(t_end_dt)}{extra}"
         else:
             tithi_str = ""
-        
-        # ৩. "পূজা" বনাম "শুভ মুহূর্ত" নির্ণয়
+
+        # ৩. "পূজা" বনাম "শুভ মুহূর্ত" নির্ণয় ("bhai" বাগ ফিক্সড)
         social_keywords = [
-            "rakhi", "bhai", "phonta", "dooj", "new year", "labh pancham", "jamai", "aranya sasthi", 
+            "rakhi", "bhai dooj", "bhai phonta", "bhai tika", "bhaidooj", "phonta", "dooj", 
+            "new year", "labh pancham", "jamai", "aranya sasthi", 
             "holi", "dol jatra", "dahi handi", "lohri", "chhoti holi",
             "রাখী", "ভাইফোঁটা", "ভাইদুজ", "নববর্ষ", "জামাই", "অরণ্য ষষ্ঠী", "হোলি", "দোলযাত্রা", "দহি", 
-            "राखी", "भाई", "जमाई", "होली", "दही", "लोहड़ी"
+            "राखी", "भाई दूज", "जमाई", "होली", "दही", "लोहड़ी"
         ]
         is_social = any(k in fest_name.lower() for k in social_keywords)
 
-        # ৪. মূল নাম ও সময়কে একসঙ্গে মার্জ করা (যাতে অ্যান্ড্রয়েড অ্যাপ টাইম পার্স করতে গিয়ে রেঞ্জ ভেঙে না দেয়!)
+        # ৪. মূল নাম ও সময়কে একসঙ্গে মার্জ করা 
         p_time = ""
         p_title = ""
         
@@ -1582,11 +1598,18 @@ def compute_full_drik_panchang(
             p_time = f"{kaal_name} ({fmt_m(abhijit_s)} - {fmt_m(abhijit_e)})"
             p_title = main_title
 
-        # ৫. FORCE OVERRIDE ALL KEYS
-        fest["tithi_span_title"] = "উৎসবের সময়সীমা / তিথি মান:" if lang_key == "bn" else ("पर्व / तिथि समय अवधि:" if lang_key == "hi" else "Festival / Tithi Span:")
+        # ৫. Non-Hindu / National Festivals Safety (Remove Puja Muhurta entirely)
+        if fest_cat not in ["hindu", "hindufestival"]:
+            p_title = ""
+            p_time = ""
+            tithi_str = ""  
+            fest["tithi_span_title"] = ""
+        else:
+            fest["tithi_span_title"] = "উৎসবের সময়সীমা / তিথি মান:" if lang_key == "bn" else ("पर्व / तिथि समय अवधि:" if lang_key == "hi" else "Festival / Tithi Span:")
+        
+        # ৬. FORCE OVERRIDE ALL KEYS
         fest["tithi_span_time"] = tithi_str
         
-        # Override Title 
         fest["puja_muhurta_title"] = p_title
         fest["puja_muhurta_title_bn"] = p_title
         fest["puja_muhurta_title_hi"] = p_title
@@ -1594,7 +1617,6 @@ def compute_full_drik_panchang(
         fest["muhurta_label_bn"] = p_title
         fest["muhurta_label_hi"] = p_title
         
-        # Clean Time Value Overrides
         fest["puja_muhurta_time"] = p_time
         fest["puja_muhurta_time_bn"] = p_time
         fest["puja_muhurta_time_hi"] = p_time
@@ -1606,7 +1628,7 @@ def compute_full_drik_panchang(
         fest["muhurta_start"] = p_time  
         fest["muhurta_end"] = ""
         
-        fest["is_puja"] = not is_social
+        fest["is_puja"] = not is_social and (fest_cat in ["hindu", "hindufestival"])
 
     # লাইভ ট্রানজিট আইডির সাথে মেটাডেটা ম্যাচিং
     tithi_num_key = (t_idx % 15) + 1
