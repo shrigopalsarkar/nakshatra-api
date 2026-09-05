@@ -1984,26 +1984,11 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
         if bengali_solar_day == 0:
             bengali_solar_day = 1
             
-        # ২. সংবৎ চান্দ্র তিথি (ক্ষয় তিথি এবং ১৬-৩০ লজিক সমন্বয়)
-        t_num = day_panchang.get("lunar_day", 1)
-        t_str = day_panchang.get("lunar_day_str", str(t_num))
+        # ২. সংবৎ চান্দ্র তিথি (১-১৫ রুল এবং ক্ষয় তিথি সমন্বয়)
+        # এখানে t_num সবসময় ১ থেকে ১৫ এর মধ্যেই থাকবে (শুক্ল বা কৃষ্ণ যাই হোক না কেন)
+        t_num = day_panchang.get("lunar_day", 1) 
+        t_str = day_panchang.get("lunar_day_str", str(t_num)) 
         paksha = day_panchang.get("paksha", "Shukla")
-        is_krishna = paksha in ["Krishna", "কৃষ্ণ পক্ষ", "कृष्ण पक्ष"]
-
-        # স্মার্ট হেল্পার: যদি কৃষ্ণপক্ষ হয়, তবে সব সংখ্যার সাথে ১৫ যোগ করে দেবে (যেমন "5, 6" হয়ে যাবে "20, 21")
-        def apply_krishna_offset(base_t_str):
-            if not is_krishna:
-                return base_t_str
-            parts = []
-            for p in base_t_str.split(","):
-                p = p.strip()
-                if p.isdigit():
-                    parts.append(str(int(p) + 15))
-                else:
-                    parts.append(p)
-            return ", ".join(parts)
-        
-        krishna_adjusted_t_str = apply_krishna_offset(t_str)
         
         # ৩. শকাব্দ সৌর তারিখ (সম্পূর্ণ সৌর হিসাব)
         def get_shaka_day_only(g_date):
@@ -2027,14 +2012,11 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
         if cal_type == "bengali":
             main_date = bengali_solar_day
             date_str = str(main_date)
-        elif cal_type == "vikram":
-            main_date = t_num + 15 if is_krishna else t_num
-            # শুক্লপক্ষে ১-১৫ এবং কৃষ্ণপক্ষে ১৬-৩০ (ক্ষয় তিথি সহ)
-            date_str = krishna_adjusted_t_str
-        elif cal_type == "gujarati":
-            main_date = t_num + 15 if is_krishna else t_num
-            # গুজরাটি ক্যালেন্ডারেও একই ১৬-৩০ লজিক এবং ক্ষয় তিথি
-            date_str = krishna_adjusted_t_str
+        elif cal_type == "vikram" or cal_type == "gujarati":
+            # বিক্রম এবং গুজরাটিতে সবসময় ১-১৫ হবে, কোনো ১৫ যোগ হবে না!
+            main_date = t_num
+            # ক্ষয় তিথি থাকলে সরাসরি "5, 6" দেখাবে
+            date_str = t_str
         elif cal_type == "shaka":
             main_date = saka_solar_day
             date_str = str(main_date)
@@ -2042,7 +2024,7 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
             main_date = d
             date_str = str(main_date)
 
-        # ভাষা অনুযায়ী সংখ্যা রূপান্তর (যেমন: "20, 21" -> "২০, ২১")
+        # ভাষা অনুযায়ী সংখ্যা রূপান্তর (যেমন: "5, 6" -> "৫, ৬")
         if lang == "bn": 
             date_str = date_str.translate(str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯'))
         elif lang == "hi": 
