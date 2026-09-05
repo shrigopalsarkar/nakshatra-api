@@ -1358,119 +1358,85 @@ def compute_full_drik_panchang(
     paksha_mid = "Shukla" if t_idx_mid < 15 else "Krishna"
     t_num_mid = (t_idx_mid % 15) + 1
 
-    # ৪. সমস্ত মহাজাগতিক সংযোগের উৎসব একত্রীকরণ
+    # ৪. সমস্ত মহাজাগতিক সংযোগের উৎসব একত্রীকরণ (The Ultimate Fix)
     today_festivals = []
 
     # (ক) সূর্যোদয়ভিত্তিক উৎসব
-    fests_rise = get_festivals_for_day(
-        current_date=local_date,
-        lunar_month=lunar_masa,
-        paksha=paksha_rise,
-        tithi_num=t_num_rise,
-        sankranti_name=None,
-        lang=lang
-    )
+    fests_rise = get_festivals_for_day(current_date=local_date, lunar_month=lunar_masa, paksha=paksha_rise, tithi_num=t_num_rise, sankranti_name=None, lang=lang)
     for f in fests_rise:
-        if f.get("muhurta_type") in ["purvahna", "sunrise_snan", "madhyahna", "brahma", "aparahna"] or f.get("category") == "national" or f.get("category") == "world":
-            if not any(x.get("name") == f.get("name") for x in today_festivals):
-                today_festivals.append(f)
+        f['calc_tithi_idx'] = t_idx_rise
+        f['calc_jd_base'] = jd_sunrise
+        if not any(x.get("name") == f.get("name") for x in today_festivals):
+            today_festivals.append(f)
 
-    # (খ) প্রদোষকাল (সূর্যাস্ত) ভিত্তিক উৎসব (Dhanteras, Diwali, Pradosh Vrat)
-    fests_set = get_festivals_for_day(
-        current_date=local_date,
-        lunar_month=lunar_masa,
-        paksha=paksha_set,
-        tithi_num=t_num_set,
-        sankranti_name=None,
-        lang=lang
-    )
-    for f in fests_set:
-        if f.get("muhurta_type") in ["pradosh", "sayankal"]:
-            if not any(x.get("name") == f.get("name") for x in today_festivals):
-                today_festivals.append(f)
+    # (খ) প্রদোষকাল (সূর্যাস্ত) ভিত্তিক উৎসব 
+    if t_idx_set != t_idx_rise:
+        fests_set = get_festivals_for_day(current_date=local_date, lunar_month=lunar_masa, paksha=paksha_set, tithi_num=t_num_set, sankranti_name=None, lang=lang)
+        for f in fests_set:
+            if f.get("muhurta_type") in ["pradosh", "sayankal", "nishita"]:
+                f['calc_tithi_idx'] = t_idx_set
+                f['calc_jd_base'] = jd_sunset
+                if not any(x.get("name") == f.get("name") for x in today_festivals):
+                    today_festivals.append(f)
 
-    # (গ) নিশীথকাল (মধ্যরাত্রি) ভিত্তিক উৎসব (Kali Chaudas, Shyama Puja, Shivratri)
-    fests_mid = get_festivals_for_day(
-        current_date=local_date,
-        lunar_month=lunar_masa,
-        paksha=paksha_mid,
-        tithi_num=t_num_mid,
-        sankranti_name=None,
-        lang=lang
-    )
-    for f in fests_mid:
-        if f.get("muhurta_type") == "nishita":
-            if not any(x.get("name") == f.get("name") for x in today_festivals):
-                today_festivals.append(f)
+    # (গ) নিশীথকাল (মধ্যরাত্রি) ভিত্তিক উৎসব
+    jd_midnight = (jd_sunset + jd_next_sunrise) / 2.0
+    if t_idx_mid != t_idx_set and t_idx_mid != t_idx_rise:
+        fests_mid = get_festivals_for_day(current_date=local_date, lunar_month=lunar_masa, paksha=paksha_mid, tithi_num=t_num_mid, sankranti_name=None, lang=lang)
+        for f in fests_mid:
+            if f.get("muhurta_type") == "nishita":
+                f['calc_tithi_idx'] = t_idx_mid
+                f['calc_jd_base'] = jd_midnight
+                if not any(x.get("name") == f.get("name") for x in today_festivals):
+                    today_festivals.append(f)
+
     # --------------------------------------------------------------------------
     # সুইস এফিমেরিস থেকে ডায়নামিক মুহূর্তের সময়সূচি গণনা (12hr / 24hr / 24+hr Support)
     # --------------------------------------------------------------------------
     def format_time_mode(dt_obj: datetime, base_date: date, mode: str = "12hr") -> str:
         m = str(mode or "12hr").lower().replace(" ", "").replace("-", "")
-        
-        # ১. 24+ Hr মোড (বৈদিক দিন: মধ্যরাত্রির পরের সময়ে ২৪ যোগ হবে, যেমন: 24:15, 25:30)
         if "24+" in m or "24plus" in m or "plus" in m:
-            if dt_obj.date() > base_date:
-                h = dt_obj.hour + 24
-            else:
-                h = dt_obj.hour
+            h = dt_obj.hour + 24 if dt_obj.date() > base_date else dt_obj.hour
             return f"{h:02d}:{dt_obj.minute:02d}"
-        
-        # ২. 24 Hr মোড (স্ট্যান্ডার্ড মিলিটারি টাইম: 17:30, 00:15)
         elif "24" in m:
             return dt_obj.strftime("%H:%M")
-        
-        # ৩. 12 Hr মোড (স্ট্যান্ডার্ড 12-ঘণ্টা: 05:30 PM)
         else:
             return dt_obj.strftime("%I:%M %p")
 
-    # সময় ফরম্যাট করার সহায়ক ফাংশন
     def fmt_m(dt_val):
         return format_time_mode(dt_val, local_date, time_format)
 
-    # ১. প্রদোষ কাল (সূর্যাস্ত থেকে ২ ঘণ্টা ২৪ মিনিট)
     pradosh_timing = f"{fmt_m(dt_set)} - {fmt_m(dt_set + timedelta(minutes=144))}"
-
-    # ২. নিশীথ কাল (রাত্রির মধ্যভাগ / ৮ম মুহূর্ত)
     night_sec = (jd_next_sunrise - jd_sunset) * 86400.0
     night_muhurta = night_sec / 15.0
     nishita_st = dt_set + timedelta(seconds=7 * night_muhurta)
     nishita_en = dt_set + timedelta(seconds=8 * night_muhurta)
     nishita_timing = f"{fmt_m(nishita_st)} - {fmt_m(nishita_en)}"
 
-    # ৩. মধ্যাহ্ন কাল (দিনের মধ্যভাগ / ৭ম ও ৮ম মুহূর্ত)
     madhyahna_st = dt_rise + timedelta(seconds=6 * part_15th)
     madhyahna_en = dt_rise + timedelta(seconds=8 * part_15th)
     madhyahna_timing = f"{fmt_m(madhyahna_st)} - {fmt_m(madhyahna_en)}"
 
-    # ৪. পূর্বাহ্ন কাল (সূর্যোদয় থেকে দিনের ১ম তৃতীয়াংশ)
     purvahna_en = dt_rise + timedelta(seconds=5 * part_15th)
     purvahna_timing = f"{fmt_m(dt_rise)} - {fmt_m(purvahna_en)}"
 
-    # ৫. সায়ংকাল / গোধূলি কাল (সূর্যাস্তের ২৪ মিনিট আগে থেকে ২৪ মিনিট পর)
     sayankal_st = dt_set - timedelta(minutes=24)
     sayankal_en = dt_set + timedelta(minutes=24)
     sayankal_timing = f"{fmt_m(sayankal_st)} - {fmt_m(sayankal_en)}"
 
-    # ৬. সূর্যোদয় ও অরুণোদয় স্নান মুহূর্ত (সূর্যোদয়ের প্রাক্কাল থেকে ১ম প্রহর)
     sunrise_snan_timing = f"{fmt_m(dt_rise - timedelta(minutes=30))} - {fmt_m(dt_rise + timedelta(minutes=45))}"
 
-    # ৭. অপরাহ্ন কাল (দিনের ৪র্থ ভাগ)
     aparahna_st = dt_rise + timedelta(seconds=9 * part_15th)
     aparahna_en = dt_rise + timedelta(seconds=12 * part_15th)
     aparahna_timing = f"{fmt_m(aparahna_st)} - {fmt_m(aparahna_en)}"
 
-    # ৮. ব্রাহ্ম মুহূর্ত (সূর্যোদয়ের ৯৬ মিনিট পূর্বে থেকে ৪৮ মিনিট পূর্বে)
     brahma_timing = f"{fmt_m(brahma_s)} - {fmt_m(brahma_e)}"
 
-    # ৯. সন্ধিপূজা মুহূর্ত (অষ্টমী তিথি সমাপ্তির ২৪ মিনিট আগে থেকে নবমী শুরুর ২৪ মিনিট পর)
     if t_end:
         t_end_dt = jd_to_local(t_end)
         sandhi_timing = f"{fmt_m(t_end_dt - timedelta(minutes=24))} - {fmt_m(t_end_dt + timedelta(minutes=24))}"
     else:
         sandhi_timing = f"{fmt_m(dt_set - timedelta(minutes=24))} - {fmt_m(dt_set + timedelta(minutes=24))}"
-
-        from festivals import compute_dynamic_festival_muhurta
 
     # সূর্যোদয় ও সূর্যাস্তের মোট মিনিট
     rise_total_min = int(dt_rise.hour * 60 + dt_rise.minute)
@@ -1478,35 +1444,26 @@ def compute_full_drik_panchang(
 
     # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি
     for fest in today_festivals:
-        
         m_type = fest.get("muhurta_type", "abhijit")
         fest_name = str(fest.get("name", ""))
         fest_cat = str(fest.get("category", "")).lower()
 
         # ==========================================================
-        # ১. পৃথিবীর যেকোনো শহরের স্থানীয় সময় অনুযায়ী সঠিক তিথি নির্ণয়
+        # ১. পৃথিবীর যেকোনো শহরের জন্য ১০০% নিখুঁত তিথি ক্যালকুলেশন
         # ==========================================================
-        # উৎসবের ধরন অনুযায়ী ওই শহরের নির্দিষ্ট সময়কে টার্গেট করা হচ্ছে
-        # (jd_sunset এবং jd_sunrise আগে থেকেই শহরের লোকেশন অনুযায়ী ক্যালকুলেট করা থাকে)
-        if m_type == "nishita":
-            jd_target = jd_sunset + 0.25  # সূর্যাস্তের প্রায় ৬ ঘণ্টা পর (স্থানীয় মধ্যরাত্রি)
-        elif m_type in ["pradosh", "sayankal"]:
-            jd_target = jd_sunset
-        else:
-            jd_target = jd_sunrise
-
-        target_tithi_idx = tithi_index(jd_target)
+        # আমরা যেই তিথিতে উৎসবটি পেয়েছি, ঠিক সেই তিথিরই শুরু এবং শেষ বের করব
+        target_tithi_idx = fest.get('calc_tithi_idx', t_idx_rise)
+        jd_base = fest.get('calc_jd_base', jd_sunrise)
 
         # তিথির শুরুর সময় খোঁজা (নিখুঁতভাবে পেছনে গিয়ে)
-        jd_search_start = jd_target
-        guard_start = 0
-        while tithi_index(jd_search_start) == target_tithi_idx and guard_start < 100:
-            jd_search_start -= 0.05  # ১.২ ঘণ্টা করে পেছনে যাবে
-            guard_start += 1
+        jd_search = jd_base
+        guard = 0
+        while tithi_index(jd_search) == target_tithi_idx and guard < 100:
+            jd_search -= 0.05  # প্রায় ১.২ ঘণ্টা করে পেছনে যাবে
+            guard += 1
             
-        # max_hours=72.0 দেওয়া হলো যাতে কোনোভাবেই টাইম-আউট না হয়
-        t_start = find_transition(jd_search_start, tithi_index, max_hours=72.0)
-        t_end = find_transition(jd_target, tithi_index, max_hours=72.0)
+        t_start = find_transition(jd_search, tithi_index, max_hours=72.0)
+        t_end = find_transition(jd_base, tithi_index, max_hours=72.0)
 
         # ২. তিথির শুরু, সমাপ্তি ও পরের দিনের লজিক
         if t_start and t_end:
@@ -1605,7 +1562,6 @@ def compute_full_drik_panchang(
         ]
         is_non_hindu = any(kw in fest_name.lower() for kw in non_hindu_kws)
         
-        # যদি নন-হিন্দু উৎসব হয়, তবে পূজার সময় লুকানো হবে
         if is_non_hindu or fest_cat in ["national", "islamic", "christian", "observance", "bank holiday"]:
             p_title = ""
             p_time = ""
