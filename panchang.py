@@ -1312,7 +1312,7 @@ def compute_full_drik_panchang(
         lunar_masa = amanta_masa
 
     # ==========================================================================
-    # ক্ষয় তিথি ডিটেকশন এবং ১-৩০ পর্যন্ত টানা সংখ্যা (Vikram/Gujarati)
+    # ক্ষয় তিথি ডিটেকশন (Vikram/Gujarati 1-15 Format)
     # ==========================================================================
     sun_lon_rise, moon_lon_rise = sidereal_longitudes(jd_sunrise)
     t_idx = int(((moon_lon_rise - sun_lon_rise) % 360.0) / 12.0) % 30
@@ -1322,8 +1322,8 @@ def compute_full_drik_panchang(
     
     paksha_val = "Shukla" if t_idx < 15 else "Krishna"
     
-    # এখানে ১৫ এর বদলে সরাসরি ১ থেকে ৩০ পর্যন্ত নেওয়া হচ্ছে
-    t_num_cur = t_idx + 1
+    # শুক্ল বা কৃষ্ণ যাই হোক, ১ থেকে ১৫ ফরম্যাটে কনভার্ট করা হলো
+    t_num_cur = (t_idx % 15) + 1
 
     # ২. দিনের মধ্যে তিথি ক্ষয় হয়েছে কি না পরীক্ষা
     tithi_step = (t_idx_next - t_idx) % 30
@@ -1332,10 +1332,10 @@ def compute_full_drik_panchang(
     if tithi_step > 1 and tithi_step < 5:
         for skipped in range(1, tithi_step):
             skipped_idx = (t_idx + skipped) % 30
-            # ক্ষয় তিথির ক্ষেত্রেও টানা সংখ্যা (১-৩০) যুক্ত হবে
-            active_tithi_nums.append(skipped_idx + 1)
+            # ক্ষয় তিথির ক্ষেত্রেও ১-১৫ ফরম্যাটে যুক্ত হবে
+            active_tithi_nums.append((skipped_idx % 15) + 1)
             
-    # ৩. হেডার টেক্সট তৈরি (যেমন: "8, 9", "16, 17", অথবা সাধারণ "18")
+    # ৩. হেডার টেক্সট তৈরি (যেমন: "5, 6", "14, 15")
     lunar_day_formatted = ", ".join(str(n) for n in active_tithi_nums)
 
     # ==========================================================================
