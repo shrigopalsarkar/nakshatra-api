@@ -1809,32 +1809,65 @@ def compute_full_drik_panchang(
     t_num_str = to_indic(t_num_cur, lang_key)
     vs_year_str = to_indic(samvat_year, lang_key)
     
-    # গুজরাটি সাল কার্তিক মাস থেকে পাল্টায় (Kartikadi System)
+    # গুজরাটি সাল (কার্তিকাদি সিস্টেম - অমাবস্যান্ত)
     guj_year = samvat_year if amanta_masa in ["Kartika", "Margashirsha", "Pausha", "Magha", "Phalguna"] else samvat_year - 1
     guj_year_str = to_indic(guj_year, lang_key)
     
-    # শকাব্দ সাল
-    shaka_year = samvat_year - 135
-    shaka_year_str = to_indic(shaka_year, lang_key)
+    # ==========================================================
+    # শকাব্দ ক্যালকুলেশন (Solar Indian National Calendar) 
+    # ==========================================================
+    # শকাব্দে কোনো "পক্ষ" থাকে না। এটি সম্পূর্ণ সৌর পঞ্জিকা।
+    def get_shaka_date(g_date):
+        import calendar
+        leap = calendar.isleap(g_date.year)
+        doy = g_date.timetuple().tm_yday
+        chaitra_start = 81 if not leap else 80
+        if doy < chaitra_start:
+            s_y = g_date.year - 79
+            doy += 365 if not calendar.isleap(g_date.year - 1) else 366
+        else:
+            s_y = g_date.year - 78
+        offset = doy - chaitra_start
+        chaitra_len = 31 if leap else 30
+        m_lens = [("Chaitra", chaitra_len), ("Vaisakha", 31), ("Jyeshtha", 31), ("Ashadha", 31), 
+                  ("Shravana", 31), ("Bhadrapada", 31), ("Ashvina", 30), ("Kartika", 30), 
+                  ("Margashirsha", 30), ("Pausha", 30), ("Magha", 30), ("Phalguna", 30)]
+        s_d = offset + 1
+        s_m_name = ""
+        for m_n, m_l in m_lens:
+            if s_d <= m_l:
+                s_m_name = m_n
+                break
+            s_d -= m_l
+        return s_d, s_m_name, s_y
+
+    shaka_d, shaka_m, shaka_y = get_shaka_date(local_date)
+    shaka_day_str = to_indic(shaka_d, lang_key)
+    shaka_year_str = to_indic(shaka_y, lang_key)
     
+    # মাসের লোকাল নাম
     bn_masa = {"Chaitra": "চৈত্র", "Vaisakha": "বৈশাখ", "Jyeshtha": "জ্যৈষ্ঠ", "Ashadha": "আষাঢ়", "Shravana": "শ্রাবণ", "Bhadrapada": "ভাদ্রপদ", "Ashvina": "আশ্বিন", "Kartika": "কার্তিক", "Margashirsha": "অগ্রহায়ণ", "Pausha": "পৌষ", "Magha": "মাঘ", "Phalguna": "ফাল্গুন"}
     hi_masa = {"Chaitra": "चैत्र", "Vaisakha": "वैशाख", "Jyeshtha": "ज्येष्ठ", "Ashadha": "आषाढ़", "Shravana": "श्रावण", "Bhadrapada": "भाद्रपद", "Ashvina": "आश्विन", "Kartika": "कार्तिक", "Margashirsha": "मार्गशीर्ष", "Pausha": "पौष", "Magha": "माघ", "Phalguna": "फाल्गुन"}
 
     loc_masa = bn_masa.get(lunar_masa, lunar_masa) if lang_key == "bn" else hi_masa.get(lunar_masa, lunar_masa) if lang_key == "hi" else lunar_masa
     loc_amanta_masa = bn_masa.get(amanta_masa, amanta_masa) if lang_key == "bn" else hi_masa.get(amanta_masa, amanta_masa) if lang_key == "hi" else amanta_masa
+    loc_shaka_masa = bn_masa.get(shaka_m, shaka_m) if lang_key == "bn" else hi_masa.get(shaka_m, shaka_m) if lang_key == "hi" else shaka_m
 
+    # ==========================================================
+    # ফাইনাল আউটপুট (যাতে শকাব্দ এবং গুজরাটিতে 'পক্ষ' না দেখায়)
+    # ==========================================================
     if lang_key == "bn":
         vk_full = f"{t_num_str} {loc_masa}, {paksha_display}, {vs_year_str} বিক্রম সংবৎ"
-        gj_full = f"{t_num_str} {loc_amanta_masa}, {paksha_display}, {guj_year_str} গুজরাটি সংবৎ"
-        sk_full = f"{t_num_str} {loc_masa}, {paksha_display}, {shaka_year_str} শকাব্দ"
+        gj_full = f"{t_num_str} {loc_amanta_masa}, {guj_year_str} গুজরাটি সংবৎ"
+        sk_full = f"{shaka_day_str} {loc_shaka_masa}, {shaka_year_str} শকাব্দ"
     elif lang_key == "hi":
         vk_full = f"{t_num_str} {loc_masa}, {paksha_display}, {vs_year_str} विक्रम संवत"
-        gj_full = f"{t_num_str} {loc_amanta_masa}, {paksha_display}, {guj_year_str} गुजराती संवत"
-        sk_full = f"{t_num_str} {loc_masa}, {paksha_display}, {shaka_year_str} शक संवत"
+        gj_full = f"{t_num_str} {loc_amanta_masa}, {guj_year_str} गुजराती संवत"
+        sk_full = f"{shaka_day_str} {loc_shaka_masa}, {shaka_year_str} शक संवत"
     else:
         vk_full = f"{t_num_str} {loc_masa}, {paksha_display}, {vs_year_str} Vikram Samvat"
-        gj_full = f"{t_num_str} {loc_amanta_masa}, {paksha_display}, {guj_year_str} Gujarati Samvat"
-        sk_full = f"{t_num_str} {loc_masa}, {paksha_display}, {shaka_year_str} Shaka Samvat"
+        gj_full = f"{t_num_str} {loc_amanta_masa}, {guj_year_str} Gujarati Samvat"
+        sk_full = f"{shaka_day_str} {loc_shaka_masa}, {shaka_year_str} Shaka Samvat"
 
     return {
         # রাশি ও সূর্য স্থিতি
@@ -1949,24 +1982,52 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
         if bengali_solar_day == 0:
             bengali_solar_day = 1
             
-        # ২. সংবৎ চান্দ্র তিথি
+        # ২. সংবৎ চান্দ্র তিথি (ক্ষয় তিথি সমন্বয় সহ)
         t_num = day_panchang.get("lunar_day", 1)
+        t_str = day_panchang.get("lunar_day_str", str(t_num))
         paksha = day_panchang.get("paksha", "Shukla")
         
-        # ৩. শকাব্দ সৌর তারিখ
-        saka_solar_day = (d + 9) % 30 + 1
+        # ৩. শকাব্দ সৌর তারিখ (সম্পূর্ণ সৌর হিসাব)
+        # শকাব্দ চৈত্র মাসের শুরু (২২/২৩ মার্চ) থেকে হিসাব হয়, তাই এখানে একটি নিখুঁত গাণিতিক ফাংশন ব্যবহার করা হলো।
+        def get_shaka_day_only(g_date):
+            leap = calendar.isleap(g_date.year)
+            doy = g_date.timetuple().tm_yday
+            chaitra_start = 81 if not leap else 80
+            if doy < chaitra_start:
+                doy += 365 if not calendar.isleap(g_date.year - 1) else 366
+            offset = doy - chaitra_start
+            chaitra_len = 31 if leap else 30
+            m_lens = [chaitra_len, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 30]
+            s_d = offset + 1
+            for m_l in m_lens:
+                if s_d <= m_l: break
+                s_d -= m_l
+            return s_d
+
+        saka_solar_day = get_shaka_day_only(dt)
         
+        # ক্যালেন্ডার অনুযায়ী প্রধান তারিখ নির্বাচন
         if cal_type == "bengali":
             main_date = bengali_solar_day
-        elif cal_type in ["vikram", "gujarati"]:
+            date_str = str(main_date)
+        elif cal_type == "vikram":
             main_date = t_num
+            # ক্ষয় তিথি থাকলে "5, 6" দেখাবে
+            date_str = t_str
+        elif cal_type == "gujarati":
+            main_date = t_num
+            # গুজরাটি ক্যালেন্ডার কৃষ্ণপক্ষে ১৬ থেকে ৩০ পর্যন্ত গোনে (যেমন: কৃষ্ণ প্রথমা = ১৬)
+            if paksha == "Krishna" or paksha == "কৃষ্ণ পক্ষ" or paksha == "कृष्ण पक्ष":
+                main_date = t_num + 15
+            date_str = str(main_date)
         elif cal_type == "shaka":
             main_date = saka_solar_day
+            date_str = str(main_date)
         else:
             main_date = d
+            date_str = str(main_date)
 
         # ভাষা অনুযায়ী সংখ্যা রূপান্তর
-        date_str = str(main_date)
         if lang == "bn": date_str = date_str.translate(str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯'))
         elif lang == "hi": date_str = date_str.translate(str.maketrans('0123456789', '०१२३४५६७८९'))
 
@@ -1999,11 +2060,15 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
     sk_full = mid_panchang.get("shaka_samvat_full", "")
     
     # '১০ জ্যৈষ্ঠ, শুক্ল পক্ষ, ২০৫১ বিক্রম সংবৎ' -> এখান থেকে শুধু 'জ্যৈষ্ঠ ২০৫১ বিক্রম সংবৎ' বের করা হচ্ছে
-    def extract_month_year(full_string):
+    def extract_month_year(full_string, is_shaka=False):
         parts = full_string.split(',')
-        if len(parts) >= 3:
+        if len(parts) >= 3 and not is_shaka:
             month_part = parts[0].split(' ', 1)[-1].strip()
             year_part = parts[2].strip()
+            return f"{month_part} {year_part}"
+        elif len(parts) >= 2 and is_shaka: # শকাব্দের ফরম্যাট '৮ আশ্বিন, ১৯৪৮ শকাব্দ'
+            month_part = parts[0].split(' ', 1)[-1].strip()
+            year_part = parts[1].strip()
             return f"{month_part} {year_part}"
         return full_string
 
@@ -2013,7 +2078,7 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
     elif cal_type == "gujarati":
         header_title = extract_month_year(gj_full)
     elif cal_type == "shaka":
-        header_title = extract_month_year(sk_full)
+        header_title = extract_month_year(sk_full, is_shaka=True)
     elif cal_type == "bengali":
         jd_sun_mid = to_jd_ut(datetime(year, month, 15, 6, 0, tzinfo=IST))
         s_lon_mid, _ = sidereal_longitudes(jd_sun_mid)
@@ -2032,6 +2097,6 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
         "year": year,
         "month": month,
         "cal_type": cal_type,
-        "header_title": header_title,  # <-- এই নতুন ফিল্ডটি অ্যাপের হেডারে বসবে
+        "header_title": header_title,
         "month_days": days_data
     }
