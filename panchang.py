@@ -2112,4 +2112,3 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
         "header_title": header_title,
         "month_days": days_data
     }
-    }
