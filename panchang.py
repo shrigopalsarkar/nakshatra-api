@@ -1475,9 +1475,19 @@ def compute_full_drik_panchang(
     # সূর্যোদয় ও সূর্যাস্তের মোট মিনিট
     rise_total_min = int(dt_rise.hour * 60 + dt_rise.minute)
     set_total_min = int(dt_set.hour * 60 + dt_set.minute)
-    
-    # === আপনি ঠিক এই লাইনটিই মিসিং ধরেছিলেন, এটি ফিরিয়ে আনা হলো ===
-    jd_midnight = (jd_sunset + jd_next_sunrise) / 2.0 
+
+    # ==========================================================
+    # --- মূল তিথির শুরুর সময় নির্ণয় (Global Tithi Start - Fixed for all cities) ---
+    # ==========================================================
+    # আমরা দিনের বর্তমান তিথিটিকে (t_idx) টার্গেট করছি, যা পুরো পৃথিবীর জন্য ফিক্সড
+    jd_t_start_search = jd_sunrise
+    guard = 0
+    while tithi_index(jd_t_start_search) == t_idx and guard < 40:
+        jd_t_start_search -= 0.1
+        guard += 1
+        
+    tithi_start_jd = find_transition(jd_t_start_search, tithi_index, max_hours=36.0)
+    tithi_end_jd = t_end  # t_end আগে থেকেই গ্লোবালি ক্যালকুলেট করা আছে
 
     # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি
     for fest in today_festivals:
@@ -1486,31 +1496,10 @@ def compute_full_drik_panchang(
         fest_name = str(fest.get("name", ""))
         fest_cat = str(fest.get("category", "")).lower()
 
-        # ==========================================================
-        # ১. সঠিক উৎসব তিথি নির্ণয় (Location & Time Specific) - RESTORED
-        # ==========================================================
-        if m_type == "nishita":
-            jd_target = jd_midnight
-        elif m_type in ["pradosh", "sayankal"]:
-            jd_target = jd_sunset
-        else:
-            jd_target = jd_sunrise
-
-        target_tithi_idx = tithi_index(jd_target)
-
-        jd_search_start = jd_target
-        guard_start = 0
-        while tithi_index(jd_search_start) == target_tithi_idx and guard_start < 40:
-            jd_search_start -= 0.1
-            guard_start += 1
-            
-        t_start = find_transition(jd_search_start, tithi_index, max_hours=36.0)
-        t_end = find_transition(jd_target, tithi_index, max_hours=36.0)
-
-        # ২. তিথির শুরু, সমাপ্তি ও পরের দিনের লজিক 
-        if t_start and t_end:
-            t_start_dt = jd_to_local(t_start)
-            t_end_dt = jd_to_local(t_end)
+        # ১. তিথির শুরু, সমাপ্তি ও পরের দিনের লজিক (Global Precision)
+        if tithi_start_jd and tithi_end_jd:
+            t_start_dt = jd_to_local(tithi_start_jd)
+            t_end_dt = jd_to_local(tithi_end_jd)
             
             diff_days = (t_end_dt.date() - local_date).days
             m_idx = t_end_dt.month - 1
@@ -1537,7 +1526,7 @@ def compute_full_drik_panchang(
         else:
             tithi_str = ""
 
-        # ৩. "পূজা" বনাম "শুভ মুহূর্ত" নির্ণয়
+        # ২. "পূজা" বনাম "শুভ মুহূর্ত" নির্ণয়
         social_keywords = [
             "rakhi", "bhai dooj", "bhai phonta", "bhai tika", "bhaidooj", "phonta", "dooj", 
             "new year", "labh pancham", "jamai", "aranya sasthi", 
@@ -1594,7 +1583,7 @@ def compute_full_drik_panchang(
             p_time = f"{kaal_name} ({fmt_m(abhijit_s)} - {fmt_m(abhijit_e)})"
             p_title = main_title
 
-        # ৪. Non-Hindu / National Festivals Safety (Smart Keyword Check)
+        # ৩. Non-Hindu / National Festivals Safety (Smart Keyword Check)
         non_hindu_kws = [
             "jayanti", "gandhi", "bose", "netaji", "bhagat", "eid", "al-fitr", "al-adha", 
             "muharram", "christmas", "good friday", "republic", "independence", "international", 
@@ -1613,7 +1602,7 @@ def compute_full_drik_panchang(
         else:
             fest["tithi_span_title"] = "উৎসবের সময়সীমা / তিথি মান:" if lang_key == "bn" else ("पर्व / तिथि समय अवधि:" if lang_key == "hi" else "Festival / Tithi Span:")
         
-        # ৫. সমস্ত ফিল্ড আপডেট করা
+        # ৪. সমস্ত ফিল্ড আপডেট করা
         fest["tithi_span_time"] = tithi_str
         
         fest["puja_muhurta_title"] = p_title
