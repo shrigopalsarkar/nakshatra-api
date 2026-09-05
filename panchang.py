@@ -1798,6 +1798,44 @@ def compute_full_drik_panchang(
     niwas_shool["kumbha_chakra_desc"] = kumbha_dirs[s_rashi_idx % 4].get(f"desc_{lang_key}", kumbha_dirs[s_rashi_idx % 4]["desc_en"])
     # ==========================================================
 
+    # ==========================================================
+    # অন্যান্য ক্যালেন্ডারের সম্পূর্ণ তারিখ (Full Date Strings)
+    # ==========================================================
+    def to_indic(num_str, lang):
+        if lang == "bn": return str(num_str).translate(str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯'))
+        elif lang == "hi": return str(num_str).translate(str.maketrans('0123456789', '०१२३४५६७८९'))
+        return str(num_str)
+
+    t_num_str = to_indic(t_num_cur, lang_key)
+    vs_year_str = to_indic(samvat_year, lang_key)
+    
+    # গুজরাটি সাল কার্তিক মাস থেকে পাল্টায় (Kartikadi System)
+    guj_year = samvat_year if amanta_masa in ["Kartika", "Margashirsha", "Pausha", "Magha", "Phalguna"] else samvat_year - 1
+    guj_year_str = to_indic(guj_year, lang_key)
+    
+    # শকাব্দ সাল
+    shaka_year = samvat_year - 135
+    shaka_year_str = to_indic(shaka_year, lang_key)
+    
+    bn_masa = {"Chaitra": "চৈত্র", "Vaisakha": "বৈশাখ", "Jyeshtha": "জ্যৈষ্ঠ", "Ashadha": "আষাঢ়", "Shravana": "শ্রাবণ", "Bhadrapada": "ভাদ্রপদ", "Ashvina": "আশ্বিন", "Kartika": "কার্তিক", "Margashirsha": "অগ্রহায়ণ", "Pausha": "পৌষ", "Magha": "মাঘ", "Phalguna": "ফাল্গুন"}
+    hi_masa = {"Chaitra": "चैत्र", "Vaisakha": "वैशाख", "Jyeshtha": "ज्येष्ठ", "Ashadha": "आषाढ़", "Shravana": "श्रावण", "Bhadrapada": "भाद्रपद", "Ashvina": "आश्विन", "Kartika": "कार्तिक", "Margashirsha": "मार्गशीर्ष", "Pausha": "पौष", "Magha": "माघ", "Phalguna": "फाल्गुन"}
+
+    loc_masa = bn_masa.get(lunar_masa, lunar_masa) if lang_key == "bn" else hi_masa.get(lunar_masa, lunar_masa) if lang_key == "hi" else lunar_masa
+    loc_amanta_masa = bn_masa.get(amanta_masa, amanta_masa) if lang_key == "bn" else hi_masa.get(amanta_masa, amanta_masa) if lang_key == "hi" else amanta_masa
+
+    if lang_key == "bn":
+        vk_full = f"{t_num_str} {loc_masa}, {paksha_display}, {vs_year_str} বিক্রম সংবৎ"
+        gj_full = f"{t_num_str} {loc_amanta_masa}, {paksha_display}, {guj_year_str} গুজরাটি সংবৎ"
+        sk_full = f"{t_num_str} {loc_masa}, {paksha_display}, {shaka_year_str} শকাব্দ"
+    elif lang_key == "hi":
+        vk_full = f"{t_num_str} {loc_masa}, {paksha_display}, {vs_year_str} विक्रम संवत"
+        gj_full = f"{t_num_str} {loc_amanta_masa}, {paksha_display}, {guj_year_str} गुजराती संवत"
+        sk_full = f"{t_num_str} {loc_masa}, {paksha_display}, {shaka_year_str} शक संवत"
+    else:
+        vk_full = f"{t_num_str} {loc_masa}, {paksha_display}, {vs_year_str} Vikram Samvat"
+        gj_full = f"{t_num_str} {loc_amanta_masa}, {paksha_display}, {guj_year_str} Gujarati Samvat"
+        sk_full = f"{t_num_str} {loc_masa}, {paksha_display}, {shaka_year_str} Shaka Samvat"
+
     return {
         # রাশি ও সূর্য স্থিতি
         "moonsign": dynamic_moonsign,
@@ -1847,6 +1885,9 @@ def compute_full_drik_panchang(
         "karana_next_name": KARANA_NAMES_MOVABLE[(k_idx) % 7],
         "karana_type": "Fixed" if (k_idx % 60) in KARANA_FIXED else "Movable",
         "pada_timeline": pada_timeline,
+        "vikram_samvat_full": vk_full,
+        "gujarati_samvat_full": gj_full,
+        "shaka_samvat_full": sk_full,
         "nakshatra_pada_display": f"{NAKSHATRAS[n_idx]} (Pada {pada_timeline[0]['pada'] if pada_timeline else 1})",
         
         # অহোরাত্র কাল বিভাজন (Day-Night Timeline)
