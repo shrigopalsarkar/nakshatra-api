@@ -1964,64 +1964,55 @@ BENGALI_DIGITS = str.maketrans("0123456789", "০১২৩৪৫৬৭৮৯")
 def to_bengali_num(n: int | str) -> str:
     return str(n).translate(BENGALI_DIGITS)
 
+# ==============================================================================
+# বৈদিক সংবৎ এবং বাংলা সৌর পঞ্জিকা মাসিক ক্যালেন্ডার জেনারেটর
+# ==============================================================================
 def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", lat: float = 22.5726, lon: float = 88.3639, lang: str = "bn"):
     import calendar
+    import re
     from datetime import timedelta
     num_days = calendar.monthrange(year, month)[1]
     days_data = []
 
-    # মাসের মাঝামাঝি (১৫ তারিখের) ডেটা নিচ্ছি
     mid_dt = date(year, month, 15)
     mid_panchang = compute_full_drik_panchang(mid_dt, lat=lat, lon=lon, lang=lang, time_format="12hr")
 
-    # ====================================================================
-    # 🚀 SMART KSHAYA TITHI DETECTOR (100% Bulletproof)
-    # প্রথম ধাপে পুরো মাসের তিথিগুলো কালেক্ট করা হচ্ছে
-    # ====================================================================
     tithi_array = []
     panchang_array = []
     for d in range(1, num_days + 1):
         dt = date(year, month, d)
         day_panchang = compute_full_drik_panchang(dt, lat=lat, lon=lon, lang=lang, time_format="12hr")
         t_num = day_panchang.get("lunar_day", 1)
-        t_num_1_to_15 = (t_num - 1) % 15 + 1  # নিশ্চিত ১-১৫ ফরম্যাট
+        t_num_1_to_15 = (t_num - 1) % 15 + 1
         tithi_array.append(t_num_1_to_15)
         panchang_array.append(day_panchang)
 
-    # মাসের শেষ দিনের ক্ষয় তিথি বোঝার জন্য পরের মাসের ১ তারিখের তিথিও লাগবে
     next_month_dt = date(year + (month // 12), (month % 12) + 1, 1)
     next_month_panchang = compute_full_drik_panchang(next_month_dt, lat=lat, lon=lon, lang=lang, time_format="12hr")
     next_month_first_tithi = (next_month_panchang.get("lunar_day", 1) - 1) % 15 + 1
     tithi_array.append(next_month_first_tithi)
 
-    # ====================================================================
-    # গ্রিড তৈরি এবং নিখুঁত স্ট্রিং জেনারেট
-    # ====================================================================
     for i, d in enumerate(range(1, num_days + 1)):
         dt = date(year, month, d)
         day_panchang = panchang_array[i]
 
-        # ১. বাংলা সৌর তারিখ
         jd_day_sun = to_jd_ut(datetime(year, month, d, 6, 0, tzinfo=IST))
         s_lon, _ = sidereal_longitudes(jd_day_sun)
         bengali_solar_day = int(s_lon % 30.0)
         if bengali_solar_day == 0: bengali_solar_day = 1
 
-        # ২. সংবৎ চান্দ্র তিথি (ম্যাজিক লজিক)
         t_num = tithi_array[i]
         next_t_num = tithi_array[i+1]
-
         expected_next = (t_num % 15) + 1
         
-        # যদি কালকের তিথি (next_t_num) আজকের পরের সিরিয়াল না হয় (যেমন ৫ এর পর ৭)
+        # 🚀 ক্ষয় তিথি লজিক:
         if next_t_num != expected_next and next_t_num != t_num:
-            t_str = f"{t_num}, {expected_next}" # ক্ষয় তিথি ধরা পড়েছে!
+            t_str = f"{t_num}, {expected_next}"
         else:
             t_str = str(t_num)
 
         paksha = day_panchang.get("paksha", "Shukla")
 
-        # ৩. শকাব্দ সৌর তারিখ
         def get_shaka_day_only(g_date):
             leap = calendar.isleap(g_date.year)
             doy = g_date.timetuple().tm_yday
@@ -2039,13 +2030,12 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
 
         saka_solar_day = get_shaka_day_only(dt)
 
-        # ৪. ক্যালেন্ডার অনুযায়ী প্রধান তারিখ নির্বাচন
         if cal_type == "bengali":
             main_date = bengali_solar_day
             date_str = str(main_date)
         elif cal_type == "vikram" or cal_type == "gujarati":
             main_date = t_num
-            date_str = t_str # এখানে যাবে আমাদের নিখুঁত "5, 6" স্ট্রিং
+            date_str = t_str 
         elif cal_type == "shaka":
             main_date = saka_solar_day
             date_str = str(main_date)
@@ -2053,24 +2043,18 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
             main_date = d
             date_str = str(main_date)
 
-        # ভাষা অনুযায়ী সংখ্যা রূপান্তর
         if lang == "bn":
             date_str = date_str.translate(str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯'))
         elif lang == "hi":
             date_str = date_str.translate(str.maketrans('0123456789', '०१२३४५६७८९'))
 
-        # ফুল ডেট স্ট্রিং (আগে থেকে যা ছিল)
         if cal_type == "vikram": full_str = day_panchang.get("vikram_samvat_full", "")
         elif cal_type == "gujarati": full_str = day_panchang.get("gujarati_samvat_full", "")
         elif cal_type == "shaka": full_str = day_panchang.get("shaka_samvat_full", "")
         else: full_str = ""
 
-        # =====================================================================
-        # 🚀 MAGIC FIX: পপআপ হেডার এবং lunar_day_str এর জন্য আপনার কথামতো আপডেট
-        # =====================================================================
-        import re
+        # 🚀 পপআপ হেডারের জন্য ডেটা আপডেট (যাতে 5, 6 থাকে)
         if (cal_type == "vikram" or cal_type == "gujarati") and full_str:
-            # এটি "5 Bhadrapada" বা "৫ ভাদ্রপদ" এর শুরুর সংখ্যাটিকে জোর করে "5, 6" বা "৫, ৬" করে দেবে
             full_str = re.sub(r'^[\d০-৯०-९]+', date_str, full_str)
 
         days_data.append({
@@ -2081,8 +2065,8 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
             "main_era_date": main_era_date,
             "main_era_date_str": date_str,
             "displayEraDate": date_str,
-            "lunar_day_str": date_str,        # <-- 🚀 আপনার কথামতো নতুন ভ্যারিয়েবল অ্যাড করা হলো!
-            "full_date_string": full_str,     # <-- 🚀 এখানে এখন "5, 6 Bhadrapada..." যাবে
+            "lunar_day_str": date_str,        # 🚀 আপনার কথামতো lunar_day_str অ্যাড করা হলো
+            "full_date_string": full_str,     # 🚀 এখানে "5, 6 Bhadrapada..." যাবে
             "tithi_name": day_panchang.get("tithi_display", ""),
             "tithi_end": day_panchang.get("tithi_end", ""),
             "nakshatra_name": day_panchang.get("nakshatra_name", ""),
@@ -2090,9 +2074,6 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
             "festivals": day_panchang.get("festivals", [])
         })
 
-    # =========================================================
-    # স্মার্ট ক্যালেন্ডার হেডার জেনারেটর (Smart Header Title)
-    # =========================================================
     vk_full = mid_panchang.get("vikram_samvat_full", "")
     gj_full = mid_panchang.get("gujarati_samvat_full", "")
     sk_full = mid_panchang.get("shaka_samvat_full", "")
@@ -2106,12 +2087,9 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
         return full_string
 
     header_title = ""
-    if cal_type == "vikram":
-        header_title = extract_month_year(vk_full)
-    elif cal_type == "gujarati":
-        header_title = extract_month_year(gj_full)
-    elif cal_type == "shaka":
-        header_title = extract_month_year(sk_full)
+    if cal_type == "vikram": header_title = extract_month_year(vk_full)
+    elif cal_type == "gujarati": header_title = extract_month_year(gj_full)
+    elif cal_type == "shaka": header_title = extract_month_year(sk_full)
     elif cal_type == "bengali":
         jd_sun_mid = to_jd_ut(datetime(year, month, 15, 6, 0, tzinfo=IST))
         s_lon_mid, _ = sidereal_longitudes(jd_sun_mid)
