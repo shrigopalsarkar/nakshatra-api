@@ -2062,11 +2062,11 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
             "gregorian_day": d,
             "gregorian_month_name": dt.strftime("%b"),
             "weekday_index": dt.weekday(),
-            "main_era_date": main_era_date,
+            "main_era_date": main_date,        # 🚀 FIX: ক্র্যাশের আসল কারণ! এখানে main_era_date এর বদলে main_date হবে
             "main_era_date_str": date_str,
             "displayEraDate": date_str,
-            "lunar_day_str": date_str,        # 🚀 আপনার কথামতো lunar_day_str অ্যাড করা হলো
-            "full_date_string": full_str,     # 🚀 এখানে "5, 6 Bhadrapada..." যাবে
+            "lunar_day_str": date_str,         # 🚀 আপনার 5, 6 ডেটা এখানে বসবে
+            "full_date_string": full_str,      # 🚀 এখানে "5, 6 Bhadrapada..." বসবে
             "tithi_name": day_panchang.get("tithi_display", ""),
             "tithi_end": day_panchang.get("tithi_end", ""),
             "nakshatra_name": day_panchang.get("nakshatra_name", ""),
