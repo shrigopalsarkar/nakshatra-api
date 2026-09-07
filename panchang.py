@@ -2059,21 +2059,30 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
         elif lang == "hi":
             date_str = date_str.translate(str.maketrans('0123456789', '०१२३४५६७८९'))
 
-        # ফুল ডেট স্ট্রিং
+        # ফুল ডেট স্ট্রিং (আগে থেকে যা ছিল)
         if cal_type == "vikram": full_str = day_panchang.get("vikram_samvat_full", "")
         elif cal_type == "gujarati": full_str = day_panchang.get("gujarati_samvat_full", "")
         elif cal_type == "shaka": full_str = day_panchang.get("shaka_samvat_full", "")
         else: full_str = ""
+
+        # =====================================================================
+        # 🚀 MAGIC FIX: পপআপ হেডার এবং lunar_day_str এর জন্য আপনার কথামতো আপডেট
+        # =====================================================================
+        import re
+        if (cal_type == "vikram" or cal_type == "gujarati") and full_str:
+            # এটি "5 Bhadrapada" বা "৫ ভাদ্রপদ" এর শুরুর সংখ্যাটিকে জোর করে "5, 6" বা "৫, ৬" করে দেবে
+            full_str = re.sub(r'^[\d০-৯०-९]+', date_str, full_str)
 
         days_data.append({
             "gregorian_date": dt.isoformat(),
             "gregorian_day": d,
             "gregorian_month_name": dt.strftime("%b"),
             "weekday_index": dt.weekday(),
-            "main_era_date": main_date,
+            "main_era_date": main_era_date,
             "main_era_date_str": date_str,
             "displayEraDate": date_str,
-            "full_date_string": full_str,
+            "lunar_day_str": date_str,        # <-- 🚀 আপনার কথামতো নতুন ভ্যারিয়েবল অ্যাড করা হলো!
+            "full_date_string": full_str,     # <-- 🚀 এখানে এখন "5, 6 Bhadrapada..." যাবে
             "tithi_name": day_panchang.get("tithi_display", ""),
             "tithi_end": day_panchang.get("tithi_end", ""),
             "nakshatra_name": day_panchang.get("nakshatra_name", ""),
