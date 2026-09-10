@@ -20,6 +20,8 @@ from datetime import datetime, timedelta, date
 from zoneinfo import ZoneInfo
 from dataclasses import dataclass
 from typing import List, Dict, Any, Optional
+from functools import lru_cache
+
 from festivals import get_festivals_for_day
 from panchang_meta import (
     TITHI_METADATA,
@@ -119,7 +121,7 @@ VARJYAM_START_GHATIS = [
 CHOGHADIYA_NAMES = {
     "en": {"Amrit": "Amrit", "Shubh": "Shubh", "Labh": "Labh", "Char": "Char", "Rog": "Rog", "Kaal": "Kaal", "Udveg": "Udveg"},
     "hi": {"Amrit": "अमृत", "Shubh": "शुभ", "Labh": "लाभ", "Char": "चल", "Rog": "रोग", "Kaal": "काल", "Udveg": "उद्वेग"},
-    "bn": {"Amrit": "অমৃত", "Shubh": "শুভ", "Labh": "লাভ", "Char": "চর", "Rog": "রোগ", "Kaal": "কাল", "Udveg": "উদ্বেগ"}
+    "bn": {"Amrit": "অমৃত", "Shubh": "শুভ", "Labh": "লাভ", "Char": "চর", "Rog": "रोग", "Kaal": "কাল", "Udveg": "উদ্বেग"}
 }
 CHOGHADIYA_ORDER = ["Udveg", "Char", "Labh", "Amrit", "Kaal", "Shubh", "Rog"]
 DAY_START_INDEX = {0: 3, 1: 6, 2: 2, 3: 5, 4: 1, 5: 4, 6: 0}
@@ -130,7 +132,7 @@ NIGHT_START_INDEX = {0: 1, 1: 4, 2: 0, 3: 3, 4: 6, 5: 2, 6: 5}
 # ==============================================================================
 SAMVATSARA_NAMES = [
     {"bn": "প্রভব", "hi": "प्रभव", "en": "Prabhava", "sa_iast": "Prabhava", "ruler": {"en": "Lord Brahma", "hi": "भगवान ब्रह्मा", "bn": "ভগবান ব্রহ্মা"}, "nature": {"en": "Highly Auspicious", "hi": "अत्यंत शुभ", "bn": "পরম শুভ"}},
-    {"bn": "বিভব", "hi": "विभव", "en": "Vibhava", "sa_iast": "Vibhava", "ruler": {"en": "Lord Brahma", "hi": "भगवान ब्रह्मा", "bn": "ভগবান ব্রহ্মা"}, "nature": {"en": "Auspicious", "hi": "शुभ ফলदायी", "bn": "শুভদায়ী"}},
+    {"bn": "বিভব", "hi": "विभव", "en": "Vibhava", "sa_iast": "Vibhava", "ruler": {"en": "Lord Brahma", "hi": "भगवान ब्रह्मा", "bn": "ভগবান ব্রহ্মা"}, "nature": {"en": "Auspicious", "hi": "शुभ फलदायी", "bn": "শুভদায়ী"}},
     {"bn": "শুক্ল", "hi": "शुक्ल", "en": "Shukla", "sa_iast": "Śukla", "ruler": {"en": "Lord Brahma", "hi": "भगवान ब्रह्मा", "bn": "ভগবান ব্রহ্মা"}, "nature": {"en": "Auspicious", "hi": "शुभ", "bn": "শুভ"}},
     {"bn": "প্রমোদ", "hi": "प्रमोद", "en": "Pramoda", "sa_iast": "Pramoda", "ruler": {"en": "Lord Brahma", "hi": "भगवान ब्रह्मा", "bn": "ভগবান ব্রহ্মা"}, "nature": {"en": "Joyous & Prosperous", "hi": "आनंद व समृद्धि", "bn": "আনন্দ ও সমৃদ্ধিদায়ক"}},
     {"bn": "প্রজাপতি (প্রজোৎপত্তি)", "hi": "प्रजापति (प्रजोत्पत्ति)", "en": "Prajapati (Prajotpatti)", "sa_iast": "Prajāpati", "ruler": {"en": "Lord Brahma", "hi": "भगवान ब्रह्मा", "bn": "ভগবান ব্রহ্মা"}, "nature": {"en": "Growth & Wealth", "hi": "वृद्धि व ऐश्वर्य", "bn": "প্রবৃদ্ধিদায়ক"}},
@@ -193,12 +195,9 @@ SAMVATSARA_NAMES = [
 
 def get_samvatsara_details(vikrama_samvat: int, lang: str = "en") -> Dict[str, Any]:
     vs = int(vikrama_samvat)
-    # যদি কোনো কারণে ভুল করে শকাব্দ (যেমন 1916) পাস হয়ে থাকে, তাকে বিক্রম সংবতে নিয়ে আসা
     if vs < 2000 and vs > 1800:
-        vs = vs + 135  # শকা থেকে বিক্রম রূপান্তর
+        vs = vs + 135 
 
-    # Brihat Samhita / Drik Standard: (VS + 9) % 60
-    # For VS 2051 -> (2051 + 9) % 60 = 20 -> 21st: Sarvajit
     idx = (vs + 9) % 60
     
     item = SAMVATSARA_NAMES[idx]
@@ -296,7 +295,7 @@ def find_transition(jd_start: float, target_fn, step_hours=0.5, max_hours=36.0):
         hours_scanned += step_hours
         if target_fn(jd) != start_index:
             lo, hi = prev_jd, jd
-            for _ in range(20):  # ৩৫ এর বদলে ২০ ইটারেশন যথেষ্ট নিখুঁত এবং সুপার ফাস্ট
+            for _ in range(20):
                 mid = (lo + hi) / 2.0
                 if target_fn(mid) == start_index:
                     lo = mid
@@ -306,6 +305,7 @@ def find_transition(jd_start: float, target_fn, step_hours=0.5, max_hours=36.0):
         prev_jd = jd
     return None
 
+@lru_cache(maxsize=512)
 def find_solar_ingress_forward(start_jd: float, target_deg: float, max_days: float = 380.0) -> datetime:
     jd = start_jd
     step = 1.0
@@ -325,8 +325,9 @@ def find_solar_ingress_forward(start_jd: float, target_deg: float, max_days: flo
         days += step
     return jd_to_local(start_jd)
 
-def get_governing_chaitra_pratipada(query_date: date, lat: float, lon: float) -> tuple[date, float]:
-    approx_mesha_jd = to_jd_ut(datetime(query_date.year, 4, 10, 0, 0, tzinfo=IST))
+@lru_cache(maxsize=32)
+def _cached_chaitra_pratipada(year: int, lat: float, lon: float) -> tuple[date, float]:
+    approx_mesha_jd = to_jd_ut(datetime(year, 4, 10, 0, 0, tzinfo=IST))
     mesha_dt = find_solar_ingress_forward(approx_mesha_jd - 25.0, 0.0, max_days=40.0)
     mesha_jd = to_jd_ut(mesha_dt)
 
@@ -357,13 +358,14 @@ def get_governing_chaitra_pratipada(query_date: date, lat: float, lon: float) ->
             chaitra_pratipada = d
             break
 
-    if query_date < chaitra_pratipada:
-        prev_mesha_approx = to_jd_ut(datetime(query_date.year - 1, 4, 10, 0, 0, tzinfo=IST))
-        prev_mesha_dt = find_solar_ingress_forward(prev_mesha_approx - 25.0, 0.0, max_days=40.0)
-        return get_governing_chaitra_pratipada(prev_mesha_dt.date() - timedelta(days=10), lat, lon)
-
     start_jd = to_jd_ut(datetime(chaitra_pratipada.year, chaitra_pratipada.month, chaitra_pratipada.day, 6, 0, tzinfo=IST))
     return chaitra_pratipada, start_jd
+
+def get_governing_chaitra_pratipada(query_date: date, lat: float, lon: float) -> tuple[date, float]:
+    cp, start_jd = _cached_chaitra_pratipada(query_date.year, lat, lon)
+    if query_date < cp:
+        return _cached_chaitra_pratipada(query_date.year - 1, lat, lon)
+    return cp, start_jd
 
 # ==============================================================================
 # ৩. বিক্রম সংবৎ মন্ত্রিসভা (১০টি পদ - DRIK MATCH)
@@ -377,191 +379,77 @@ def compute_mantri_mandala(
 ) -> List[Dict[str, Any]]:
 
     l_str = str(lang).lower().strip()
+    lang_key = "bn" if (l_str.startswith("bn") or "বাংলা" in l_str) else "hi" if (l_str.startswith("hi") or "हि" in l_str) else "en"
 
-    lang_key = (
-        "bn" if (l_str.startswith("bn") or "বাংলা" in l_str)
-        else "hi" if (l_str.startswith("hi") or "हि" in l_str)
-        else "en"
-    )
+    new_year_day, cycle_start_jd = get_governing_chaitra_pratipada(for_date, lat, lon)
+    
+    # 🚀 Call the CACHED helper instead of computing 10 ingresses every time!
+    return _cached_mantri_ingresses(new_year_day, cycle_start_jd, lat, lon, lang_key)
 
-    # ---------------------------------------------------------
-    # 1. Find governing Vikram Samvat / Chaitra Shukla Pratipada
-    # ---------------------------------------------------------
-    new_year_day, cycle_start_jd = get_governing_chaitra_pratipada(
-        for_date,
-        lat,
-        lon
-    )
 
-    # ---------------------------------------------------------
-    # 2. Solar / astronomical events
-    #    Longitudes are SIDEREAL
-    # ---------------------------------------------------------
-
+@lru_cache(maxsize=128)
+def _cached_mantri_ingresses(new_year_day: date, cycle_start_jd: float, lat: float, lon: float, lang_key: str) -> List[Dict[str, Any]]:
     # Minister — Mesha Sankranti (0°)
-    mesha_dt = find_solar_ingress_forward(
-        cycle_start_jd - 10.0,
-        0.0
-    )
+    mesha_dt = find_solar_ingress_forward(cycle_start_jd - 10.0, 0.0)
 
     # Phaladhipati — Mithuna Sankranti (60°)
-    mithun_dt = find_solar_ingress_forward(
-        cycle_start_jd + 50.0,
-        60.0
-    )
+    mithun_dt = find_solar_ingress_forward(cycle_start_jd + 50.0, 60.0)
 
     # Meghadhipati — Ardra Pravesha
-    ardra_dt = find_solar_ingress_forward(
-        cycle_start_jd + 60.0,
-        66.66667
-    )
+    ardra_dt = find_solar_ingress_forward(cycle_start_jd + 60.0, 66.66667)
 
     # Sasyadhipati — Karka Sankranti (90°)
-    karka_dt = find_solar_ingress_forward(
-        cycle_start_jd + 80.0,
-        90.0
-    )
+    karka_dt = find_solar_ingress_forward(cycle_start_jd + 80.0, 90.0)
 
     # Senadhipati — Simha Sankranti (120°)
-    simha_dt = find_solar_ingress_forward(
-        cycle_start_jd + 110.0,
-        120.0
-    )
+    simha_dt = find_solar_ingress_forward(cycle_start_jd + 110.0, 120.0)
 
-    # ---------------------------------------------------------
-    # IMPORTANT:
     # Dhanadhipati = Kanya Sankranti (150°)
-    #
-    # NOT Kumbha Sankranti (300°)
-    # ---------------------------------------------------------
-    kanya_dt = find_solar_ingress_forward(
-        cycle_start_jd + 140.0,
-        150.0
-    )
+    kanya_dt = find_solar_ingress_forward(cycle_start_jd + 140.0, 150.0)
 
     # Rasadhipati — Tula Sankranti (180°)
-    tula_dt = find_solar_ingress_forward(
-        cycle_start_jd + 170.0,
-        180.0
-    )
+    tula_dt = find_solar_ingress_forward(cycle_start_jd + 170.0, 180.0)
 
     # Dhanyadhipati — Dhanu Sankranti (240°)
-    dhanu_dt = find_solar_ingress_forward(
-        cycle_start_jd + 230.0,
-        240.0
-    )
+    dhanu_dt = find_solar_ingress_forward(cycle_start_jd + 230.0, 240.0)
 
     # Neerasadhipati — Makara Sankranti (270°)
-    makar_dt = find_solar_ingress_forward(
-        cycle_start_jd + 260.0,
-        270.0
-    )
-
-    # ---------------------------------------------------------
-    # 3. Mantri Mandala events
-    # ---------------------------------------------------------
+    makar_dt = find_solar_ingress_forward(cycle_start_jd + 260.0, 270.0)
 
     ingresses = [
-        {
-            "id": 1,
-            "dt": datetime(
-                new_year_day.year,
-                new_year_day.month,
-                new_year_day.day,
-                12,
-                0,
-                tzinfo=IST
-            )
-        },  # Raja — Chaitra Shukla Pratipada
-
-        {
-            "id": 2,
-            "dt": mesha_dt
-        },  # Mantri — Mesha Sankranti
-
-        {
-            "id": 3,
-            "dt": simha_dt
-        },  # Senadhipati — Simha Sankranti
-
-        {
-            "id": 4,
-            "dt": karka_dt
-        },  # Sasyadhipati — Karka Sankranti
-
-        {
-            "id": 5,
-            "dt": dhanu_dt
-        },  # Dhanyadhipati — Dhanu Sankranti
-
-        {
-            "id": 6,
-            "dt": ardra_dt
-        },  # Meghadhipati — Ardra Pravesha
-
-        {
-            "id": 7,
-            "dt": tula_dt
-        },  # Rasadhipati — Tula Sankranti
-
-        {
-            "id": 8,
-            "dt": mithun_dt
-        },  # Phaladhipati — Mithuna Sankranti
-
-        {
-            "id": 9,
-            "dt": kanya_dt
-        },  # Dhanadhipati — Kanya Sankranti
-
-        {
-            "id": 10,
-            "dt": makar_dt
-        },  # Neerasadhipati — Makara Sankranti
+        {"id": 1, "dt": datetime(new_year_day.year, new_year_day.month, new_year_day.day, 12, 0, tzinfo=IST)},  
+        {"id": 2, "dt": mesha_dt},  
+        {"id": 3, "dt": simha_dt},  
+        {"id": 4, "dt": karka_dt},  
+        {"id": 5, "dt": dhanu_dt},  
+        {"id": 6, "dt": ardra_dt},  
+        {"id": 7, "dt": tula_dt},  
+        {"id": 8, "dt": mithun_dt},  
+        {"id": 9, "dt": kanya_dt},  
+        {"id": 10, "dt": makar_dt},  
     ]
-
-    # ---------------------------------------------------------
-    # 4. Determine planetary lord from weekday
-    # ---------------------------------------------------------
 
     mantri_mandal_list = []
 
     for item in ingresses:
-
         p_id = item["id"]
-
         title, desc = PORTFOLIO_META[p_id][lang_key]
-
-        lord_key = get_vedic_weekday_from_dt(
-            item["dt"],
-            lat,
-            lon
-        )
-
+        lord_key = get_vedic_weekday_from_dt(item["dt"], lat, lon)
         planet_info = PLANET_MAP[lord_key]
 
         mantri_mandal_list.append({
             "id": p_id,
             "title": title,
             "description": desc,
-
             "planet_name": planet_info["name"][lang_key],
-
             "deity_name": planet_info["deity"][lang_key],
-
             "planet_icon": planet_info["icon"],
-
             "event_date": item["dt"].date().isoformat(),
-
-            # Useful for debugging / verification
             "event_weekday": lord_key,
-
             "event_datetime": item["dt"].isoformat()
         })
 
     return mantri_mandal_list
-
-
 
 
 # ==============================================================================
@@ -617,7 +505,6 @@ def compute_choghadiya(dt_rise: datetime, dt_set: datetime, weekday: int, lang_k
 # ==============================================================================
 
 def compute_niwas_and_shool(weekday: int, tithi_idx: int, moon_rashi_idx: int, lang_key: str = "en") -> dict:
-    # ১. দিশা শূল ও প্রতিষেধক
     shool_map = {
         0: {"dir": {"en": "West", "hi": "पश्चिम", "bn": "পশ্চিম"}, "remedy": {"en": "Betel Leaf (Paan)", "hi": "पान", "bn": "পান"}},
         1: {"dir": {"en": "East", "hi": "पूर्व", "bn": "পূর্ব"}, "remedy": {"en": "Mirror Seeing", "hi": "दर्पण", "bn": "দর্পণ দর্শন"}},
@@ -629,8 +516,6 @@ def compute_niwas_and_shool(weekday: int, tithi_idx: int, moon_rashi_idx: int, l
     }
     disha_info = shool_map[weekday]
 
-    # ২. অগ্নিবাস বিচার ((Tithi + Weekday + 1) % 4)
-    # 1: Prithvi (Auspicious), 2: Patala, 3: Swarga, 0: Vayu
     agni_calc = ((tithi_idx % 15 + 1) + (weekday + 1) + 1) % 4
     if agni_calc == 1:
         agnivasa = {"en": "Prithvi (Earth) - Auspicious for Havan", "hi": "पृथ्वी पर (शुभ फलदायी)", "bn": "পৃথিবীতে (হোম ও যজ্ঞের জন্য অত্যন্ত শুভ)"}
@@ -641,8 +526,6 @@ def compute_niwas_and_shool(weekday: int, tithi_idx: int, moon_rashi_idx: int, l
     else:
         agnivasa = {"en": "Akasha / Vayu (Sky) - Grief", "hi": "आकाश में (शोक कारक)", "bn": "আকাশে (শোকদায়ক)"}
 
-    # ৩. শিববাস বিচার ((Tithi * 2 + 5) % 7)
-    # 1: Kailash, 2: Nandi, 3: Sabha, 4: Krida, 5: Bhojana, 6: Smashana, 0: Dhyana
     shiva_calc = (((tithi_idx + 1) * 2) + 5) % 7
     if shiva_calc in [1, 2]:
         shivavasa = {"en": "Kailasa / Nandi - Auspicious for Rudrabhishek", "hi": "कैलाश/नंदी पर (रुद्राभिषेक हेतु शुभ)", "bn": "কৈলাস/নন্দীর পিঠে (রুদ্রাভিষেকের জন্য পরম শুভ)"}
@@ -651,12 +534,11 @@ def compute_niwas_and_shool(weekday: int, tithi_idx: int, moon_rashi_idx: int, l
     else:
         shivavasa = {"en": "Smashana / Dhyana - Avoid Rudrabhishek", "hi": "श्मशान/ध्यान में (अनर्थकारी)", "bn": "শ্মশান/ধ্যানমগ্ন (রুদ্রাভিষেক বর্জনীয়)"}
 
-    # ৪. চন্দ্র ও রাহু বাস
     rashi_dir = [
-        {"en": "East", "hi": "पूर्व", "bn": "পূর্ব"},       # Mesha
-        {"en": "South", "hi": "दक्षिण", "bn": "দক্ষিণ"},   # Vrishabha
-        {"en": "West", "hi": "पश्चिम", "bn": "পশ্চিম"},    # Mithuna
-        {"en": "North", "hi": "उत्तर", "bn": "উত্তর"},      # Karka
+        {"en": "East", "hi": "पूर्व", "bn": "পূর্ব"},       
+        {"en": "South", "hi": "दक्षिण", "bn": "দক্ষিণ"},   
+        {"en": "West", "hi": "पश्चिम", "bn": "পশ্চিম"},    
+        {"en": "North", "hi": "उत्तर", "bn": "উত্তর"},      
         {"en": "East", "hi": "पूर्व", "bn": "পূর্ব"},
         {"en": "South", "hi": "दक्षिण", "bn": "দক্ষিণ"},
         {"en": "West", "hi": "पश्चिम", "bn": "পশ্চিম"},
@@ -689,37 +571,32 @@ def compute_niwas_and_shool(weekday: int, tithi_idx: int, moon_rashi_idx: int, l
     }
 
 def compute_special_yogas(weekday: int, nak_idx: int, sun_nak_idx: int, lang_key: str = "en") -> dict:
-    # ১. ২৮ আনন্দাদি যোগ
-    # আনন্দাদি সূচক = (চন্দ্র নক্ষত্র - সূর্য নক্ষত্র + বার অফসেট) % ২৮
     anandadi_idx = (nak_idx - sun_nak_idx + (weekday * 4)) % 28
     anandadi_name = ANANDADI_YOGAS[anandadi_idx]
 
-    # ২. সর্বার্থ সিদ্ধি ও অমৃত সিদ্ধি যোগ
-    # Weekday: 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
     sarvartha_set = {
-        6: [12, 16, 21, 0, 3, 11],       # Sun: Hasta, Anuradha, Shravana, Ashwini, Rohini, Uttara Phalguni
-        0: [3, 4, 7, 16, 21],             # Mon: Rohini, Mrigashira, Pushya, Anuradha, Shravana
-        1: [0, 2],                        # Tue: Ashwini, Krittika
-        2: [3, 12, 16],                   # Wed: Rohini, Hasta, Anuradha
-        3: [6, 7, 16],                    # Thu: Punarvasu, Pushya, Anuradha
-        4: [0, 16, 26],                   # Fri: Ashwini, Anuradha, Revati
-        5: [3, 14, 21]                    # Sat: Rohini, Swati, Shravana
+        6: [12, 16, 21, 0, 3, 11],       
+        0: [3, 4, 7, 16, 21],             
+        1: [0, 2],                        
+        2: [3, 12, 16],                   
+        3: [6, 7, 16],                    
+        4: [0, 16, 26],                   
+        5: [3, 14, 21]                    
     }
     amrita_set = {
-        6: [12],                          # Sun: Hasta
-        0: [4],                           # Mon: Mrigashira
-        1: [0],                           # Tue: Ashwini
-        2: [16],                          # Wed: Anuradha
-        3: [7],                           # Thu: Pushya
-        4: [26],                          # Fri: Revati
-        5: [3]                            # Sat: Rohini
+        6: [12],                          
+        0: [4],                           
+        1: [0],                           
+        2: [16],                          
+        3: [7],                           
+        4: [26],                          
+        5: [3]                            
     }
 
     is_sarvartha = nak_idx in sarvartha_set.get(weekday, [])
     is_amrita = nak_idx in amrita_set.get(weekday, [])
     is_ravi_yoga = ((nak_idx - sun_nak_idx) % 27) in [3, 5, 8, 9, 12, 19]
 
-    # ৩. তামিল যোগ (Siddha, Amrita, Marana)
     tamil_marana_combos = [(6, 11), (0, 7), (1, 19), (2, 23), (3, 26), (4, 3), (5, 9)]
     if (weekday, nak_idx) in tamil_marana_combos:
         tamil_yoga = "Marana Yoga (Inauspicious)"
@@ -737,16 +614,13 @@ def compute_special_yogas(weekday: int, nak_idx: int, sun_nak_idx: int, lang_key
     }
 
 def compute_chandra_and_tarabalam(moon_rashi_idx: int, moon_nak_idx: int, lang_key: str = "en") -> dict:
-    # শুভ চন্দ্রবল রাশি (১, ৩, ৬, ৭, ১০, ১১ তম স্থান)
     good_chandrabalam_rashis = []
     for r_idx, r_name in enumerate(RASHIS):
         diff = (moon_rashi_idx - r_idx + 1) % 12
         if diff in [1, 3, 6, 7, 10, 11]:
             good_chandrabalam_rashis.append(r_name)
 
-    # তারাবল ম্যাপিং (৯টি তারা: ১=জন্ম, ২=সম্পদ, ৩=বিপদ, ৪=ক্ষেম, ৫=প্রত্যরী, ৬=সাধক, ৭=বধ, ৮=মিত্র, ৯=পরমমিত্র)
-    tara_names = ["Janma", "Sampat", "Vipat", "Kshema", "Pratyari", "Sadhaka", "Vadha", "Mitra", "Ati-Mitra"]
-    good_tara_indices = [1, 3, 5, 7, 8] # Sampat, Kshema, Sadhaka, Mitra, Ati-Mitra
+    good_tara_indices = [1, 3, 5, 7, 8] 
 
     good_tarabalam_nakshatras = []
     for n_idx, n_name in enumerate(NAKSHATRAS):
@@ -756,22 +630,21 @@ def compute_chandra_and_tarabalam(moon_rashi_idx: int, moon_nak_idx: int, lang_k
 
     return {
         "good_chandrabalam_rashis": good_chandrabalam_rashis,
-        "good_tarabalam_nakshatras": good_tarabalam_nakshatras[:14] # প্রথম ১৪টি প্রধান
+        "good_tarabalam_nakshatras": good_tarabalam_nakshatras[:14] 
     }
 
 def compute_dur_muhurtam_and_varjyam(dt_rise: datetime, dt_set: datetime, weekday: int, nak_idx: int) -> dict:
-    # ১. দূর মুহূর্ত (১৫ ভাগের নির্দিষ্ট ভাগ)
     dina_sec = (dt_set - dt_rise).total_seconds()
     m15 = dina_sec / 15.0
 
     dur_muhurta_parts = {
-        6: [13],            # Sun: 14th
-        0: [7, 11],         # Mon: 8th & 12th
-        1: [3, 10],         # Tue: 4th & 11th
-        2: [7],             # Wed: 8th
-        3: [5, 11],         # Thu: 6th & 12th
-        4: [3, 8],          # Fri: 4th & 9th
-        5: [0, 1]           # Sat: 1st & 2nd
+        6: [13],            
+        0: [7, 11],         
+        1: [3, 10],         
+        2: [7],             
+        3: [5, 11],         
+        4: [3, 8],          
+        5: [0, 1]           
     }
     slots = dur_muhurta_parts.get(weekday, [7])
     dur_muhurtams = []
@@ -780,7 +653,6 @@ def compute_dur_muhurtam_and_varjyam(dt_rise: datetime, dt_set: datetime, weekda
         en = st + timedelta(seconds=m15)
         dur_muhurtams.append({"start": st.strftime("%H:%M:%S"), "end": en.strftime("%H:%M:%S")})
 
-    # ২. বর্জ্যম (বিষ ঘটিকা - ৪ ঘটিকা = ৯৬ মিনিট)
     ghati_start = VARJYAM_START_GHATIS[nak_idx]
     v_st = dt_rise + timedelta(minutes=ghati_start * 24.0)
     v_en = v_st + timedelta(minutes=96.0)
@@ -791,17 +663,13 @@ def compute_dur_muhurtam_and_varjyam(dt_rise: datetime, dt_set: datetime, weekda
     }
 
 def compute_epochs_and_calendars(target_date: date, jd_noon: float) -> dict:
-    # ১. কলিযুগ সাল ও অহর্গণ (Kali Ahargana)
-    # কলিযুগ শুরু: ১৮ ফেব্রুয়ারি ৩১০২ খ্রি.পূ. (JD 588465.5)
     kali_ahargana = int(jd_noon - 588465.5)
     kali_year = target_date.year + 3101
 
-    # ২. ভারতীয় জাতীয় শক পঞ্জিকা (Indian National Saka Calendar)
     saka_year = target_date.year - 78
     if target_date < date(target_date.year, 3, 22):
         saka_year -= 1
 
-    # ৩. জুলিয়ান ও মডিফাইড জুলিয়ান ডেট
     mjd = jd_noon - 2400000.5
 
     return {
@@ -811,12 +679,8 @@ def compute_epochs_and_calendars(target_date: date, jd_noon: float) -> dict:
         "julian_date": round(jd_noon, 4),
         "modified_julian_date": round(mjd, 4)
     }
-# ==============================================================================
-# ডাইনামিক বিক্রম সংবৎ টাইটেল জেনারেটর (DYNAMIC SAMVAT TITLE GENERATOR)
-# ==============================================================================
 
 def to_indic_digits(number: int, lang_key: str) -> str:
-    """সংখ্যাকে বাংলা (০-৯), হিন্দি (०-९) বা ইংরেজিতে রূপান্তর করে।"""
     s = str(number)
     if lang_key == "bn":
         bn_map = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'}
@@ -827,7 +691,6 @@ def to_indic_digits(number: int, lang_key: str) -> str:
     return s
 
 def get_mantri_mandala_title(samvat_year: int, lang_key: str) -> str:
-    """ভাষা অনুযায়ী স্বয়ংক্রিয় বিক্রম সংবৎ হেডার তৈরি করে।"""
     year_str = to_indic_digits(samvat_year, lang_key)
     if lang_key == "bn":
         return f"বিক্রম সংবৎ {year_str}-এর মন্ত্রিসভা"
@@ -835,111 +698,46 @@ def get_mantri_mandala_title(samvat_year: int, lang_key: str) -> str:
         return f"विक्रम संवत {year_str} का मंत्रिमंडल"
     return f"Mantri Mandala of Vikram Samvat {year_str}"
 
-# =============================================================================
-# VEDIC DAY-NIGHT PERIODS (অহোরাত্র কাল বিভাজন)
-# =============================================================================
 def calculate_vedic_day_periods(dt_sunrise: datetime, dt_sunset: datetime, dt_next_sunrise: datetime, lang: str = "en") -> list:
-    """
-    ২৪ ঘণ্টার সম্পূর্ণ নির্বিঘ্ন বৈদিক অহোরাত্র বিভাজন (১০টি শাস্ত্রীয় কাল - কোনো ফাঁক থাকবে না)।
-    """
     day_duration = dt_sunset - dt_sunrise
     night_duration = dt_next_sunrise - dt_sunset
 
     solar_noon = dt_sunrise + (day_duration / 2)
     solar_midnight = dt_sunset + (night_duration / 2)
 
-    # ১. ব্রাহ্ম মুহূর্ত: সূর্যোদয়ের ৯৬ মি. আগে থেকে ৪৮ মি. আগে
     brahma_start = dt_sunrise - timedelta(minutes=96)
     brahma_end = dt_sunrise - timedelta(minutes=48)
-
-    # ২. প্রাতঃকাল (ঊষা): সূর্যোদয়ের ৪৮ মি. আগে থেকে সূর্যোদয়
     pratah_start = brahma_end
     pratah_end = dt_sunrise
-
-    # ৩. সকাল / পূর্বাহ্ণ: সূর্যোদয় থেকে মধ্যাহ্নের প্রারম্ভ
     sakal_start = dt_sunrise
     sakal_end = solar_noon - timedelta(minutes=60)
-
-    # ৪. দুপুরবেলা / মধ্যাহ্ন: দ্বিপ্রহর (অভিজিৎ সংলগ্ন সময়)
     dupur_start = sakal_end
     dupur_end = solar_noon + timedelta(minutes=60)
-
-    # ৫. বিকাল বেলা (অপরাহ্ণ): দুপুর থেকে গোধূলি বেলার পূর্ব পর্যন্ত (যেটা মিসিং ছিল)
     bikal_start = dupur_end
     bikal_end = dt_sunset - timedelta(minutes=48)
-
-    # ৬. সায়াহ্ন / গোধূলি বেলা: সূর্যাস্তের ঠিক পূর্বের ৪৮ মিনিট
     godhuli_start = bikal_end
     godhuli_end = dt_sunset
-
-    # ৭. সন্ধ্যা কাল / প্রদোষ: সূর্যাস্ত থেকে রাত্রির শুরু (৭২ মিনিট)
     sandhya_start = dt_sunset
     sandhya_end = dt_sunset + timedelta(minutes=72)
-
-    # ৮. রাত্রিকাল (প্রথম প্রহর): সন্ধ্যা সমাপ্তি থেকে মহানিশার পূর্ব পর্যন্ত
     ratri_start = sandhya_end
     ratri_end = solar_midnight - timedelta(minutes=48)
-
-    # ৯. নিশীথ রাত্রি কাল (মহানিশা): মধ্যরাত্রি কেন্দ্রিক কাল
     nishi_start = ratri_end
     nishi_end = solar_midnight + timedelta(minutes=48)
-
-    # ১০. শেষ রাত্রি / উষাকাল: মধ্যরাত্রি থেকে পরদিনের ব্রাহ্ম মুহূর্তের প্রারম্ভ
     next_brahma_start = dt_next_sunrise - timedelta(minutes=96)
     shesh_ratri_start = nishi_end
     shesh_ratri_end = next_brahma_start
 
     periods_data = [
-        {
-            "id": "brahma_muhurta",
-            "name": {"bn": "ব্রাহ্ম মুহূর্ত", "hi": "ब्रह्म मुहूर्त", "en": "Brahma Muhurta"},
-            "start": brahma_start, "end": brahma_end
-        },
-        {
-            "id": "pratah_kal",
-            "name": {"bn": "প্রাতঃকাল (ঊষা)", "hi": "प्रातःकाल (उषा)", "en": "Dawn (Pratah Kaal)"},
-            "start": pratah_start, "end": pratah_end
-        },
-        {
-            "id": "sakal",
-            "name": {"bn": "সকাল / পূর্বাহ্ণ", "hi": "सवेरा / पूर्वाह्न", "en": "Morning (Forenoon)"},
-            "start": sakal_start, "end": sakal_end
-        },
-        {
-            "id": "dupur_bela",
-            "name": {"bn": "দুপুরবেলা / মধ্যাহ্ন", "hi": "दोपहर / मध्याह्न", "en": "Midday (Madhyahna)"},
-            "start": dupur_start, "end": dupur_end
-        },
-        {
-            "id": "bikal_aparahna",
-            "name": {"bn": "বিকাল বেলা (অপরাহ্ণ)", "hi": "तीसरा पहर / अपराह्न", "en": "Afternoon (Aparahna)"},
-            "start": bikal_start, "end": bikal_end
-        },
-        {
-            "id": "sayahna_godhuli",
-            "name": {"bn": "গোধূলি বেলা / সায়াহ্ন", "hi": "गोधूलि वेला / सायं", "en": "Twilight / Godhuli"},
-            "start": godhuli_start, "end": godhuli_end
-        },
-        {
-            "id": "sandhya_kal",
-            "name": {"bn": "সন্ধ্যা কাল / প্রদোষ", "hi": "संध्या काल / प्रदोष", "en": "Evening / Pradosh"},
-            "start": sandhya_start, "end": sandhya_end
-        },
-        {
-            "id": "ratrikal",
-            "name": {"bn": "রাত্রিকাল (প্রথম প্রহর)", "hi": "रात्रिकाल (प्रथम प्रहर)", "en": "Night (Early Watch)"},
-            "start": ratri_start, "end": ratri_end
-        },
-        {
-            "id": "nishi_ratri_kal",
-            "name": {"bn": "নিশীথ রাত্রি কাল (মহানিশা)", "hi": "निशीथ काल (महानिशा)", "en": "Midnight (Nishitha)"},
-            "start": nishi_start, "end": nishi_end
-        },
-        {
-            "id": "shesh_ratri_usha",
-            "name": {"bn": "শেষ রাত্রি / ঊষাকাল", "hi": "उषाकाल / अंतिम प्रहर", "en": "Pre-Dawn / Last Watch"},
-            "start": shesh_ratri_start, "end": shesh_ratri_end
-        }
+        {"id": "brahma_muhurta", "name": {"bn": "ব্রাহ্ম মুহূর্ত", "hi": "ब्रह्म मुहूर्त", "en": "Brahma Muhurta"}, "start": brahma_start, "end": brahma_end},
+        {"id": "pratah_kal", "name": {"bn": "প্রাতঃকাল (ঊষা)", "hi": "प्रातःकाल (उषा)", "en": "Dawn (Pratah Kaal)"}, "start": pratah_start, "end": pratah_end},
+        {"id": "sakal", "name": {"bn": "সকাল / পূর্বাহ্ণ", "hi": "सवेरा / पूर्वाह्न", "en": "Morning (Forenoon)"}, "start": sakal_start, "end": sakal_end},
+        {"id": "dupur_bela", "name": {"bn": "দুপুরবেলা / মধ্যাহ্ন", "hi": "दोपहर / मध्याह्न", "en": "Midday (Madhyahna)"}, "start": dupur_start, "end": dupur_end},
+        {"id": "bikal_aparahna", "name": {"bn": "বিকাল বেলা (অপরাহ্ণ)", "hi": "तीसरा पहर / अपराह्न", "en": "Afternoon (Aparahna)"}, "start": bikal_start, "end": bikal_end},
+        {"id": "sayahna_godhuli", "name": {"bn": "গোধূলি বেলা / সায়াহ্ন", "hi": "गोधूलि वेला / सायं", "en": "Twilight / Godhuli"}, "start": godhuli_start, "end": godhuli_end},
+        {"id": "sandhya_kal", "name": {"bn": "সন্ধ্যা কাল / প্রদোষ", "hi": "संध्या काल / प्रदोष", "en": "Evening / Pradosh"}, "start": sandhya_start, "end": sandhya_end},
+        {"id": "ratrikal", "name": {"bn": "রাত্রিকাল (প্রথম প্রহর)", "hi": "रात्रिकाल (प्रथम प्रहर)", "en": "Night (Early Watch)"}, "start": ratri_start, "end": ratri_end},
+        {"id": "nishi_ratri_kal", "name": {"bn": "নিশীথ রাত্রি কাল (মহানিশা)", "hi": "निशीथ काल (महानिशा)", "en": "Midnight (Nishitha)"}, "start": nishi_start, "end": nishi_end},
+        {"id": "shesh_ratri_usha", "name": {"bn": "শেষ রাত্রি / ঊষাকাল", "hi": "उषाकाल / अंतिम प्रहर", "en": "Pre-Dawn / Last Watch"}, "start": shesh_ratri_start, "end": shesh_ratri_end}
     ]
 
     l_key = "bn" if "bn" in lang or "bangla" in lang else ("hi" if "hi" in lang else "en")
@@ -963,12 +761,14 @@ def calculate_vedic_day_periods(dt_sunrise: datetime, dt_sunset: datetime, dt_ne
 # ৬. সম্পূর্ণ পঞ্চাঙ্গ (ANDROID DTO & DRIK PANCHANG 100% REPLICA)
 # ==============================================================================
 
+# 🚀 CACHE ADDED HERE
+@lru_cache(maxsize=1024)
 def compute_full_drik_panchang(
     local_date: date,
     lat: float = 22.5726,
     lon: float = 88.3639,
     lang: str = "en",
-    time_format: str = "12hr"  # <--- 12hr / 24hr / 24+hr ফরম্যাট প্যারামিটার
+    time_format: str = "12hr" 
 ) -> dict:
     l_str = str(lang).lower().strip()
     lang_key = "bn" if (l_str.startswith("bn") or "বাংলা" in l_str) else ("hi" if (l_str.startswith("hi") or "हि" in l_str) else "en")
@@ -976,7 +776,6 @@ def compute_full_drik_panchang(
     noon_local = datetime(local_date.year, local_date.month, local_date.day, 6, 0, tzinfo=IST)
     jd_approx = to_jd_ut(noon_local) - 0.25
 
-    # সূর্যোদয় ও সূর্যাস্ত
     geopos = (lon, lat, 0.0)
     swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
     _, s_rise = swe.rise_trans(jd_approx, swe.SUN, swe.CALC_RISE, geopos)
@@ -986,7 +785,6 @@ def compute_full_drik_panchang(
     jd_sunrise, jd_sunset, jd_next_sunrise = s_rise[0], s_set[0], next_s_rise[0]
     dt_rise, dt_set = jd_to_local(jd_sunrise), jd_to_local(jd_sunset)
 
-    # চন্দ্রোদয় ও চন্দ্রাস্ত
     try:
         _, m_rise = swe.rise_trans(jd_sunrise - 0.25, swe.MOON, swe.CALC_RISE, geopos)
         moonrise_str = jd_to_local(m_rise[0]).strftime("%H:%M:%S")
@@ -998,7 +796,6 @@ def compute_full_drik_panchang(
     except Exception:
         moonset_str = "03:30:00"
 
-    # পঞ্চাঙ্গ এলিমেন্ট ও ট্রানজিশন
     def tithi_index(jd):
         s, m = sidereal_longitudes(jd)
         return int(((m - s) % 360.0) / 12.0)
@@ -1047,7 +844,6 @@ def compute_full_drik_panchang(
             return ""
         dt_val = jd_to_local(jd)
         
-        # সেফ ইনলাইন টাইম ফরম্যাটার (সার্ভার ক্র্যাশ এড়াতে format_time_mode মুছে ফেলা হয়েছে)
         m_format = str(time_format).lower().replace(" ", "").replace("-", "")
         if "24+" in m_format or "plus" in m_format:
             h = dt_val.hour + 24 if dt_val.date() > local_date else dt_val.hour
@@ -1085,7 +881,6 @@ def compute_full_drik_panchang(
         return time_str
     def fmt_time(dt): return dt.strftime("%H:%M:%S")
 
-    # Pada Timeline
     def pada_index(jd):
         _, m = sidereal_longitudes(jd)
         return int((m % 360.0) / (360.0 / 108.0))
@@ -1109,7 +904,6 @@ def compute_full_drik_panchang(
             break
         jd_cursor = p_end
 
-    # দিনমান ও মুহুর্ত
     dina_mana_sec = (dt_set - dt_rise).total_seconds()
     part_8th = dina_mana_sec / 8.0
     part_15th = dina_mana_sec / 15.0
@@ -1131,16 +925,12 @@ def compute_full_drik_panchang(
     brahma_s = dt_rise - timedelta(minutes=96)
     brahma_e = dt_rise - timedelta(minutes=48)
 
-    # রাশি ও সূর্য নক্ষত্র
     sun_lon, moon_lon = sidereal_longitudes(jd_sunrise)
     s_rashi_idx = int(sun_lon // 30) % 12
     m_rashi_idx = int(moon_lon // 30) % 12
     sun_nak_idx = int(sun_lon / (360.0 / 27.0)) % 27
     sun_pada = int((sun_lon % (360.0 / 27.0)) / (360.0 / 108.0)) + 1
 
-    # --------------------------------------------------------------------------
-    # সমস্ত অ্যাডভান্সড সেকশনের জন্য ডাইনামিক টাইম ট্রানজিশন ইঞ্জিন (Drik Standard)
-    # --------------------------------------------------------------------------
     def get_upto_str(jd_val):
         if not jd_val: return ""
         dt_val = jd_to_local(jd_val)
@@ -1178,7 +968,6 @@ def compute_full_drik_panchang(
 
     then_str = "তারপর" if lang_key == "bn" else ("तदुपरांत" if lang_key == "hi" else "then")
 
-    # বর্তমান ও পরবর্তী স্টেটের ডেটা ক্যালকুলেশন
     niwas_shool = compute_niwas_and_shool(weekday, t_idx, m_rashi_idx, lang_key=lang_key)
     niwas_shool_next_tithi = compute_niwas_and_shool(weekday, (t_idx + 1) % 30, m_rashi_idx, lang_key=lang_key)
     niwas_shool_next_nak = compute_niwas_and_shool(weekday, t_idx, (m_rashi_idx + 1) % 12, lang_key=lang_key)
@@ -1186,7 +975,6 @@ def compute_full_drik_panchang(
     special_yogas = compute_special_yogas(weekday, n_idx, sun_nak_idx, lang_key=lang_key)
     special_yogas_next = compute_special_yogas(weekday, (n_idx + 1) % 27, sun_nak_idx, lang_key=lang_key)
 
-    # ১. Tithi based transitions (Agnivasa & Shivavasa)
     t_end_str = get_upto_str(t_end)
     if t_end_str:
         curr_agni = niwas_shool['agnivasa'].split('(')[0].split('-')[0].strip()
@@ -1197,7 +985,6 @@ def compute_full_drik_panchang(
         next_shiva = niwas_shool_next_tithi['shivavasa'].split('(')[0].split('-')[0].strip()
         niwas_shool["shivavasa"] = f"{curr_shiva}{t_end_str}, {then_str} {next_shiva}"
 
-    # ২. Nakshatra based transitions (Anandadi & Tamil Yoga)
     n_end_str = get_upto_str(n_end)
     if n_end_str:
         curr_anandadi = special_yogas['anandadi_yoga']
@@ -1208,7 +995,6 @@ def compute_full_drik_panchang(
         next_tamil = special_yogas_next['tamil_yoga'].split('(')[0].strip()
         special_yogas["tamil_yoga"] = f"{curr_tamil}{n_end_str}, {then_str} {next_tamil}"
 
-    # ৩. Moon/Rashi based transitions (Chandra Vasa)
     def moon_transition_index(jd):
         _, m = sidereal_longitudes(jd)
         return int((m % 360.0) / 30.0)
@@ -1226,26 +1012,17 @@ def compute_full_drik_panchang(
         next_chandra_localized = rashi_dirs_dict.get(lang_key, rashi_dirs_dict["en"])[next_rashi_idx]
         niwas_shool["chandra_vasa"] = f"{curr_chandra}{moon_end_str}, {then_str} {next_chandra_localized}"
 
-    # বাকি জেনারেল ক্যালকুলেশন
     chandra_tarabalam = compute_chandra_and_tarabalam(m_rashi_idx, n_idx, lang_key=lang_key)
     dur_varjyam = compute_dur_muhurtam_and_varjyam(dt_rise, dt_set, weekday, n_idx)
     epochs = compute_epochs_and_calendars(local_date, jd_sunrise)
 
-    # সংবৎ সাল ও ডাইনামিক টাইটেল নির্ণয় (চৈত্র প্রতিপদের বছর + ৫৭)
-    # ==========================================================================
     new_year_day, _ = get_governing_chaitra_pratipada(local_date, lat, lon)
     samvat_year = new_year_day.year + 57
     mantri_title = get_mantri_mandala_title(samvat_year, lang_key)
 
-       
-    # ==========================================================================
-    # রেফারেন্স ক্যালেন্ডার ও ড্রিক পঞ্চাঙ্গ ১০০% ম্যাচিং পূর্ণিমান্ত চান্দ্র মাস ইঞ্জিন
-    # ==========================================================================
-    # ১. তিথি ইনডেক্স ও পক্ষ নির্ধারণ (০-২৯)
     diff_tithi = (moon_lon - sun_lon) % 360.0
     tithi_idx = int(diff_tithi / 12.0) % 30
     
-    # চান্দ্র দিন নম্বর (শুক্ল পক্ষে ১-১৫, কৃষ্ণ পক্ষে ১-১৫)
     tithi_num = (tithi_idx % 15) + 1
     paksha_val = "Shukla" if tithi_idx < 15 else "Krishna"
     
@@ -1256,7 +1033,6 @@ def compute_full_drik_panchang(
     else:
         paksha_display = f"{paksha_val} Paksha"
 
-    # ২. সুইস এফিমেরিস দ্বারা পূর্ববর্তী অমাবস্যার সঠিক মহাজাগতিক ক্ষণ সন্ধান
     approx_days_back = diff_tithi / 12.190749
     jd_approx = jd_sunrise - approx_days_back
 
@@ -1292,7 +1068,6 @@ def compute_full_drik_panchang(
 
     jd_exact_amavasya = bracket_hi
 
-    # ৩. অমাবস্যায় সূর্যের স্পষ্ট রাশি
     sun_amav_res = swe.calc_ut(jd_exact_amavasya, swe.SUN, swe.FLG_SWIEPH | swe.FLG_SIDEREAL)
     amav_sun_rashi_idx = int(sun_amav_res[0][0] / 30.0) % 12
 
@@ -1303,17 +1078,12 @@ def compute_full_drik_panchang(
     ]
     amanta_masa = LUNAR_MASA_ORDER[amav_sun_rashi_idx]
 
-    # ৪. রেফারেন্স ক্যালেন্ডার অনুযায়ী পূর্ণিমান্ত চান্দ্র মাস রুল:
-    # কৃষ্ণ পক্ষে পূর্ণিমার পরের দিন থেকেই নতুন মাস শুরু হয়
     if paksha_val == "Krishna":
         purnimanta_idx = (amav_sun_rashi_idx + 1) % 12
         lunar_masa = LUNAR_MASA_ORDER[purnimanta_idx]
     else:
         lunar_masa = amanta_masa
 
-    # ==========================================================================
-    # ক্ষয় তিথি ডিটেকশন (Vikram/Gujarati 1-15 Format)
-    # ==========================================================================
     sun_lon_rise, moon_lon_rise = sidereal_longitudes(jd_sunrise)
     t_idx = int(((moon_lon_rise - sun_lon_rise) % 360.0) / 12.0) % 30
     
@@ -1322,48 +1092,35 @@ def compute_full_drik_panchang(
     
     paksha_val = "Shukla" if t_idx < 15 else "Krishna"
     
-    # শুক্ল বা কৃষ্ণ যাই হোক, ১ থেকে ১৫ ফরম্যাটে কনভার্ট করা হলো
     t_num_cur = (t_idx % 15) + 1
-
-    # ২. দিনের মধ্যে তিথি ক্ষয় হয়েছে কি না পরীক্ষা
     tithi_step = (t_idx_next - t_idx) % 30
     
     active_tithi_nums = [t_num_cur]
     if tithi_step > 1 and tithi_step < 5:
         for skipped in range(1, tithi_step):
             skipped_idx = (t_idx + skipped) % 30
-            # ক্ষয় তিথির ক্ষেত্রেও ১-১৫ ফরম্যাটে যুক্ত হবে
             active_tithi_nums.append((skipped_idx % 15) + 1)
             
-    # ৩. হেডার টেক্সট তৈরি (যেমন: "5, 6", "14, 15")
     lunar_day_formatted = ", ".join(str(n) for n in active_tithi_nums)
 
-    # ==========================================================================
-    # জ্যোতির্বৈজ্ঞানিক গ্রহ-গোচর ভিত্তিক উৎসব নিরূপণ (Sunrise, Sunset & Midnight)
-    # ==========================================================================
-    # ১. সূর্যোদয়ের সময়কার তিথি
     sun_lon_rise, moon_lon_rise = sidereal_longitudes(jd_sunrise)
     t_idx_rise = int(((moon_lon_rise - sun_lon_rise) % 360.0) / 12.0) % 30
     paksha_rise = "Shukla" if t_idx_rise < 15 else "Krishna"
     t_num_rise = (t_idx_rise % 15) + 1
 
-    # ২. সূর্যাস্তের (প্রদোষকাল) সময়কার তিথি ও পক্ষ
     sun_lon_set, moon_lon_set = sidereal_longitudes(jd_sunset)
     t_idx_set = int(((moon_lon_set - sun_lon_set) % 360.0) / 12.0) % 30
     paksha_set = "Shukla" if t_idx_set < 15 else "Krishna"
     t_num_set = (t_idx_set % 15) + 1
 
-    # ৩. মধ্যরাত্রির (নিশীথকাল) সময়কার তিথি ও পক্ষ
     jd_midnight = (jd_sunset + jd_next_sunrise) / 2.0
     sun_lon_mid, moon_lon_mid = sidereal_longitudes(jd_midnight)
     t_idx_mid = int(((moon_lon_mid - sun_lon_mid) % 360.0) / 12.0) % 30
     paksha_mid = "Shukla" if t_idx_mid < 15 else "Krishna"
     t_num_mid = (t_idx_mid % 15) + 1
 
-    # ৪. সমস্ত মহাজাগতিক সংযোগের উৎসব একত্রীকরণ (The Ultimate Fix)
     today_festivals = []
 
-    # (ক) সূর্যোদয়ভিত্তিক উৎসব
     fests_rise = get_festivals_for_day(current_date=local_date, lunar_month=lunar_masa, paksha=paksha_rise, tithi_num=t_num_rise, sankranti_name=None, lang=lang)
     for f in fests_rise:
         f['calc_tithi_idx'] = t_idx_rise
@@ -1371,7 +1128,6 @@ def compute_full_drik_panchang(
         if not any(x.get("name") == f.get("name") for x in today_festivals):
             today_festivals.append(f)
 
-    # (খ) প্রদোষকাল (সূর্যাস্ত) ভিত্তিক উৎসব 
     if t_idx_set != t_idx_rise:
         fests_set = get_festivals_for_day(current_date=local_date, lunar_month=lunar_masa, paksha=paksha_set, tithi_num=t_num_set, sankranti_name=None, lang=lang)
         for f in fests_set:
@@ -1381,7 +1137,6 @@ def compute_full_drik_panchang(
                 if not any(x.get("name") == f.get("name") for x in today_festivals):
                     today_festivals.append(f)
 
-    # (গ) নিশীথকাল (মধ্যরাত্রি) ভিত্তিক উৎসব
     jd_midnight = (jd_sunset + jd_next_sunrise) / 2.0
     if t_idx_mid != t_idx_set and t_idx_mid != t_idx_rise:
         fests_mid = get_festivals_for_day(current_date=local_date, lunar_month=lunar_masa, paksha=paksha_mid, tithi_num=t_num_mid, sankranti_name=None, lang=lang)
@@ -1392,9 +1147,6 @@ def compute_full_drik_panchang(
                 if not any(x.get("name") == f.get("name") for x in today_festivals):
                     today_festivals.append(f)
 
-    # --------------------------------------------------------------------------
-    # সুইস এফিমেরিস থেকে ডায়নামিক মুহূর্তের সময়সূচি গণনা (12hr / 24hr / 24+hr Support)
-    # --------------------------------------------------------------------------
     def format_time_mode(dt_obj: datetime, base_date: date, mode: str = "12hr") -> str:
         m = str(mode or "12hr").lower().replace(" ", "").replace("-", "")
         if "24+" in m or "24plus" in m or "plus" in m:
@@ -1440,37 +1192,26 @@ def compute_full_drik_panchang(
     else:
         sandhi_timing = f"{fmt_m(dt_set - timedelta(minutes=24))} - {fmt_m(dt_set + timedelta(minutes=24))}"
 
-    # সূর্যোদয় ও সূর্যাস্তের মোট মিনিট
-    rise_total_min = int(dt_rise.hour * 60 + dt_rise.minute)
-    set_total_min = int(dt_set.hour * 60 + dt_set.minute)
-
-    # প্রতিটি উৎসবের জন্য ডায়নামিক মুহূর্ত তৈরি
     for fest in today_festivals:
         m_type = fest.get("muhurta_type", "abhijit")
         fest_name = str(fest.get("name", ""))
         fest_cat = str(fest.get("category", "")).lower()
 
-        # ==========================================================
-        # ১. পৃথিবীর যেকোনো শহরের জন্য ১০০% নিখুঁত তিথি ক্যালকুলেশন
-        # ==========================================================
-        # আমরা যেই তিথিতে উৎসবটি পেয়েছি, ঠিক সেই তিথিরই শুরু এবং শেষ বের করব
         target_tithi_idx = fest.get('calc_tithi_idx', t_idx_rise)
         jd_base = fest.get('calc_jd_base', jd_sunrise)
 
-        # তিথির শুরুর সময় খোঁজা (নিখুঁতভাবে পেছনে গিয়ে)
         jd_search = jd_base
         guard = 0
         while tithi_index(jd_search) == target_tithi_idx and guard < 100:
-            jd_search -= 0.05  # প্রায় ১.২ ঘণ্টা করে পেছনে যাবে
+            jd_search -= 0.05 
             guard += 1
             
         t_start = find_transition(jd_search, tithi_index, max_hours=72.0)
-        t_end = find_transition(jd_base, tithi_index, max_hours=72.0)
+        t_end_fest = find_transition(jd_base, tithi_index, max_hours=72.0)
 
-        # ২. তিথির শুরু, সমাপ্তি ও পরের দিনের লজিক
-        if t_start and t_end:
+        if t_start and t_end_fest:
             t_start_dt = jd_to_local(t_start)
-            t_end_dt = jd_to_local(t_end)
+            t_end_dt = jd_to_local(t_end_fest)
             
             diff_days = (t_end_dt.date() - local_date).days
             m_idx = t_end_dt.month - 1
@@ -1497,7 +1238,6 @@ def compute_full_drik_panchang(
         else:
             tithi_str = ""
 
-        # ৩. "পূজা" বনাম "শুভ মুহূর্ত" নির্ণয়
         social_keywords = [
             "rakhi", "bhai dooj", "bhai phonta", "bhai tika", "bhaidooj", "phonta", "dooj", 
             "new year", "labh pancham", "jamai", "aranya sasthi", 
@@ -1554,7 +1294,6 @@ def compute_full_drik_panchang(
             p_time = f"{kaal_name} ({fmt_m(abhijit_s)} - {fmt_m(abhijit_e)})"
             p_title = main_title
 
-        # ৪. Non-Hindu / National Festivals Safety
         non_hindu_kws = [
             "jayanti", "gandhi", "bose", "netaji", "bhagat", "eid", "al-fitr", "al-adha", 
             "muharram", "christmas", "good friday", "republic", "independence", "international", 
@@ -1572,7 +1311,6 @@ def compute_full_drik_panchang(
         else:
             fest["tithi_span_title"] = "উৎসবের সময়সীমা / তিথি মান:" if lang_key == "bn" else ("पर्व / तिथि समय अवधि:" if lang_key == "hi" else "Festival / Tithi Span:")
         
-        # ৫. সমস্ত ডেটা মার্জ করে পাঠানো
         fest["tithi_span_time"] = tithi_str
         
         fest["puja_muhurta_title"] = p_title
@@ -1595,17 +1333,13 @@ def compute_full_drik_panchang(
         
         fest["is_puja"] = not is_social and not is_non_hindu
         
-    # লাইভ ট্রানজিট আইডির সাথে মেটাডেটা ম্যাচিং
     tithi_num_key = (t_idx % 15) + 1
     
-    # মেটাডেটা এক্সট্রাক্ট করে ভাষা অনুযায়ী অন-দ্য-ফ্লাই ট্রান্সলেশন করা
     def process_meta(meta_dict):
         result = {}
-        
-        # English to Bengali Translation Dictionary
         bn_trans = {
             "Kshipra / Laghu": "ক্ষিপ্র / লঘু", "Ugra / Krura": "উগ্র / ক্রূর", "Misra / Sadharana": "মিশ্র / সাধারণ",
-            "Sthira / Dhruva": "স্থির / ধ্রুব", "Mridu": "মৃদু", "Tikshna / Daruna": "তীক্ষ্ণ / দারুণ",
+            "Sthira / Dhruva": "স্থिर / ধ্রুব", "Mridu": "মৃদু", "Tikshna / Daruna": "তীক্ষ্ণ / দারুণ",
             "Chara / Chala": "চর / চল", "Kshipra and Laghu": "ক্ষিপ্র ও লঘু", "Tikshna": "তীক্ষ্ণ", "Ugra": "উগ্র",
             "Horse Head": "অশ্ব মস্তক", "Yoni": "যোনি", "Razor / Knife": "ক্ষুর / ছুরি", "Cart / Chariot": "শকট / রথ",
             "Deer Head": "মৃগ মস্তক", "Teardrop / Gem": "অশ্রুবিন্দু / মণি", "House / Bow": "গৃহ / ধনু",
@@ -1618,7 +1352,6 @@ def compute_full_drik_panchang(
             "Anandaprada": "আনন্দপ্রদ", "Vijayaprada": "বিজয়প্রদ", "Paushtika": "पौষ্টিক", "Pitruprada": "পিতৃপ্রদ"
         }
         
-        # English to Hindi Translation Dictionary
         hi_trans = {
             "Kshipra / Laghu": "क्षिप्र / लघु", "Ugra / Krura": "उग्र / क्रूर", "Misra / Sadharana": "मिश्र / साधारण",
             "Sthira / Dhruva": "स्थिर / ध्रुव", "Mridu": "मृदु", "Tikshna / Daruna": "तीक्ष्ण / दारुण",
@@ -1649,12 +1382,6 @@ def compute_full_drik_panchang(
     yoga_detail_info = process_meta(YOGA_METADATA.get(y_idx + 1, {}))
     karana_detail_info = process_meta(KARANA_METADATA.get(karana_name, {}))
 
-    # ==========================================================
-    # সূর্য রাশি, সূর্য নক্ষত্র এবং চন্দ্র নক্ষত্র পদের ডাইনামিক ট্রানজিশন
-    # (Swiss Ephemeris Live Planetary Movement)
-    # ==========================================================
-    
-    # লোকাল ডিকশনারি (যাতে বাংলা ও হিন্দিতে নিখুঁত নাম আসে)
     rashi_bn = ["মেষ", "বৃষ", "মিথুন", "কর্কট", "সিংহ", "কন্যা", "তুলা", "বৃশ্চিক", "ধনু", "মকর", "কুম্ভ", "মীন"]
     rashi_hi = ["मेष", "वृषभ", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुंभ", "मीन"]
     nak_bn = ["অশ্বিনী", "ভরণী", "কৃত্তিকা", "রোহিণী", "মৃগশিরা", "আর্দ্রা", "পুনর্বসু", "পুষ্যা", "অশ্লেষা", "মঘা", "পূর্ব ফাল্গুনী", "উত্তর ফাল্গুনী", "হস্তা", "চিত্রা", "স্বাতী", "বিশাখা", "অনুরাধা", "জ্যেষ্ঠা", "মূলা", "পূর্বাষাঢ়া", "উত্তরাষাঢ়া", "শ্রবণা", "ধনিষ্ঠা", "শতভিষা", "পূর্ব ভাদ্রপদ", "উত্তর ভাদ্রপদ", "রেবতী"]
@@ -1672,26 +1399,22 @@ def compute_full_drik_panchang(
 
     pada_word = "পদ" if lang_key in ["bn", "hi"] else "Pada"
 
-    # ১. ডাইনামিক চন্দ্র রাশি
     moon_end_str_final = get_upto_str(moon_rashi_end)
     if moon_end_str_final:
         dynamic_moonsign = f"{loc_rashi(m_rashi_idx)}{moon_end_str_final}, {then_str} {loc_rashi((m_rashi_idx + 1) % 12)}"
     else:
         dynamic_moonsign = loc_rashi(m_rashi_idx)
 
-    # ২. ডাইনামিক সূর্য রাশি (Sankranti Tracking - Live)
     next_sun_rashi_deg = (s_rashi_idx + 1) * 30.0
     sun_rashi_dt = find_solar_ingress_forward(jd_sunrise, next_sun_rashi_deg % 360.0, max_days=35.0)
     sun_rashi_end_str = get_upto_str(to_jd_ut(sun_rashi_dt))
     dynamic_sunsign = f"{loc_rashi(s_rashi_idx)}{sun_rashi_end_str}, {then_str} {loc_rashi((s_rashi_idx + 1) % 12)}"
 
-    # ৩. ডাইনামিক সূর্য নক্ষত্র (Live)
     next_sun_nak_deg = (sun_nak_idx + 1) * (360.0 / 27.0)
     sun_nak_dt = find_solar_ingress_forward(jd_sunrise, next_sun_nak_deg % 360.0, max_days=15.0)
     sun_nak_end_str = get_upto_str(to_jd_ut(sun_nak_dt))
     dynamic_surya_nakshatra = f"{loc_nak(sun_nak_idx)} ({pada_word} {sun_pada}){sun_nak_end_str}, {then_str} {loc_nak((sun_nak_idx + 1) % 27)}"
 
-    # ৪. ডাইনামিক চন্দ্র নক্ষত্র পদ (Navamsha Tracking - Live)
     def moon_pada_index(jd):
         _, m = sidereal_longitudes(jd)
         return int((m % 360.0) / (360.0 / 108.0))
@@ -1702,11 +1425,6 @@ def compute_full_drik_panchang(
     next_pada = (curr_pada % 4) + 1
     dynamic_nakshatra_pada = f"{loc_nak(n_idx)} ({pada_word} {curr_pada}){pada_end_str}, {then_str} {pada_word} {next_pada}"
 
-    # ==========================================================
-    # ৫টি মিসিং অ্যাডভান্সড ফিল্ড (Jeevana, Netra, Homahuti, Bhadravasa, Kumbha) + Descriptions
-    # ==========================================================
-    
-    # ১. জীবমান ও নেত্রমান (Jeevana & Netra Mana)
     jeeva_list = [
         {
             "en": "2 Jeeva (Full Life Energy)", "hi": "२ जीव (पूर्ण प्राण)", "bn": "২ জীব (পরম শুভ / পূর্ণ প্রাণশক্তি)",
@@ -1744,7 +1462,7 @@ def compute_full_drik_panchang(
             "en": "1 Netra (One Eye)", "hi": "१ नेत्र (एक दृष्टि)", "bn": "১ নেত্র (এক দৃষ্টি / মধ্যম)",
             "desc_en": "Fair visibility; proceed with caution.",
             "desc_hi": "मध्यम दृष्टि; सावधानी से कार्य करें।",
-            "desc_bn": "মধ্যম দৃষ্টি, সতর্কতার সাথে কাজ করুন।"
+            "desc_bn": "মধ্যম दृष्टि, সতর্কতার সাথে কাজ করুন।"
         },
         {
             "en": "0 Netra (Blind / Inauspicious)", "hi": "० नेत्र (नेत्रहीन / अशुभ)", "bn": "০ নেত্র (দৃষ্টিহীন / অশুভ / বর্জনীয়)",
@@ -1760,7 +1478,6 @@ def compute_full_drik_panchang(
     special_yogas["netra_mana"] = netra_list[n_idx % 3].get(lang_key, netra_list[n_idx % 3]["en"])
     special_yogas["netra_mana_desc"] = netra_list[n_idx % 3].get(f"desc_{lang_key}", netra_list[n_idx % 3]["desc_en"])
 
-    # ২. হোমাহুতি (Homahuti)
     homa_deities = [
         {"en": "Sun (Planet)", "bn": "সূর্য গ্রহ", "hi": "सूर्य ग्रह", "desc_en": "Grants health, fame, and power in fire oblations.", "desc_hi": "हवन में आरोग्य, यश और शक्ति प्रदाता।", "desc_bn": "যজ্ঞকর্মে হোমাহুতি আরোগ্য, যশ ও সম্মান বৃদ্ধিকারী।"},
         {"en": "Chandra (Planet)", "bn": "চন্দ্র গ্রহ", "hi": "चंद्र ग्रह", "desc_en": "Daily planetary fire oblation deity, favorable for pacification rituals.", "desc_hi": "दैनिक हवन में शांति और कल्याणकारी फल प्रदाता।", "desc_bn": "দৈনিক যজ্ঞকর্মে হোমাহুতি অধিপতি গ্রহ, শান্তি ও কল্যাণদায়ী।"},
@@ -1775,7 +1492,6 @@ def compute_full_drik_panchang(
     niwas_shool["homahuti"] = homa_deities[(n_idx + weekday + 1) % 9].get(lang_key, homa_deities[(n_idx + weekday + 1) % 9]["en"])
     niwas_shool["homahuti_desc"] = homa_deities[(n_idx + weekday + 1) % 9].get(f"desc_{lang_key}", homa_deities[(n_idx + weekday + 1) % 9]["desc_en"])
 
-    # ৩. ভদ্রাবাস (Bhadravasa)
     if "Vishti" in karana_name or "Bhadra" in karana_name:
         if m_rashi_idx in [0, 1, 2, 7]:
             b_vasa = {"en": "Swarga (Heaven) - Auspicious", "hi": "स्वर्ग (शुभ)", "bn": "স্বর্গ (शुभफलপ্রদ)", "desc_en": "Bhadra resides in Heaven; brings success and happiness.", "desc_hi": "भद्रा स्वर्ग में है; सफलता और सुख लाती है।", "desc_bn": "ভদ্রা স্বর্গে বিরাজমান; কল্যাণ ও সাফল্য প্রদানকারী।"}
@@ -1789,20 +1505,15 @@ def compute_full_drik_panchang(
     niwas_shool["bhadravasa"] = b_vasa.get(lang_key, b_vasa["en"])
     niwas_shool["bhadravasa_desc"] = b_vasa.get(f"desc_{lang_key}", b_vasa["desc_en"])
 
-    # ৪. কুম্ভ চক্র (Kumbha Chakra)
     kumbha_dirs = [
         {"en": "East (Purva)", "hi": "पूर्व दिशा", "bn": "পূর্ব দিক", "desc_en": "Auspicious: Kumbha faces East; brings wealth and prosperity.", "desc_hi": "शुभ: कुंभ पूर्वमुखी है; धन और समृद्धि प्रदाता।", "desc_bn": "শুভ: কুম্ভ পূর্বমুখী; ধন ও সমৃদ্ধি প্রদানকারী।"},
         {"en": "South (Dakshina)", "hi": "दक्षिण दिशा", "bn": "দক্ষিণ দিক", "desc_en": "Auspicious: Kumbha faces South; fulfills desires and bestows victory.", "desc_hi": "शुभ: कुंभ दक्षिणमुखी है; मनोकामना पूर्ण और विजय प्रदाता।", "desc_bn": "শুভ: কুম্ভ দক্ষিণমুখী; মনস্কামনা পূর্ণ ও বিজয় প্রদানকারী।"},
         {"en": "West (Pashchima)", "hi": "पश्चिम दिशा", "bn": "পশ্চিম দিক", "desc_en": "Auspicious: Kumbha faces West; brings peace and stability.", "desc_hi": "शुभ: कुंभ पश्चिममुखी है; शांति और स्थिरता लाता है।", "desc_bn": "শুভ: কুম্ভ পশ্চিমমুখী; শান্তি ও স্থায়িত্ব প্রদানকারী।"},
-        {"en": "North (Uttara)", "hi": "उत्तर दिशा", "bn": "উত্তর দিক", "desc_en": "Auspicious: Kumbha faces North; bestows health and knowledge.", "desc_hi": "शुभ: कुंभ उत्तरमुखी है; स्वास्थ्य और ज्ञान प्रदाता।", "desc_bn": "শুভ: কুম্ভ উত্তরমুখী; জ্ঞান ও সুস্বাস্থ্য প্রদানকারী।"}
+        {"en": "North (Uttara)", "hi": "उत्तर दिशा", "bn": "উত্তর দিক", "desc_en": "Auspicious: Kumbha faces North; bestows health and knowledge.", "desc_hi": "शुभ: कुंभ उत्तरमुखी है; स्वास्थ्य और ज्ञान प्रदाता।", "desc_bn": "শুভ: কুম্ভ উত্তরमुखी; জ্ঞান ও সুস্বাস্থ্য প্রদানকারী।"}
     ]
     niwas_shool["kumbha_chakra"] = kumbha_dirs[s_rashi_idx % 4].get(lang_key, kumbha_dirs[s_rashi_idx % 4]["en"])
     niwas_shool["kumbha_chakra_desc"] = kumbha_dirs[s_rashi_idx % 4].get(f"desc_{lang_key}", kumbha_dirs[s_rashi_idx % 4]["desc_en"])
-    # ==========================================================
 
-    # ==========================================================
-    # অন্যান্য ক্যালেন্ডারের সম্পূর্ণ তারিখ (Full Date Strings)
-    # ==========================================================
     def to_indic(num_str, lang):
         if lang == "bn": return str(num_str).translate(str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯'))
         elif lang == "hi": return str(num_str).translate(str.maketrans('0123456789', '०१२३४५६७८९'))
@@ -1811,14 +1522,9 @@ def compute_full_drik_panchang(
     t_num_str = to_indic(t_num_cur, lang_key)
     vs_year_str = to_indic(samvat_year, lang_key)
     
-    # গুজরাটি সাল (কার্তিকাদি সিস্টেম - অমাবস্যান্ত)
     guj_year = samvat_year if amanta_masa in ["Kartika", "Margashirsha", "Pausha", "Magha", "Phalguna"] else samvat_year - 1
     guj_year_str = to_indic(guj_year, lang_key)
     
-    # ==========================================================
-    # শকাব্দ ক্যালকুলেশন (Solar Indian National Calendar) 
-    # ==========================================================
-    # শকাব্দে কোনো "পক্ষ" থাকে না। এটি সম্পূর্ণ সৌর পঞ্জিকা।
     def get_shaka_date(g_date):
         import calendar
         leap = calendar.isleap(g_date.year)
@@ -1847,7 +1553,6 @@ def compute_full_drik_panchang(
     shaka_day_str = to_indic(shaka_d, lang_key)
     shaka_year_str = to_indic(shaka_y, lang_key)
     
-    # মাসের লোকাল নাম
     bn_masa = {"Chaitra": "চৈত্র", "Vaisakha": "বৈশাখ", "Jyeshtha": "জ্যৈষ্ঠ", "Ashadha": "আষাঢ়", "Shravana": "শ্রাবণ", "Bhadrapada": "ভাদ্রপদ", "Ashvina": "আশ্বিন", "Kartika": "কার্তিক", "Margashirsha": "অগ্রহায়ণ", "Pausha": "পৌষ", "Magha": "মাঘ", "Phalguna": "ফাল্গুন"}
     hi_masa = {"Chaitra": "चैत्र", "Vaisakha": "वैशाख", "Jyeshtha": "ज्येष्ठ", "Ashadha": "आषाढ़", "Shravana": "श्रावण", "Bhadrapada": "भाद्रपद", "Ashvina": "आश्विन", "Kartika": "कार्तिक", "Margashirsha": "मार्गशीर्ष", "Pausha": "पौष", "Magha": "माघ", "Phalguna": "फाल्गुन"}
 
@@ -1855,9 +1560,6 @@ def compute_full_drik_panchang(
     loc_amanta_masa = bn_masa.get(amanta_masa, amanta_masa) if lang_key == "bn" else hi_masa.get(amanta_masa, amanta_masa) if lang_key == "hi" else amanta_masa
     loc_shaka_masa = bn_masa.get(shaka_m, shaka_m) if lang_key == "bn" else hi_masa.get(shaka_m, shaka_m) if lang_key == "hi" else shaka_m
 
-    # ==========================================================
-    # ফাইনাল আউটপুট (যাতে শকাব্দ এবং গুজরাটিতে 'পক্ষ' না দেখায়)
-    # ==========================================================
     if lang_key == "bn":
         vk_full = f"{t_num_str} {loc_masa}, {paksha_display}, {vs_year_str} বিক্রম সংবৎ"
         gj_full = f"{t_num_str} {loc_amanta_masa}, {guj_year_str} গুজরাটি সংবৎ"
@@ -1872,7 +1574,6 @@ def compute_full_drik_panchang(
         sk_full = f"{shaka_day_str} {loc_shaka_masa}, {shaka_year_str} Shaka Samvat"
 
     return {
-        # রাশি ও সূর্য স্থিতি
         "moonsign": dynamic_moonsign,
         "sunsign": dynamic_sunsign,
         "surya_nakshatra": dynamic_surya_nakshatra,
@@ -1894,12 +1595,11 @@ def compute_full_drik_panchang(
         "tithi_display": TITHI_NAMES[t_idx],
         "festivals": today_festivals,
         "date_local": local_date.isoformat(),
-        "samvat_year": samvat_year,               # <- এই লাইনটি যোগ করুন
+        "samvat_year": samvat_year,               
         "vikram_samvat": samvat_year,
-        # সংবৎসর (Brihat Samhita 60 Samvatsara Drik Sync)
         "samvatsara_name": get_samvatsara((int(samvat_year) + 135) if (1800 <= int(samvat_year or 0) <= 2000) else int(samvat_year or 2051), lang=lang_key),
         "samvatsara_details": get_samvatsara_details((int(samvat_year) + 135) if (1800 <= int(samvat_year or 0) <= 2000) else int(samvat_year or 2051), lang=lang_key),
-        "mantri_mandal_title": mantri_title,       # <- এই লাইনটি যোগ করুন
+        "mantri_mandal_title": mantri_title,       
         "weekday_name": WEEKDAY_NAMES[lang_key][(weekday + 1) % 7],
         "sunrise": fmt_time(dt_rise),
         "sunset": fmt_time(dt_set),
@@ -1925,10 +1625,8 @@ def compute_full_drik_panchang(
         "shaka_samvat_full": sk_full,
         "nakshatra_pada_display": f"{NAKSHATRAS[n_idx]} (Pada {pada_timeline[0]['pada'] if pada_timeline else 1})",
         
-        # অহোরাত্র কাল বিভাজন (Day-Night Timeline)
         "day_timeline_periods": calculate_vedic_day_periods(dt_rise, dt_set, jd_to_local(jd_next_sunrise), lang=lang_key),
         
-        # অশুভ কাল ও শুভ মুহূর্ত
         "kaal_periods": {
             "rahu_kaal": {"start": fmt_time(rahu_s), "end": fmt_time(rahu_e)},
             "gulika_kaal": {"start": fmt_time(gulika_s), "end": fmt_time(gulika_e)},
@@ -1943,30 +1641,20 @@ def compute_full_drik_panchang(
             "amrit_kaal": {"start": "08:30:00", "end": "10:15:00"}
         },
 
-        # বিক্রম সংবৎ মন্ত্রিসভা ও চৌঘড়িয়া
         "mantri_mandal": compute_mantri_mandala(local_date, lat, lon, lang=lang),
         "choghadiya": compute_choghadiya(dt_rise, dt_set, weekday, lang_key=lang_key),
 
-        # নতুন অ্যাডভান্সড ফিচার সেকশনসমূহ
         "niwas_and_shool": niwas_shool,
         "special_yogas": special_yogas,
         "chandra_tarabalam": chandra_tarabalam,
         "epochs_and_calendars": epochs
     }
 
-    # ==============================================================================
-# বৈদিক সংবৎ এবং বাংলা সৌর পঞ্জিকা (বঙ্গাব্দ) মাসিক ক্যালেন্ডার জেনারেটর
+# ==============================================================================
+# বৈদিক সংবৎ এবং বাংলা সৌর পঞ্জিকা মাসিক ক্যালেন্ডার জেনারেটর (🚀 CACHED!)
 # ==============================================================================
 
-BENGALI_SOLAR_MONTHS = ["বৈশাখ", "জ্যৈষ্ঠ", "আষাঢ়", "শ্রাবণ", "ভাদ্র", "আশ্বিন", "কার্তিক", "অগ্রহায়ণ", "পৌষ", "মাঘ", "ফাল্গুন", "চৈত্র"]
-BENGALI_DIGITS = str.maketrans("0123456789", "০১২৩৪৫৬৭৮৯")
-
-def to_bengali_num(n: int | str) -> str:
-    return str(n).translate(BENGALI_DIGITS)
-
-# ==============================================================================
-# বৈদিক সংবৎ এবং বাংলা সৌর পঞ্জিকা মাসিক ক্যালেন্ডার জেনারেটর
-# ==============================================================================
+@lru_cache(maxsize=128)
 def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", lat: float = 22.5726, lon: float = 88.3639, lang: str = "bn"):
     import calendar
     import re
@@ -2005,7 +1693,6 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
         next_t_num = tithi_array[i+1]
         expected_next = (t_num % 15) + 1
         
-        # 🚀 ক্ষয় তিথি লজিক:
         if next_t_num != expected_next and next_t_num != t_num:
             t_str = f"{t_num}, {expected_next}"
         else:
@@ -2053,7 +1740,6 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
         elif cal_type == "shaka": full_str = day_panchang.get("shaka_samvat_full", "")
         else: full_str = ""
 
-        # 🚀 পপআপ হেডারের জন্য ডেটা আপডেট (যাতে 5, 6 থাকে)
         if (cal_type == "vikram" or cal_type == "gujarati") and full_str:
             full_str = re.sub(r'^[\d০-৯०-९]+', date_str, full_str)
 
@@ -2062,11 +1748,11 @@ def get_monthly_calendar_grid(year: int, month: int, cal_type: str = "bengali", 
             "gregorian_day": d,
             "gregorian_month_name": dt.strftime("%b"),
             "weekday_index": dt.weekday(),
-            "main_era_date": main_date,        # 🚀 FIX: ক্র্যাশের আসল কারণ! এখানে main_era_date এর বদলে main_date হবে
+            "main_era_date": main_date,
             "main_era_date_str": date_str,
             "displayEraDate": date_str,
-            "lunar_day_str": date_str,         # 🚀 আপনার 5, 6 ডেটা এখানে বসবে
-            "full_date_string": full_str,      # 🚀 এখানে "5, 6 Bhadrapada..." বসবে
+            "lunar_day_str": date_str,
+            "full_date_string": full_str,
             "tithi_name": day_panchang.get("tithi_display", ""),
             "tithi_end": day_panchang.get("tithi_end", ""),
             "nakshatra_name": day_panchang.get("nakshatra_name", ""),
