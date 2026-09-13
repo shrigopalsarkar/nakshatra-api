@@ -1295,10 +1295,10 @@ def compute_full_drik_panchang(
             p_title = main_title
 
         non_hindu_kws = [
-            "jayanti", "gandhi", "bose", "netaji", "bhagat", "eid", "al-fitr", "al-adha", 
+            "gandhi", "bose", "netaji", "bhagat", "eid", "al-fitr", "al-adha", 
             "muharram", "christmas", "good friday", "republic", "independence", "international", 
-            "national", "day", "জয়ন্তী", "গান্ধী", "নেতাজি", "বোস", "ভগত", "ঈদ", "রমজান", 
-            "মহরম", "খ্রিস্টমাস", "গুড ফ্রাইডে", "জাতীয়", "দিবস", "আন্তর্জাতিক", "जयंती", 
+            "national", "day", "গান্ধী", "নেতাজি", "বোস", "ভগত", "ঈদ", "রমজান", 
+            "মহরম", "খ্রিস্টমাস", "গুড ফ্রাইডে", "জাতীয়", "দিবস", "আন্তর্জাতিক", 
             "गांधी", "बोस", "भगत", "ईद", "मुहर्रम", "क्रिसमस", "राष्ट्रीय", "दिवस", "अंतर्राष्ट्रीय"
         ]
         is_non_hindu = any(kw in fest_name.lower() for kw in non_hindu_kws)
