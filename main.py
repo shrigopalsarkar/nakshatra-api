@@ -182,7 +182,7 @@ async def generate_chat_response(request: BackendChatRequest):
         import json
 
         # 🚀 FIX 2: গুগলের ফ্রি টিয়ারের সবচেয়ে স্ট্যাবল (Stable) লেটেস্ট মডেল অ্যালিয়াস বসানো হলো
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
         
         payload = {"contents": cleaned_contents}
         if sys_prompt:
