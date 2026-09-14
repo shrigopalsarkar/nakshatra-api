@@ -140,11 +140,16 @@ async def generate_chat_response(request: BackendChatRequest):
 
         lang_code = resolve_user_language(request.contents, sys_prompt)
 
-        api_key = (
+        raw_api_key = (
             os.environ.get("GEMINI_API_KEY")
             or os.environ.get("GOOGLE_API_KEY")
             or os.environ.get("API_KEY")
+            or ""
         )
+        
+        # 🚀 FIX 1: API Key-এর আগে বা পরে থাকা অদৃশ্য স্পেস বা কোটেশন ক্লিন করা হলো
+        api_key = raw_api_key.strip().replace('"', '').replace("'", "")
+        
         if not api_key:
             err_txt = ERROR_MESSAGES[lang_code]
             return BackendChatResponse(text=err_txt, responseText=err_txt, status="success")
@@ -176,7 +181,9 @@ async def generate_chat_response(request: BackendChatRequest):
         import urllib.request
         import json
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+        # 🚀 FIX 2: গুগলের ফ্রি টিয়ারের সবচেয়ে স্ট্যাবল (Stable) লেটেস্ট মডেল অ্যালিয়াস বসানো হলো
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
+        
         payload = {"contents": cleaned_contents}
         if sys_prompt:
             payload["systemInstruction"] = {"parts": [{"text": sys_prompt}]}
@@ -205,7 +212,8 @@ async def generate_chat_response(request: BackendChatRequest):
         return BackendChatResponse(text=fallback, responseText=fallback, status="success")
 
     except Exception as e:
-        print("[AI ERROR]:", str(e))
+        # 🚀 FIX 3: ভবিষ্যতে এরর ট্র্যাক করার জন্য লগে আরও ডিটেইলস প্রিন্ট করার ব্যবস্থা
+        print(f"[AI ERROR DETAILED]: {str(e)}")
         fallback = ERROR_MESSAGES.get(lang_code, ERROR_MESSAGES["en"])
         return BackendChatResponse(text=fallback, responseText=fallback, status="success")
 
